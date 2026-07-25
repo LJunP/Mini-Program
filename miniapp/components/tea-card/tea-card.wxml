@@ -1,0 +1,35 @@
+<!-- components/tea-card/tea-card.wxml -->
+<view class="tea-card" bindtap="onTap">
+  <!-- 封面 -->
+  <view class="tea-card__cover" style="background:{{coverGradient}};">
+    <image wx:if="{{tea.coverImage}}" src="{{tea.coverImage}}" mode="aspectFill" lazy-load="{{true}}" class="tea-card__img" />
+    <view wx:else class="tea-card__cover-text">{{tea.name}}</view>
+    <!-- 已收藏标记 -->
+    <view wx:if="{{isCollected}}" class="tea-card__collected-badge">
+      <text>♥</text>
+    </view>
+  </view>
+
+  <!-- 内容 -->
+  <view class="tea-card__body">
+    <view class="tea-card__header">
+      <text class="tea-card__name ellipsis">{{tea.name}}</text>
+      <domain-tag domain="tea" size="small" />
+    </view>
+
+    <view class="tea-card__meta">
+      <text class="tea-card__origin ellipsis">{{tea.origin}}</text>
+      <text class="tea-card__grade" wx:if="{{tea.grade}}">{{tea.grade}}</text>
+    </view>
+
+    <view class="tea-card__rating">
+      <text class="tea-card__score">{{tea.ratingAvg}}</text>
+      <text class="tea-card__rating-count">({{tea.ratingCount}}人评分)</text>
+      <text wx:if="{{isCollected}}" class="tea-card__collected-text">已收藏</text>
+    </view>
+
+    <view class="tea-card__tags" wx:if="{{tea.styleTags && tea.styleTags.length}}">
+      <text wx:for="{{tea.styleTags}}" wx:key="*this" class="tag">{{item}}</text>
+    </view>
+  </view>
+</view>

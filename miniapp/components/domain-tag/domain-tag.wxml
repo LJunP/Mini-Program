@@ -1,0 +1,4 @@
+<!-- components/domain-tag/domain-tag.wxml -->
+<view class="domain-tag domain-tag--{{size}}" style="color:{{color}};background-color:{{bgColor}};">
+  {{text}}
+</view>

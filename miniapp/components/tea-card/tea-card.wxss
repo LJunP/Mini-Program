@@ -1,0 +1,106 @@
+/* components/tea-card/tea-card.wxss */
+.tea-card {
+  display: flex;
+  background-color: #FFFFFFFC;
+  border: 0.5px solid #EAE5DC;
+  border-radius: 12px;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+  box-sizing: border-box;
+}
+
+.tea-card__cover {
+  width: 180rpx;
+  height: 180rpx;
+  border-radius: 8px;
+  margin-right: 24rpx;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+.tea-card__img {
+  width: 100%;
+  height: 100%;
+}
+.tea-card__cover-text {
+  font-size: 32rpx;
+  color: #FFFFFF;
+  font-weight: 500;
+  letter-spacing: 4rpx;
+}
+.tea-card__collected-badge {
+  position: absolute;
+  top: 8rpx;
+  right: 8rpx;
+  width: 32rpx;
+  height: 32rpx;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tea-card__collected-badge text {
+  font-size: 20rpx;
+  color: #E84D4D;
+}
+
+.tea-card__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.tea-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.tea-card__name {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #2C2C2A;
+  flex: 1;
+  margin-right: 12rpx;
+}
+.tea-card__meta {
+  display: flex;
+  align-items: center;
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #8B8578;
+}
+.tea-card__origin {
+  flex: 1;
+  margin-right: 12rpx;
+}
+.tea-card__grade {
+  color: #854F0B;
+}
+.tea-card__rating {
+  margin-top: 8rpx;
+  display: flex;
+  align-items: baseline;
+}
+.tea-card__score {
+  font-size: 28rpx;
+  color: #3B6D11;
+  font-weight: 500;
+  margin-right: 8rpx;
+}
+.tea-card__rating-count {
+  font-size: 22rpx;
+  color: #B5B0A6;
+}
+.tea-card__collected-text {
+  font-size: 22rpx;
+  color: #E84D4D;
+  margin-left: 12rpx;
+}
+.tea-card__tags {
+  margin-top: 12rpx;
+}

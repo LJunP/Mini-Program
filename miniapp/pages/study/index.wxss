@@ -1,0 +1,328 @@
+/* pages/study/index.wxss */
+.mock-notice {
+  margin: 16rpx 0 0;
+  padding: 12rpx 24rpx;
+  background: rgba(243, 203, 71, 0.12);
+  border-radius: 8rpx;
+  text-align: center;
+}
+.mock-notice__text {
+  font-size: 22rpx;
+  color: #b8860b;
+}
+
+.study-hero {
+  margin: 16rpx 0 24rpx;
+  padding: 36rpx 28rpx;
+  background: linear-gradient(135deg, #2C2C2A 0%, #4A6B7C 100%);
+  border-radius: 16px;
+  color: #FFFFFF;
+}
+.study-hero__kicker {
+  font-size: 22rpx;
+  opacity: 0.72;
+  letter-spacing: 4rpx;
+}
+.study-hero__title {
+  font-size: 40rpx;
+  font-weight: 600;
+  margin-top: 12rpx;
+}
+.study-hero__desc {
+  font-size: 26rpx;
+  line-height: 1.7;
+  opacity: 0.86;
+  margin-top: 16rpx;
+}
+.study-stats {
+  display: flex;
+  gap: 16rpx;
+  margin-bottom: 28rpx;
+}
+.study-stats__item {
+  flex: 1;
+  background-color: #FFFFFFFC;
+  border: 0.5px solid #EAE5DC;
+  border-radius: 12px;
+  padding: 24rpx 12rpx;
+  text-align: center;
+}
+.study-stats__value {
+  display: block;
+  font-size: 40rpx;
+  font-weight: 600;
+  color: #2C2C2A;
+}
+.study-stats__label {
+  display: block;
+  font-size: 22rpx;
+  color: #8B8578;
+  margin-top: 6rpx;
+}
+.study-module {
+  display: flex;
+  align-items: center;
+  background-color: #FFFFFFFC;
+  border: 0.5px solid #EAE5DC;
+  border-radius: 12px;
+  padding: 24rpx;
+  margin-bottom: 16rpx;
+}
+.study-module__mark {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 12px;
+  color: #FFFFFF;
+  font-size: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.study-module__body {
+  flex: 1;
+  min-width: 0;
+  margin-left: 24rpx;
+}
+.study-module__title {
+  display: block;
+  font-size: 32rpx;
+  color: #2C2C2A;
+  font-weight: 500;
+}
+.study-module__subtitle {
+  display: block;
+  font-size: 24rpx;
+  color: #8B8578;
+  margin-top: 8rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.study-module__count {
+  min-width: 44rpx;
+  height: 44rpx;
+  line-height: 44rpx;
+  text-align: center;
+  background-color: #F4F0E8;
+  border-radius: 999rpx;
+  color: #8B8578;
+  font-size: 22rpx;
+  margin-left: 16rpx;
+}
+.study-module__arrow {
+  color: #B5B0A6;
+  font-size: 44rpx;
+  margin-left: 16rpx;
+}
+/* 推荐学习路径 */
+.tech-stacks {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  margin-bottom: 24rpx;
+}
+.tech-stack {
+  display: flex;
+  align-items: center;
+  background-color: #FFFFFFFC;
+  border: 0.5px solid #EAE5DC;
+  border-radius: 12px;
+  padding: 24rpx;
+}
+.tech-stack__icon {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 8px;
+  color: #FFFFFF;
+  font-size: 24rpx;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.tech-stack__info {
+  flex: 1;
+  min-width: 0;
+  margin-left: 24rpx;
+}
+.tech-stack__name {
+  display: block;
+  font-size: 28rpx;
+  color: #2C2C2A;
+  font-weight: 500;
+}
+.tech-stack__desc {
+  display: block;
+  font-size: 22rpx;
+  color: #8B8578;
+  margin-top: 8rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tech-stack__arrow {
+  color: #B5B0A6;
+  font-size: 40rpx;
+  margin-left: 16rpx;
+}
+
+.review-card {
+  background-color: #FFFFFFFC;
+  border: 0.5px solid #EAE5DC;
+  border-radius: 12px;
+  padding: 28rpx;
+  margin-bottom: 24rpx;
+}
+.review-card__title {
+  font-size: 32rpx;
+  color: #2C2C2A;
+  font-weight: 500;
+}
+.review-card__summary {
+  font-size: 26rpx;
+  color: #5A554C;
+  line-height: 1.7;
+  margin-top: 12rpx;
+}
+.review-card__action {
+  display: inline-block;
+  margin-top: 20rpx;
+  padding: 8rpx 20rpx;
+  background-color: #EAE5DC;
+  border-radius: 999rpx;
+  color: #8B8578;
+  font-size: 22rpx;
+}
+
+/* 每日一题 */
+.daily-question-card {
+  background-color: #FFFFFFFC;
+  border: 0.5px solid #EAE5DC;
+  border-radius: 12px;
+  padding: 28rpx;
+  margin-bottom: 24rpx;
+  position: relative;
+  overflow: hidden;
+}
+.daily-question-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 6rpx;
+  height: 100%;
+  background-color: #854F0B;
+}
+.daily-question-card__header {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 16rpx;
+}
+.daily-question-card__badge {
+  display: inline-block;
+  padding: 4rpx 16rpx;
+  background-color: rgba(133, 79, 11, 0.1);
+  color: #854F0B;
+  font-size: 22rpx;
+  border-radius: 4rpx;
+  font-weight: 500;
+}
+.daily-question-card__streak {
+  display: flex;
+  align-items: baseline;
+  gap: 4rpx;
+}
+.daily-question-card__streak-num {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #854F0B;
+}
+.daily-question-card__streak-label {
+  font-size: 20rpx;
+  color: #8B8578;
+}
+.daily-question-card__viewed {
+  margin-left: auto;
+  padding: 4rpx 12rpx;
+  background-color: #EAE5DC;
+  border-radius: 4rpx;
+}
+.daily-question-card__viewed text {
+  font-size: 20rpx;
+  color: #8B8578;
+}
+.daily-question-card__title {
+  display: block;
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #2C2C2A;
+  line-height: 1.5;
+  margin-bottom: 12rpx;
+}
+.daily-question-card__question {
+  display: block;
+  font-size: 26rpx;
+  color: #5A554C;
+  line-height: 1.7;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+.daily-question-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 20rpx;
+  padding-top: 16rpx;
+  border-top: 0.5px solid #EAE5DC;
+}
+.daily-question-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  font-size: 22rpx;
+  color: #8B8578;
+}
+.daily-question-card__dot {
+  color: #D4CFC4;
+}
+.daily-question-card__go {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+  color: #854F0B;
+  font-size: 24rpx;
+  font-weight: 500;
+}
+.daily-question-card__arrow {
+  font-size: 32rpx;
+}
+
+/* 明日预告 */
+.tomorrow-preview {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 20rpx 24rpx;
+  background-color: rgba(133, 79, 11, 0.04);
+  border-radius: 12px;
+  margin-bottom: 24rpx;
+}
+.tomorrow-preview__label {
+  font-size: 22rpx;
+  color: #B5B0A6;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.tomorrow-preview__title {
+  font-size: 24rpx;
+  color: #8B8578;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

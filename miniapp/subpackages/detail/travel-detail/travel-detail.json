@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "行旅详情",
+  "usingComponents": {
+    "domain-tag": "/components/domain-tag/domain-tag"
+  }
+}

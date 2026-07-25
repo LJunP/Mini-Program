@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "茶品对比",
+  "usingComponents": {
+    "radar-chart": "/components/radar-chart/radar-chart"
+  }
+}

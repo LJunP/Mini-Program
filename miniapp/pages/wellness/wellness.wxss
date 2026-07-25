@@ -1,0 +1,86 @@
+/* pages/wellness/wellness.wxss */
+.page-header {
+  padding: 32rpx 16rpx 24rpx;
+}
+.page-header__title {
+  font-size: 44rpx;
+  font-weight: 500;
+  color: #2C2C2A;
+  letter-spacing: 8rpx;
+}
+.page-header__sub {
+  display: block;
+  font-size: 24rpx;
+  color: #8B8578;
+  margin-top: 8rpx;
+  letter-spacing: 4rpx;
+}
+
+/* 横向 tab */
+.tabs-scroll {
+  border-bottom: 0.5px solid #EAE5DC;
+}
+.tabs {
+  display: flex;
+  padding: 16rpx 16rpx 24rpx;
+  gap: 12rpx;
+}
+.tabs__item {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  padding: 10rpx 20rpx;
+  border-radius: 24rpx;
+  background-color: #FFFFFF;
+  font-size: 24rpx;
+  color: #8B8578;
+}
+.tabs__item-icon {
+  font-size: 24rpx;
+}
+.tabs__item--active {
+  background-color: #A0522D;
+  color: #FFFFFF;
+  font-weight: 500;
+}
+.tabs__item--active::after {
+  display: none;
+}
+
+.wellness-list {
+  padding: 16rpx 32rpx;
+}
+
+/* 养生元数据栏 */
+.wellness-item {
+  margin-bottom: 24rpx;
+}
+.wellness-meta {
+  padding: 12rpx 24rpx 16rpx;
+  background-color: #FFFFFFFC;
+  border: 0.5px solid #EAE5DC;
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  margin-top: -12rpx;
+}
+.wellness-meta__tags {
+  display: flex;
+  gap: 8rpx;
+  margin-bottom: 8rpx;
+}
+.meta-tag {
+  font-size: 20rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+}
+.meta-tag--difficulty-1 { background-color: #E8F5E9; color: #2E7D32; }
+.meta-tag--difficulty-2 { background-color: #E3F2FD; color: #1565C0; }
+.meta-tag--difficulty-3 { background-color: #FFF3E0; color: #E65100; }
+.meta-tag--difficulty-4 { background-color: #FCE4EC; color: #C62828; }
+.meta-tag--duration { background-color: #F3EFE6; color: #5A554C; }
+.wellness-meta__caution {
+  font-size: 20rpx;
+  color: #B5B0A6;
+  line-height: 1.5;
+}

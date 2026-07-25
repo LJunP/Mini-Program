@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "行旅",
+  "enablePullDownRefresh": true,
+  "onReachBottomDistance": 100,
+  "usingComponents": {
+    "domain-tag": "/components/domain-tag/domain-tag",
+    "empty-state": "/components/empty-state/empty-state"
+  }
+}

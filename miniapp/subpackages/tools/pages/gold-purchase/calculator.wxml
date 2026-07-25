@@ -1,0 +1,192 @@
+<!-- subpackages/tools/pages/gold-purchase/calculator.wxml -->
+<view class="calc-page">
+  <view class="header-card">
+    <view class="header-card__title">收币采购成本估算</view>
+    <view class="header-card__sub">精打细算 · 回血为王 · 收币→寄售→购买礼包 · 反推真实人民币花费</view>
+    <view class="header-card__price">
+      <text class="header-card__price-num">{{targetToken}}</text>
+      <text class="header-card__price-unit">目标代币券</text>
+    </view>
+    <view class="header-card__round">{{packagePrice}} × {{packageCount}}套</view>
+  </view>
+
+  <!-- 购买目标 -->
+  <view class="section">
+    <view class="section__header">
+      <text class="section__title">购买目标</text>
+    </view>
+    <view class="section__body">
+      <view class="field">
+        <view class="field__label">礼包单价</view>
+        <view class="field__input-wrap">
+          <input class="field__input" type="number" value="{{packagePrice}}" bindinput="onPackagePriceChange" placeholder="0" />
+          <text class="field__unit">点券/套</text>
+        </view>
+      </view>
+      <view class="field">
+        <view class="field__label">购买数量</view>
+        <view class="field__input-wrap">
+          <input class="field__input" type="number" value="{{packageCount}}" bindinput="onPackageCountChange" placeholder="0" />
+          <text class="field__unit">套</text>
+        </view>
+        <view class="field__hint">目标代币券 = {{packagePrice}} × {{packageCount}} = {{targetToken}} 代币券</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 寄售参数 -->
+  <view class="section">
+    <view class="section__header">
+      <text class="section__title">金币寄售参数</text>
+    </view>
+    <view class="section__body">
+      <view class="field field--row">
+        <view class="field__label">拥有拍卖行优惠券</view>
+        <switch checked="{{hasAuctionCoupon}}" bindchange="onAuctionCouponToggle" color="#1a1a2e" />
+      </view>
+      <view class="field__hint field__hint--warn">无券：金币寄售实收95%（手续费5%）；有券：实收99%（手续费1%）。</view>
+      <view class="consign-tiers">
+        <view class="consign-tier" wx:for="{{consignmentTiers}}" wx:key="name" data-index="{{index}}">
+          <text class="consign-tier__name">{{item.name}}（{{item.amountWan}}万）</text>
+          <view class="consign-tier__input">
+            <input class="field__input field__input--small" type="digit" value="{{item.token}}" data-index="{{index}}" bindinput="onConsignmentTierTokenChange" placeholder="0" />
+            <text class="field__unit">代币券/档</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 收币方式 -->
+  <view class="section">
+    <view class="section__header">
+      <text class="section__title">收币方式</text>
+    </view>
+    <view class="section__body">
+      <view class="field__hint field__hint--warn">手续费一律由买家承担。面对面交易3%不受拍卖行优惠券影响；拍卖行上架无券5%、有券3%。</view>
+      <view class="mode-tabs">
+        <view class="mode-tab {{acquisitionMethod === 'faceToFace' ? 'mode-tab--active' : ''}}" data-method="faceToFace" bindtap="onAcquisitionMethodChange">
+          <text class="mode-tab__name">面对面交易</text>
+          <text class="mode-tab__desc">到手97%（3%手续费）</text>
+        </view>
+        <view class="mode-tab {{acquisitionMethod === 'auction' ? 'mode-tab--active' : ''}}" data-method="auction" bindtap="onAcquisitionMethodChange">
+          <text class="mode-tab__name">拍卖行上架</text>
+          <text class="mode-tab__desc">{{hasAuctionCoupon ? '到手97%（3%）' : '到手95%（5%）'}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 采购参数 -->
+  <view class="section">
+    <view class="section__header">
+      <text class="section__title">采购参数</text>
+    </view>
+    <view class="section__body">
+      <view class="field">
+        <view class="field__label">仓库已有金币</view>
+        <view class="field__input-wrap">
+          <input class="field__input" type="digit" value="{{ownGold}}" bindinput="onOwnGoldChange" placeholder="0" />
+          <text class="field__unit">万金币</text>
+        </view>
+      </view>
+      <view class="field">
+        <view class="field__label">卖家售价比例</view>
+        <view class="field__input-wrap">
+          <input class="field__input" type="digit" value="{{sellerRatioWan}}" bindinput="onSellerRatioChange" placeholder="例如：50" />
+          <text class="field__unit">万金币/元</text>
+        </view>
+        <view class="field__hint">填写50表示1元 = 50万金币。</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="action-bar">
+    <button class="btn btn--primary" bindtap="calculate">计算成本</button>
+    <button class="btn btn--secondary" bindtap="resetCalc">重置</button>
+  </view>
+
+  <!-- 结果 -->
+  <block wx:if="{{showResult && result}}">
+    <view class="result-section">
+      <view class="result-card result-card--main">
+        <view class="result-card__title">采购成本估算结果</view>
+        <view class="result-grid">
+          <view class="result-grid__item"><text class="result-grid__label">目标代币券</text><text class="result-grid__value">{{result.targetToken}}</text><text class="result-grid__unit">代币券</text></view>
+          <view class="result-grid__item result-grid__item--highlight"><text class="result-grid__label">人民币花费</text><text class="result-grid__value">{{result.rmbCost}}</text><text class="result-grid__unit">元</text></view>
+          <view class="result-grid__item"><text class="result-grid__label">需购金币总量</text><text class="result-grid__value">{{result.goldToBuy}}</text><text class="result-grid__unit">万金币</text></view>
+          <view class="result-grid__item"><text class="result-grid__label">需寄售金币</text><text class="result-grid__value">{{result.goldToConsign}}</text><text class="result-grid__unit">万金币</text></view>
+        </view>
+      </view>
+
+      <!-- 详细流水 -->
+      <view class="result-card">
+        <view class="result-card__title">采购流水</view>
+        <view class="flow-step flow-step--total"><text class="flow-step__label">目标代币券</text><text class="flow-step__value">{{result.targetToken}} 代币券</text></view>
+        <view class="flow-step"><text class="flow-step__label">需寄售金币（毛）</text><text class="flow-step__value">{{result.goldToConsign}} 万金币</text></view>
+        <view class="flow-step"><text class="flow-step__label">寄售实收率（{{result.consignmentRate}}%）</text><text class="flow-step__value flow-step__value--negative">-{{result.consignmentFee}} 代币券</text></view>
+        <view class="flow-step flow-step--total"><text class="flow-step__label">实得代币券</text><text class="flow-step__value flow-step__value--positive">{{result.actualToken}} 代币券</text></view>
+        <view class="flow-step"><text class="flow-step__label">仓库已有金币</text><text class="flow-step__value">{{result.ownGold}} 万金币</text></view>
+        <view class="flow-step flow-step--total"><text class="flow-step__label">需采购金币（净）</text><text class="flow-step__value">{{result.goldToAcquire}} 万金币</text></view>
+        <view class="flow-step"><text class="flow-step__label">{{result.acquisitionMethodName}}手续费（{{result.acquireFeeRate}}%）</text><text class="flow-step__value flow-step__value--negative">-{{result.acquisitionFee}} 万金币</text></view>
+        <view class="flow-step flow-step--total"><text class="flow-step__label">需购买金币总量</text><text class="flow-step__value">{{result.goldToBuy}} 万金币</text></view>
+        <view class="flow-step"><text class="flow-step__label">卖家售价（1元 = {{result.sellerRatioWan}}万金币）</text><text class="flow-step__value"></text></view>
+        <view class="flow-step flow-step--total"><text class="flow-step__label">人民币花费</text><text class="flow-step__value flow-step__value--positive">{{result.rmbCost}} 元</text></view>
+      </view>
+
+      <!-- 寄售档位明细 -->
+      <view class="result-card" wx:if="{{result.consignmentBreakdown.length > 0}}">
+        <view class="result-card__title">寄售档位明细</view>
+        <view class="breakdown-table">
+          <view class="breakdown-row breakdown-row--header">
+            <text class="breakdown-cell">档位</text>
+            <text class="breakdown-cell">数量</text>
+            <text class="breakdown-cell">代币/档</text>
+            <text class="breakdown-cell">手续费</text>
+            <text class="breakdown-cell">实得</text>
+          </view>
+          <view class="breakdown-row" wx:for="{{result.consignmentBreakdown}}" wx:key="tierName">
+            <text class="breakdown-cell">{{item.tierName}}</text>
+            <text class="breakdown-cell">×{{item.count}}</text>
+            <text class="breakdown-cell">{{item.tokenPerUnit}}</text>
+            <text class="breakdown-cell breakdown-cell--neg">{{item.fee}}</text>
+            <text class="breakdown-cell breakdown-cell--pos">{{item.netToken}}</text>
+          </view>
+        </view>
+        <view class="field__hint" wx:if="{{result.remainingGoldWan > 0}}">剩余不足100万档位金币：{{result.remainingGoldWan}} 万（无法寄售）</view>
+      </view>
+    </view>
+  </block>
+
+  <!-- 分享操作栏 -->
+  <view class="share-bar" wx:if="{{showResult && result}}">
+    <button class="share-btn share-btn--poster" bindtap="onShareResult">
+      <text>生成分享海报</text>
+    </button>
+    <button class="share-btn share-btn--copy" bindtap="onCopyResult">
+      <text>复制结果</text>
+    </button>
+  </view>
+
+  <!-- 隐藏的海报 Canvas -->
+  <canvas type="2d" id="posterCanvas" class="poster-canvas"></canvas>
+
+  <view class="footer-note">
+    <text>※ 手续费一律由买家承担。</text>
+    <text>※ 面对面交易3%不受拍卖行优惠券影响；拍卖行上架无券5%、有券3%。</text>
+    <text>※ 金币寄售无券实收95%、有券实收99%。</text>
+    <text>※ 结果仅供参考，实际以游戏内为准。</text>
+  </view>
+
+  <!-- 探索妙不可园 -->
+  <view class="explore-card" bindtap="goHome">
+    <view class="explore-card__icon">
+      <text class="explore-card__char">园</text>
+    </view>
+    <view class="explore-card__body">
+      <text class="explore-card__title">妙不可园</text>
+      <text class="explore-card__desc">偷得浮生半日闲，来品一杯茶，焚一炉香</text>
+    </view>
+    <text class="explore-card__arrow">›</text>
+  </view>
+</view>

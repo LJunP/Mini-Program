@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "妙不可园",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "content-card": "/components/content-card/content-card",
+    "tea-card": "/components/tea-card/tea-card",
+    "domain-tag": "/components/domain-tag/domain-tag",
+    "retry-bar": "/components/retry-bar/retry-bar"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "茶品详情",
+  "usingComponents": {
+    "radar-chart": "/components/radar-chart/radar-chart",
+    "domain-tag": "/components/domain-tag/domain-tag",
+    "review-modal": "/components/review-modal/review-modal"
+  }
+}

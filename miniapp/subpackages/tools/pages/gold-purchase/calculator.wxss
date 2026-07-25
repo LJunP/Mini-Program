@@ -1,0 +1,532 @@
+/* subpackages/tools/pages/gold-purchase/calculator.wxss */
+/* 收币采购成本估算器样式 */
+
+/* ============ 页面容器 ============ */
+.calc-page {
+  min-height: 100vh;
+  background-color: #f5f3ee;
+  padding: 24rpx 24rpx 80rpx;
+  box-sizing: border-box;
+}
+
+/* ============ 顶部信息卡 ============ */
+.header-card {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  border-radius: 24rpx;
+  padding: 40rpx 32rpx;
+  margin-bottom: 24rpx;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8rpx 32rpx rgba(26, 26, 46, 0.3);
+}
+.header-card::after {
+  content: '';
+  position: absolute;
+  top: -60rpx;
+  right: -40rpx;
+  width: 240rpx;
+  height: 240rpx;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.06) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.header-card__title {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 2rpx;
+  position: relative;
+  z-index: 1;
+}
+.header-card__sub {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.55);
+  margin-top: 8rpx;
+  letter-spacing: 1rpx;
+  position: relative;
+  z-index: 1;
+}
+.header-card__price {
+  display: flex;
+  align-items: baseline;
+  margin-top: 28rpx;
+  position: relative;
+  z-index: 1;
+}
+.header-card__price-num {
+  font-size: 52rpx;
+  font-weight: 700;
+  color: #ffc857;
+  line-height: 1;
+}
+.header-card__price-unit {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.6);
+  margin-left: 12rpx;
+}
+.header-card__round {
+  position: absolute;
+  top: 40rpx;
+  right: 32rpx;
+  background: rgba(255, 200, 87, 0.15);
+  border: 1rpx solid rgba(255, 200, 87, 0.3);
+  border-radius: 999rpx;
+  padding: 8rpx 24rpx;
+  font-size: 22rpx;
+  color: #ffc857;
+  z-index: 1;
+}
+
+/* ============ 通用 Section ============ */
+.section {
+  background: #fff;
+  border-radius: 20rpx;
+  margin-bottom: 20rpx;
+  overflow: hidden;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+.section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28rpx 28rpx;
+}
+.section__title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1a1a2e;
+  letter-spacing: 1rpx;
+}
+.section__body {
+  padding: 0 28rpx 28rpx;
+}
+
+/* ============ 表单字段 ============ */
+.field {
+  margin-bottom: 24rpx;
+}
+.field:last-child {
+  margin-bottom: 0;
+}
+.field--row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.field__label {
+  font-size: 28rpx;
+  color: #3a3a4a;
+  font-weight: 500;
+  margin-bottom: 12rpx;
+}
+.field--row .field__label {
+  margin-bottom: 0;
+}
+.field__input-wrap {
+  display: flex;
+  align-items: center;
+  background: #f5f3ee;
+  border-radius: 14rpx;
+  padding: 0 20rpx;
+  height: 80rpx;
+  border: 2rpx solid transparent;
+  transition: border-color 0.2s;
+}
+.field__input-wrap:focus-within {
+  border-color: #1a1a2e;
+}
+.field__input {
+  flex: 1;
+  font-size: 30rpx;
+  color: #1a1a2e;
+  font-weight: 500;
+  min-width: 0;
+}
+.field__unit {
+  font-size: 24rpx;
+  color: #9a9aaa;
+  margin-left: 12rpx;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.field__hint {
+  font-size: 22rpx;
+  color: #9a9aaa;
+  margin-top: 8rpx;
+  line-height: 1.5;
+}
+.field__hint--warn {
+  color: #b8860b;
+  background: rgba(184, 134, 11, 0.06);
+  padding: 10rpx 16rpx;
+  border-radius: 8rpx;
+  margin-top: 12rpx;
+}
+
+/* ============ 模式切换 Tab ============ */
+.mode-tabs {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 16rpx;
+}
+.mode-tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20rpx 12rpx;
+  border-radius: 14rpx;
+  background: #f5f3ee;
+  border: 2rpx solid transparent;
+  transition: all 0.2s;
+}
+.mode-tab--active {
+  background: #1a1a2e;
+  border-color: #1a1a2e;
+}
+.mode-tab__name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #6a6a7a;
+}
+.mode-tab--active .mode-tab__name {
+  color: #ffc857;
+}
+.mode-tab__desc {
+  font-size: 20rpx;
+  color: #9a9aaa;
+  margin-top: 6rpx;
+}
+.mode-tab--active .mode-tab__desc {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ============ 寄售档位输入 ============ */
+.consign-tiers {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  margin-top: 16rpx;
+}
+.consign-tier {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+.consign-tier__name {
+  font-size: 26rpx;
+  color: #3a3a4a;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+.consign-tier__input {
+  display: flex;
+  align-items: center;
+  background: #f5f3ee;
+  border-radius: 14rpx;
+  padding: 0 20rpx;
+  height: 72rpx;
+  min-width: 240rpx;
+  flex: 1;
+}
+
+/* ============ 操作按钮 ============ */
+.action-bar {
+  display: flex;
+  gap: 20rpx;
+  margin: 32rpx 0;
+}
+.btn {
+  flex: 1;
+  height: 92rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: 16rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  text-align: center;
+  border: none;
+  letter-spacing: 2rpx;
+  box-sizing: border-box;
+}
+.btn::after {
+  border: none;
+}
+.btn--primary {
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  color: #ffc857;
+  box-shadow: 0 6rpx 20rpx rgba(26, 26, 46, 0.3);
+}
+.btn--primary:active {
+  transform: scale(0.98);
+}
+.btn--secondary {
+  background: #fff;
+  color: #6a6a7a;
+  border: 2rpx solid #e0ddd5;
+}
+.btn--secondary:active {
+  background: #f5f3ee;
+}
+
+/* ============ 计算结果 ============ */
+.result-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+  margin-top: 8rpx;
+}
+.result-card {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 28rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+.result-card--main {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  padding: 36rpx 28rpx;
+}
+.result-card__title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #3a3a4a;
+  margin-bottom: 24rpx;
+  padding-left: 16rpx;
+  border-left: 6rpx solid #1a1a2e;
+}
+.result-card--main .result-card__title {
+  color: #ffc857;
+  border-left-color: #ffc857;
+}
+
+/* 核心数据网格 */
+.result-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+.result-grid__item {
+  width: calc(50% - 8rpx);
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 14rpx;
+  padding: 24rpx 20rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.result-grid__item--highlight {
+  background: rgba(255, 200, 87, 0.12);
+  border: 1rpx solid rgba(255, 200, 87, 0.25);
+}
+.result-grid__label {
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 8rpx;
+}
+.result-grid__value {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.2;
+}
+.result-grid__item--highlight .result-grid__value {
+  color: #ffc857;
+}
+.result-grid__unit {
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 4rpx;
+}
+
+/* ============ 采购流水 ============ */
+.flow-step {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #f0ede5;
+}
+.flow-step:last-child {
+  border-bottom: none;
+}
+.flow-step--total {
+  border-top: 2rpx solid #ece8de;
+  border-bottom: none;
+  margin-top: 8rpx;
+  padding-top: 20rpx;
+}
+.flow-step__label {
+  font-size: 26rpx;
+  color: #5a5a6a;
+}
+.flow-step__value {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+.flow-step__value--positive {
+  color: #2ecc71;
+}
+.flow-step__value--negative {
+  color: #e74c3c;
+}
+.flow-step--total .flow-step__label {
+  font-weight: 600;
+  color: #1a1a2e;
+}
+.flow-step--total .flow-step__value {
+  font-size: 32rpx;
+}
+
+/* ============ 寄售档位明细表 ============ */
+.breakdown-table {
+  width: 100%;
+}
+.breakdown-row {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #f0ede5;
+}
+.breakdown-row:last-child {
+  border-bottom: none;
+}
+.breakdown-row--header {
+  border-bottom: 2rpx solid #ece8de;
+  padding-bottom: 16rpx;
+  margin-bottom: 4rpx;
+}
+.breakdown-row--header .breakdown-cell {
+  font-size: 22rpx;
+  color: #9a9aaa;
+  font-weight: 600;
+}
+.breakdown-cell {
+  flex: 1;
+  text-align: center;
+  font-size: 26rpx;
+  color: #3a3a4a;
+}
+.breakdown-cell:first-child {
+  text-align: left;
+  font-weight: 500;
+}
+.breakdown-cell:last-child {
+  text-align: right;
+}
+.breakdown-cell--neg {
+  color: #e74c3c;
+}
+.breakdown-cell--pos {
+  color: #2ecc71;
+  font-weight: 600;
+}
+
+/* ============ 底部说明 ============ */
+.footer-note {
+  margin-top: 40rpx;
+  padding: 24rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  align-items: center;
+}
+.footer-note text {
+font-size: 22rpx;
+color: #b0b0c0;
+line-height: 1.6;
+}
+
+/* ============ 探索妙不可园 ============ */
+.explore-card {
+  display: flex;
+  align-items: center;
+  margin-top: 40rpx;
+  padding: 32rpx 28rpx;
+  background: linear-gradient(135deg, #3B6D11 0%, #5B8C85 100%);
+  border-radius: 20rpx;
+  box-shadow: 0 8rpx 24rpx rgba(59, 109, 17, 0.2);
+}
+.explore-card__icon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.explore-card__char {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #FFFFFF;
+}
+.explore-card__body {
+  flex: 1;
+  min-width: 0;
+  margin-left: 24rpx;
+}
+.explore-card__title {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #FFFFFF;
+  letter-spacing: 4rpx;
+}
+.explore-card__desc {
+  display: block;
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.8);
+  margin-top: 8rpx;
+}
+.explore-card__arrow {
+  font-size: 40rpx;
+  color: rgba(255, 255, 255, 0.6);
+  flex-shrink: 0;
+  margin-left: 16rpx;
+}
+
+/* ============ 分享操作栏 ============ */
+.share-bar {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 24rpx;
+}
+.share-btn {
+  flex: 1;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  border: none;
+  letter-spacing: 2rpx;
+}
+.share-btn::after {
+  border: none;
+}
+.share-btn--poster {
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  color: #ffc857;
+  box-shadow: 0 6rpx 20rpx rgba(26, 26, 46, 0.2);
+}
+.share-btn--copy {
+  background: #fff;
+  color: #1a1a2e;
+  border: 2rpx solid #e0ddd5;
+}
+
+/* ============ 隐藏 Canvas ============ */
+.poster-canvas {
+  position: fixed;
+  left: -9999rpx;
+  top: 0;
+  width: 600px;
+  height: 900px;
+}

@@ -1,0 +1,100 @@
+<!-- pages/edit-profile/edit-profile.wxml -->
+<view class="page-bg">
+  <view class="edit-section">
+    <view class="edit-item">
+      <text class="edit-item__label">头像</text>
+      <view class="edit-item__content">
+        <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+          <view class="avatar-preview">
+            <image wx:if="{{avatarUrl}}" src="{{avatarUrl}}" mode="aspectFill" class="avatar-preview__img" />
+            <view wx:else class="avatar-preview__placeholder" style="background-color: {{avatarBgColor}}">
+              <text class="avatar-preview__text">{{nickname.charAt(0)}}</text>
+            </view>
+          </view>
+        </button>
+        <text class="edit-item__arrow">›</text>
+      </view>
+    </view>
+    
+    <view class="edit-item">
+      <text class="edit-item__label">昵称</text>
+      <view class="edit-item__content">
+        <input 
+          type="nickname" 
+          value="{{nickname}}" 
+          placeholder="请输入昵称" 
+          bindinput="onNicknameInput"
+          class="edit-item__input"
+          maxlength="20"
+        />
+      </view>
+    </view>
+    
+    <view class="edit-item">
+      <text class="edit-item__label">简介</text>
+      <view class="edit-item__content">
+        <textarea 
+          value="{{bio}}" 
+          placeholder="介绍一下自己吧" 
+          bindinput="onBioInput"
+          class="edit-item__textarea"
+          maxlength="100"
+          auto-height
+          show-confirm-bar="{{false}}"
+        />
+      </view>
+    </view>
+  </view>
+  
+  <view class="edit-section">
+    <view class="edit-item">
+      <text class="edit-item__label">性别</text>
+      <view class="edit-item__content">
+        <picker mode="selector" range="{{genderOptions}}" value="{{genderIndex}}" bindchange="onGenderChange">
+          <view class="edit-item__picker">
+            <text class="{{genderIndex === 0 ? 'edit-item__placeholder' : ''}}">{{genderOptions[genderIndex]}}</text>
+            <text class="edit-item__arrow">›</text>
+          </view>
+        </picker>
+      </view>
+    </view>
+    
+    <view class="edit-item">
+      <text class="edit-item__label">生日</text>
+      <view class="edit-item__content">
+        <picker mode="date" value="{{birthday}}" start="1920-01-01" end="{{todayDate}}" bindchange="onBirthdayChange">
+          <view class="edit-item__picker">
+            <text class="{{!birthday ? 'edit-item__placeholder' : ''}}">{{birthday || '请选择生日'}}</text>
+            <text class="edit-item__arrow">›</text>
+          </view>
+        </picker>
+      </view>
+    </view>
+  </view>
+  
+  <view class="edit-section">
+    <view class="edit-item">
+      <text class="edit-item__label">个人标签</text>
+      <view class="edit-item__content">
+        <view class="tags-container">
+          <view 
+            wx:for="{{tags}}" 
+            wx:key="index" 
+            class="tag-item"
+          >
+            <text class="tag-item__text">{{item}}</text>
+            <view class="tag-item__remove" data-index="{{index}}" bindtap="onRemoveTag">×</view>
+          </view>
+          <view class="tag-item tag-item--add" bindtap="onAddTag">
+            <text class="tag-item__text">+添加</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+  
+  <view class="edit-footer">
+    <button class="save-btn" bindtap="onSave">保存修改</button>
+    <button class="reset-btn" bindtap="onReset">重置</button>
+  </view>
+</view>

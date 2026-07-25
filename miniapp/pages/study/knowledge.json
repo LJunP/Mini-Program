@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "知识科普",
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "empty-state": "/components/empty-state/empty-state"
+  }
+}

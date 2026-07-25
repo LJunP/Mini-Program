@@ -1,0 +1,108 @@
+<view class="page-bg">
+  <view class="page-header">
+    <text class="page-header__title">面试学习</text>
+    <text class="page-header__sub">九零一题 · 每一道都值得认真对待</text>
+  </view>
+
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <view class="search-bar__box">
+      <icon class="search-bar__icon" type="search" size="14"></icon>
+      <input
+        class="search-bar__input"
+        type="text"
+        placeholder="搜索关键词 (如 MySQL、Redis、var...)"
+        value="{{keyword}}"
+        bindinput="onSearchInput"
+        bindconfirm="onSearchConfirm"
+        confirm-type="search"
+      />
+      <icon wx:if="{{keyword}}" class="search-bar__clear" type="clear" size="14" bindtap="onClearSearch"></icon>
+    </view>
+  </view>
+
+  <view class="filter-title">题型</view>
+  <view class="chips">
+    <view
+      wx:for="{{types}}"
+      wx:key="key"
+      class="chip {{currentType === item.key ? 'chip--active' : ''}}"
+      data-key="{{item.key}}"
+      bindtap="onTypeTap"
+    >{{item.name}}</view>
+  </view>
+
+  <view class="filter-title">方向</view>
+  <view class="chips">
+    <view
+      wx:for="{{tracks}}"
+      wx:key="key"
+      class="chip {{currentTrack === item.key ? 'chip--active' : ''}}"
+      data-key="{{item.key}}"
+      bindtap="onTrackTap"
+    >{{item.name}}</view>
+  </view>
+
+  <view class="filter-title">技术板块</view>
+  <view class="chips">
+    <view
+      wx:for="{{topics}}"
+      wx:key="key"
+      class="chip {{currentTopic === item.key ? 'chip--active' : ''}}"
+      data-key="{{item.key}}"
+      bindtap="onTopicTap"
+    >{{item.name}}</view>
+  </view>
+
+  <view class="section-header">
+    <text class="section-title">题库</text>
+    <text
+      class="reset-filters-btn"
+      wx:if="{{currentType !== 'all' || currentTrack !== 'all' || currentTopic !== 'all' || keyword !== ''}}"
+      bindtap="onResetFilters"
+    >重置筛选</text>
+  </view>
+  <view class="question-list" wx:if="{{list.length}}">
+    <view class="question-card" wx:for="{{list}}" wx:key="id" data-id="{{item.id}}" bindtap="onQuestionTap">
+      <view class="question-card__header">
+        <text class="question-card__type">{{item.type}}</text>
+        <text wx:if="{{item.studyStatus === 'mastered'}}" class="question-card__status question-card__status--mastered">已掌握</text>
+        <text wx:elif="{{item.studyStatus === 'learning'}}" class="question-card__status question-card__status--learning">学习中</text>
+        <text wx:elif="{{item.studyStatus === 'weak'}}" class="question-card__status question-card__status--weak">薄弱</text>
+        <text class="question-card__meta">{{item.track}} · 难度 {{item.difficulty}} · 高频 {{item.frequency}}</text>
+      </view>
+      <text class="question-card__title">{{item.title}}</text>
+      <text class="question-card__question ellipsis-2">{{item.question}}</text>
+      <view class="question-card__points">
+        <text class="point" wx:for="{{item.keyPoints}}" wx:key="*this">{{item}}</text>
+      </view>
+    </view>
+  </view>
+
+  <empty-state wx:else text="暂无题目" desc="试试其他筛选条件" />
+
+  <!-- 加载更多 -->
+  <view class="load-more" wx:if="{{list.length}}">
+    <view wx:if="{{loadingMore}}" class="load-more__loading">
+      <text>加载中...</text>
+    </view>
+    <text wx:elif="{{!hasMore}}" class="load-more__end">— 已加载全部 —</text>
+  </view>
+
+  <!-- 探索妙不可园 -->
+  <view class="explore-card" bindtap="goHome">
+    <view class="explore-card__icon">
+      <text class="explore-card__char">园</text>
+    </view>
+    <view class="explore-card__body">
+      <text class="explore-card__title">妙不可园</text>
+      <text class="explore-card__desc">偷得浮生半日闲，来品一杯茶，焚一炉香</text>
+    </view>
+    <text class="explore-card__arrow">›</text>
+  </view>
+
+  <!-- 返回顶部 -->
+  <view class="back-to-top {{showBackTop ? 'back-to-top--show' : ''}}" bindtap="onBackToTop">
+    <text class="back-to-top__arrow">↑</text>
+  </view>
+</view>

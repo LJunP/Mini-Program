@@ -1,0 +1,293 @@
+/* components/incense-timer/incense-timer.wxss */
+
+/* 浮动入口按钮 */
+.it-fab {
+  position: fixed;
+  right: 32rpx;
+  bottom: 200rpx;
+  z-index: 900;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8B6F47 0%, #6B5337 100%);
+  box-shadow: 0 8rpx 24rpx rgba(139, 111, 71, 0.3);
+}
+.it-fab__icon {
+  font-size: 36rpx;
+}
+.it-fab__text {
+  font-size: 20rpx;
+  color: #FFFFFF;
+  margin-top: 2rpx;
+}
+
+/* 运行中浮动条 */
+.it-running {
+  position: fixed;
+  left: 32rpx;
+  right: 32rpx;
+  bottom: 160rpx;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 16rpx 24rpx;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #8B6F47 0%, #6B5337 100%);
+  box-shadow: 0 8rpx 24rpx rgba(139, 111, 71, 0.3);
+}
+.it-running__icon {
+  font-size: 32rpx;
+}
+.it-running__time {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #FFFFFF;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 2rpx;
+}
+.it-running__progress {
+  flex: 1;
+  height: 6rpx;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.it-running__progress-fill {
+  height: 100%;
+  background-color: #FFFFFF;
+  border-radius: 3px;
+  transition: width 1s linear;
+}
+
+/* 面板遮罩 */
+.it-panel-mask,
+.it-running-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+/* 选择面板 */
+.it-panel {
+  width: 100%;
+  background-color: #FFFFFF;
+  border-radius: 24rpx 24rpx 0 0;
+  padding: 32rpx 32rpx calc(32rpx + env(safe-area-inset-bottom));
+  animation: slideUp 0.3s ease;
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.it-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24rpx;
+}
+.it-panel__title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #2C2C2A;
+}
+.it-panel__close {
+  width: 56rpx;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  color: #B5B0A6;
+}
+
+.it-panel__incense {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 16rpx 24rpx;
+  background-color: #F3EFE6;
+  border-radius: 12rpx;
+  margin-bottom: 24rpx;
+}
+.it-panel__incense-label {
+  font-size: 24rpx;
+  color: #8B8578;
+}
+.it-panel__incense-name {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #8B6F47;
+}
+
+/* 时长选择 */
+.it-durations {
+  display: flex;
+  gap: 16rpx;
+  margin-bottom: 32rpx;
+}
+.it-duration {
+  flex: 1;
+  text-align: center;
+  padding: 20rpx 0;
+  border-radius: 12rpx;
+  background-color: #F3EFE6;
+  font-size: 28rpx;
+  color: #5A554C;
+  transition: all 0.2s;
+}
+.it-duration--active {
+  background-color: #8B6F47;
+  color: #FFFFFF;
+  font-weight: 500;
+}
+
+/* 开始按钮 */
+.it-start-btn {
+  text-align: center;
+  padding: 28rpx;
+  border-radius: 16rpx;
+  background: linear-gradient(135deg, #8B6F47 0%, #6B5337 100%);
+  color: #FFFFFF;
+  font-size: 32rpx;
+  font-weight: 500;
+  margin-bottom: 32rpx;
+  box-shadow: 0 8rpx 24rpx rgba(139, 111, 71, 0.3);
+}
+
+/* 焚香统计 */
+.it-stats {
+  display: flex;
+  align-items: center;
+  padding: 24rpx;
+  background-color: #FAF8F3;
+  border-radius: 12rpx;
+  margin-bottom: 16rpx;
+}
+.it-stats__item {
+  flex: 1;
+  text-align: center;
+}
+.it-stats__num {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #8B6F47;
+  display: block;
+}
+.it-stats__label {
+  font-size: 22rpx;
+  color: #8B8578;
+  margin-top: 4rpx;
+  display: block;
+}
+.it-stats__divider {
+  width: 1rpx;
+  height: 48rpx;
+  background-color: #EAE5DC;
+}
+
+/* 历史记录 */
+.it-history-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  padding: 16rpx;
+  font-size: 24rpx;
+  color: #8B8578;
+}
+.it-history-toggle__icon {
+  font-size: 20rpx;
+}
+.it-history {
+  max-height: 400rpx;
+  overflow-y: auto;
+}
+.it-history__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx 0;
+  border-bottom: 0.5px solid #EAE5DC;
+}
+.it-history__name {
+  flex: 1;
+  font-size: 26rpx;
+  color: #2C2C2A;
+}
+.it-history__duration {
+  font-size: 24rpx;
+  color: #8B6F47;
+  margin-right: 16rpx;
+}
+.it-history__date {
+  font-size: 22rpx;
+  color: #B5B0A6;
+}
+.it-history-empty {
+  text-align: center;
+  padding: 32rpx;
+  font-size: 24rpx;
+  color: #B5B0A6;
+}
+
+/* 运行中展开面板 */
+.it-running-panel {
+  width: 100%;
+  background-color: #FFFFFF;
+  border-radius: 24rpx 24rpx 0 0;
+  padding: 48rpx 32rpx calc(48rpx + env(safe-area-inset-bottom));
+  text-align: center;
+  animation: slideUp 0.3s ease;
+}
+.it-running-panel__time {
+  font-size: 96rpx;
+  font-weight: 200;
+  color: #8B6F47;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 24rpx;
+}
+.it-running-panel__progress {
+  height: 12rpx;
+  background-color: #F3EFE6;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 32rpx;
+}
+.it-running-panel__progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #8B6F47 0%, #6B5337 100%);
+  border-radius: 6px;
+  transition: width 1s linear;
+}
+.it-running-panel__btns {
+  display: flex;
+  gap: 24rpx;
+}
+.it-running-panel__btn {
+  flex: 1;
+  padding: 24rpx;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  text-align: center;
+}
+.it-running-panel__btn--stop {
+  background-color: #F3EFE6;
+  color: #8B8578;
+}
+.it-running-panel__btn--hide {
+  background-color: #8B6F47;
+  color: #FFFFFF;
+}

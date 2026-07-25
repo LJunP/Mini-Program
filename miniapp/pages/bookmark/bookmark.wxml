@@ -1,0 +1,126 @@
+<!-- pages/bookmark/bookmark.wxml -->
+<view class="page-bg">
+  <view class="page-header">
+    <text class="page-header__title">风雅书签</text>
+    <text class="page-header__sub">收藏的茶、行旅、养生 · 共 {{totalCount}} 项</text>
+  </view>
+
+  <!-- 搜索栏 -->
+  <view class="bm-search">
+    <view class="bm-search__box">
+      <text class="bm-search__icon">⌕</text>
+      <input
+        class="bm-search__input"
+        type="text"
+        placeholder="搜索书签内容"
+        value="{{searchKeyword}}"
+        bindinput="onSearchInput"
+      />
+      <text class="bm-search__clear" wx:if="{{searchKeyword}}" bindtap="onSearchClear">×</text>
+    </view>
+  </view>
+
+  <!-- 分类 tab -->
+  <view class="tabs" wx:if="{{!isSearching}}">
+    <view
+      wx:for="{{tabs}}"
+      wx:key="key"
+      class="tabs__item {{currentTab === item.key ? 'tabs__item--active' : ''}}"
+      data-key="{{item.key}}"
+      bindtap="onTabTap"
+    >
+      <text>{{item.name}}</text>
+    </view>
+    <view class="tabs__sort" bindtap="onToggleSort">
+      <text>排序</text>
+      <text class="tabs__sort-icon {{showSortOptions ? 'tabs__sort-icon--active' : ''}}">▼</text>
+    </view>
+  </view>
+
+  <!-- 排序选项 -->
+  <view class="sort-panel {{showSortOptions ? 'sort-panel--show' : ''}}" wx:if="{{!isSearching}}">
+    <view class="sort-options">
+      <view
+        wx:for="{{sortOptions}}"
+        wx:key="key"
+        class="sort-option {{sortBy === item.key ? 'sort-option--active' : ''}}"
+        data-key="{{item.key}}"
+        bindtap="onSortChange"
+      >
+        <text>{{item.name}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 搜索结果 -->
+  <view class="search-results" wx:if="{{isSearching}}">
+    <view class="search-results__count" wx:if="{{searchResults.length}}">
+      <text>找到 {{searchResults.length}} 项匹配结果</text>
+    </view>
+    <view
+      wx:for="{{searchResults}}"
+      wx:key="target_ref_id"
+      class="bm-item"
+      data-domain="{{item.domain}}"
+      data-ref-id="{{item.target_ref_id}}"
+      bindtap="onItemTap"
+    >
+      <view class="bm-item__cover" style="background-color:{{item.color}};">
+        <text class="bm-item__cover-text">{{item.name}}</text>
+      </view>
+      <view class="bm-item__body">
+        <view class="bm-item__tag-row">
+          <text class="bm-item__domain">{{item.short_name}}</text>
+          <text class="bm-item__name ellipsis-2">{{item.name}}</text>
+        </view>
+        <text wx:if="{{item.preview}}" class="bm-item__preview ellipsis-2">{{item.preview}}</text>
+        <text wx:if="{{item.note}}" class="bm-item__note ellipsis">{{item.note}}</text>
+        <text class="bm-item__time">{{item.created_at}}</text>
+      </view>
+      <view class="bm-item__del" catchtap="onRemove" data-domain="{{item.domain}}" data-ref-id="{{item.target_ref_id}}">
+        <text>移除</text>
+      </view>
+    </view>
+    <empty-state wx:if="{{!searchResults.length}}" text="未找到匹配的书签" desc="试试其他关键词" />
+  </view>
+
+  <!-- 分组列表 -->
+  <block wx:if="{{!isSearching && groups.length}}">
+    <view
+      wx:for="{{groups}}"
+      wx:key="domain"
+      class="group"
+    >
+      <view class="group__header">
+        <view class="group__tag" style="background-color:{{item.color}};"><text>{{item.short_name}}</text></view>
+        <text class="group__name">{{item.domain_name}}</text>
+        <text class="group__count">{{item.total}}</text>
+      </view>
+
+      <view
+        wx:for="{{item.items}}"
+        wx:key="target_ref_id"
+        wx:for-item="ci"
+        class="bm-item"
+        data-domain="{{item.domain}}"
+        data-ref-id="{{ci.target_ref_id}}"
+        bindtap="onItemTap"
+      >
+        <view class="bm-item__cover" style="background-color:{{item.color}};">
+          <text class="bm-item__cover-text">{{ci.name}}</text>
+        </view>
+        <view class="bm-item__body">
+          <text class="bm-item__name ellipsis-2">{{ci.name}}</text>
+          <text wx:if="{{ci.preview}}" class="bm-item__preview ellipsis-2">{{ci.preview}}</text>
+          <text wx:if="{{ci.note}}" class="bm-item__note ellipsis">{{ci.note}}</text>
+          <text class="bm-item__time">{{ci.created_at}}</text>
+        </view>
+        <view class="bm-item__del" catchtap="onRemove" data-domain="{{item.domain}}" data-ref-id="{{ci.target_ref_id}}">
+          <text>移除</text>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <empty-state wx:if="{{!isSearching && !groups.length}}" text="书签还是空的" desc="去首页收藏一些风雅吧" />
+</view>

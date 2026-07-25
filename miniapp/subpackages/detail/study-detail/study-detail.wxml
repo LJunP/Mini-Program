@@ -1,0 +1,107 @@
+<view class="page-bg" wx:if="{{detail}}">
+  <view class="hero" style="background-color:{{meta.color}};">
+    <view class="hero__tag">{{meta.label}}</view>
+    <view class="hero__title">{{detail.title}}</view>
+    <view class="hero__meta">
+      <text>{{detail.duration}} 分钟</text>
+      <text class="hero__dot">·</text>
+      <text>难度 {{detail.difficulty}}</text>
+      <text class="hero__dot">·</text>
+      <text>{{detail.category}}</text>
+    </view>
+    <view class="hero__summary">{{detail.summary}}</view>
+  </view>
+
+  <view class="section-title">正文</view>
+  <view class="card section-card">
+    <block wx:for="{{detail.sections}}" wx:key="index">
+      <view wx:if="{{item.type === 'heading'}}" class="content-heading">{{item.text}}</view>
+      <text wx:elif="{{item.type === 'paragraph'}}" class="paragraph">{{item.text}}</text>
+      <view wx:elif="{{item.type === 'quote'}}" class="quote">{{item.text}}</view>
+      <view wx:elif="{{item.type === 'code'}}" class="code-block">
+        <view class="code-block__lang">{{item.language || 'text'}}</view>
+        <text class="code-block__text">{{item.text}}</text>
+      </view>
+      <view wx:elif="{{item.type === 'list'}}" class="list-block">
+        <view wx:for="{{item.items}}" wx:key="*this" wx:for-item="listItem" class="list-block__item">
+          <view class="list-block__dot"></view>
+          <text class="list-block__text">{{listItem}}</text>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <view class="section-title" wx:if="{{detail.keyPoints && detail.keyPoints.length}}">关键点</view>
+  <view class="card" wx:if="{{detail.keyPoints && detail.keyPoints.length}}">
+    <text class="key-point" wx:for="{{detail.keyPoints}}" wx:key="*this">{{item}}</text>
+  </view>
+
+  <view class="section-title" wx:if="{{detail.tags && detail.tags.length}}">标签</view>
+  <view class="card" wx:if="{{detail.tags && detail.tags.length}}">
+    <text class="tag" wx:for="{{detail.tags}}" wx:key="*this">{{item}}</text>
+  </view>
+
+  <view class="section-title">我的笔记</view>
+  <view class="note-section">
+    <block wx:if="{{note}}">
+      <view class="note-card">
+        <text class="note-card__content">{{note.content}}</text>
+        <view class="note-card__footer">
+          <text class="note-card__time">最后编辑：{{noteEditTime}}</text>
+          <view class="note-card__actions">
+            <text class="note-card__btn" bindtap="onOpenNoteInput">编辑</text>
+            <text class="note-card__btn note-card__btn--delete" bindtap="onDeleteNote">删除</text>
+          </view>
+        </view>
+      </view>
+    </block>
+    <block wx:else>
+      <view class="note-empty" bindtap="onOpenNoteInput">
+        <text class="note-empty__icon">✎</text>
+        <text class="note-empty__text">写一条笔记，记录你的学习心得</text>
+      </view>
+    </block>
+  </view>
+
+  <view class="bottom-placeholder"></view>
+  <view class="action-bar safe-bottom">
+    <view class="action-bar__collect {{isCollected ? 'action-bar__collect--active' : ''}}" bindtap="onToggleCollect">
+      <text>{{isCollected ? '已收藏' : '收藏'}}</text>
+    </view>
+    <button class="action-bar__share" open-type="share">分享</button>
+  </view>
+</view>
+
+<view wx:else class="page-bg">
+  <view class="skeleton-detail__hero skeleton-pulse"></view>
+  <view class="skeleton-detail__card skeleton-pulse"></view>
+  <view class="skeleton-detail__card skeleton-pulse"></view>
+</view>
+
+<!-- 笔记编辑弹层 -->
+<view class="note-input {{showNoteInput ? 'note-input--show' : ''}}">
+  <view class="note-input__mask" bindtap="onCloseNoteInput"></view>
+  <view class="note-input__panel">
+    <view class="note-input__header">
+      <text class="note-input__title">{{note ? '编辑笔记' : '写笔记'}}</text>
+      <view class="note-input__close" bindtap="onCloseNoteInput">
+        <text>✕</text>
+      </view>
+    </view>
+    <textarea
+      class="note-input__textarea"
+      placeholder="记录你此刻的学习心得、灵感或感悟..."
+      value="{{noteText}}"
+      bindinput="onNoteInput"
+      maxlength="500"
+      auto-height
+      focus="{{showNoteInput}}"
+    />
+    <view class="note-input__footer">
+      <text class="note-input__count">{{noteText.length}}/500</text>
+      <view class="note-input__save" bindtap="onSaveNote">
+        <text>保存</text>
+      </view>
+    </view>
+  </view>
+</view>

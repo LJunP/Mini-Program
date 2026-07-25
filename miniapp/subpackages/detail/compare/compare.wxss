@@ -1,0 +1,207 @@
+/* subpackages/detail/compare/compare.wxss */
+
+/* 对比头部 */
+.compare-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 32rpx 16rpx 48rpx;
+}
+.compare-header__tea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.compare-header__cover {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16rpx;
+}
+.compare-header__cover-text {
+  font-size: 28rpx;
+  color: #FFFFFF;
+  font-weight: 500;
+}
+.compare-header__name {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #2C2C2A;
+  margin-bottom: 8rpx;
+}
+.compare-header__origin {
+  font-size: 22rpx;
+  color: #8B8578;
+  margin-bottom: 12rpx;
+}
+.compare-header__score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.compare-header__score-num {
+  font-size: 36rpx;
+  font-weight: 500;
+  color: #3B6D11;
+}
+.compare-header__score-label {
+  font-size: 20rpx;
+  color: #8B8578;
+  margin-top: 4rpx;
+}
+.compare-header__vs {
+  width: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding-top: 48rpx;
+}
+.compare-header__vs-text {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #B5B0A6;
+  letter-spacing: 4rpx;
+}
+
+/* 雷达图对比 */
+.radar-compare {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32rpx 16rpx;
+}
+.radar-compare__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.radar-compare__label {
+  font-size: 24rpx;
+  color: #8B8578;
+  margin-top: 16rpx;
+}
+.radar-compare__divider {
+  width: 0.5px;
+  height: 240rpx;
+  background-color: #EAE5DC;
+  margin: 0 16rpx;
+}
+
+/* 五维对比条 */
+.dim-row {
+  margin-bottom: 24rpx;
+}
+.dim-row:last-child {
+  margin-bottom: 0;
+}
+.dim-row__header {
+  margin-bottom: 12rpx;
+}
+.dim-row__label {
+  font-size: 24rpx;
+  color: #5A554C;
+  font-weight: 500;
+}
+.dim-row__bars {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+.dim-row__bar-wrap {
+  display: flex;
+  align-items: center;
+  height: 32rpx;
+}
+.dim-row__bar-wrap--a {
+  flex-direction: row-reverse;
+}
+.dim-row__bar-wrap--b {
+  flex-direction: row;
+}
+.dim-row__bar {
+  height: 16rpx;
+  border-radius: 8rpx;
+  transition: width 0.3s ease;
+  min-width: 8rpx;
+}
+.dim-row__bar--a {
+  background-color: #3B6D11;
+}
+.dim-row__bar--b {
+  background-color: #5B8C85;
+}
+.dim-row__val {
+  font-size: 22rpx;
+  color: #8B8578;
+  margin: 0 12rpx;
+  min-width: 40rpx;
+}
+.dim-row__val--a {
+  text-align: right;
+}
+.dim-row__val--b {
+  text-align: left;
+}
+
+/* 冲泡参数对比 */
+.params-compare {
+  padding: 24rpx;
+}
+.params-compare__row {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 0;
+  border-bottom: 0.5px solid #EAE5DC;
+}
+.params-compare__row:last-child {
+  border-bottom: none;
+}
+.params-compare__label {
+  width: 100rpx;
+  font-size: 24rpx;
+  color: #8B8578;
+  flex-shrink: 0;
+}
+.params-compare__val {
+  flex: 1;
+  font-size: 26rpx;
+  color: #2C2C2A;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* 综合评分 */
+.total-score {
+  display: flex;
+  align-items: center;
+  padding: 32rpx 24rpx;
+}
+.total-score__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.total-score__tea {
+  font-size: 24rpx;
+  color: #8B8578;
+  margin-bottom: 12rpx;
+}
+.total-score__num {
+  font-size: 56rpx;
+  font-weight: 500;
+}
+.total-score__divider {
+  width: 0.5px;
+  height: 80rpx;
+  background-color: #EAE5DC;
+  margin: 0 24rpx;
+}

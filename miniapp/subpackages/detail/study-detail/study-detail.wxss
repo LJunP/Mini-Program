@@ -1,0 +1,278 @@
+/* subpackages/detail/study-detail/study-detail.wxss */
+.hero {
+  padding: 64rpx 32rpx 56rpx;
+  color: #FFFFFF;
+  border-radius: 0 0 20rpx 20rpx;
+}
+.hero__tag {
+  display: inline-block;
+  padding: 6rpx 18rpx;
+  background-color: rgba(255, 255, 255, 0.18);
+  border-radius: 999rpx;
+  font-size: 22rpx;
+}
+.hero__title {
+  font-size: 44rpx;
+  font-weight: 600;
+  line-height: 1.5;
+  margin-top: 24rpx;
+}
+.hero__meta {
+  margin-top: 20rpx;
+  font-size: 24rpx;
+  opacity: 0.86;
+}
+.hero__dot {
+  margin: 0 12rpx;
+}
+.hero__summary {
+  margin-top: 24rpx;
+  font-size: 26rpx;
+  line-height: 1.8;
+  opacity: 0.9;
+}
+.section-card {
+  padding: 32rpx;
+}
+.content-heading {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #2C2C2A;
+  margin: 32rpx 0 18rpx;
+}
+.content-heading:first-child {
+  margin-top: 0;
+}
+.paragraph {
+  display: block;
+  color: #2C2C2A;
+  font-size: 28rpx;
+  line-height: 2;
+  margin-bottom: 24rpx;
+}
+.quote {
+  padding: 24rpx;
+  background-color: rgba(74, 107, 124, 0.08);
+  border-left: 4rpx solid #4A6B7C;
+  color: #5A554C;
+  font-size: 26rpx;
+  line-height: 1.8;
+  margin: 24rpx 0;
+}
+.code-block {
+  background-color: #2C2C2A;
+  border-radius: 10px;
+  padding: 24rpx;
+  margin: 24rpx 0;
+}
+.code-block__lang {
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 22rpx;
+  margin-bottom: 12rpx;
+}
+.code-block__text {
+  color: #FFFFFF;
+  font-size: 24rpx;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  font-family: Menlo, Monaco, Consolas, monospace;
+}
+.list-block {
+  margin: 20rpx 0;
+}
+.list-block__item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 16rpx;
+}
+.list-block__dot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  background-color: #3B6D11;
+  margin: 16rpx 18rpx 0 0;
+  flex-shrink: 0;
+}
+.list-block__text {
+  flex: 1;
+  color: #5A554C;
+  font-size: 26rpx;
+  line-height: 1.8;
+}
+.key-point {
+  display: inline-block;
+  padding: 6rpx 16rpx;
+  background-color: rgba(74, 107, 124, 0.08);
+  color: #4A6B7C;
+  border-radius: 4px;
+  margin-right: 12rpx;
+  margin-bottom: 12rpx;
+  font-size: 22rpx;
+}
+.bottom-placeholder {
+  height: 120rpx;
+}
+.action-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  padding: 16rpx 24rpx;
+  background-color: #FFFFFFFC;
+  border-top: 0.5px solid #EAE5DC;
+  z-index: 10;
+}
+.action-bar__collect,
+.action-bar__share {
+  flex: 1;
+  height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  border-radius: 40px;
+  margin: 0 8rpx;
+  letter-spacing: 4rpx;
+}
+.action-bar__collect {
+  background-color: #F3EFE6;
+  color: #5A554C;
+}
+.action-bar__collect--active {
+  background-color: #3B6D11;
+  color: #FFFFFF;
+}
+.action-bar__share {
+  background-color: #854F0B;
+  color: #FFFFFF;
+  padding: 0;
+  border: none;
+  line-height: 80rpx;
+}
+.action-bar__share::after {
+  border: none;
+}
+.loading {
+  padding: 200rpx 0;
+  color: #8B8578;
+  text-align: center;
+}
+
+/* ========= 笔记功能 ========= */
+.note-section { margin-bottom: 24rpx; }
+.note-card {
+  background: #FFFFFFFC;
+  border: 0.5px solid #EAE5DC;
+  border-left: 4rpx solid #3B6D11;
+  border-radius: 12px;
+  padding: 24rpx;
+}
+.note-card__content {
+  display: block;
+  font-size: 28rpx;
+  color: #2C2C2A;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.note-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16rpx;
+  padding-top: 12rpx;
+  border-top: 0.5px solid #F4F0E8;
+}
+.note-card__time { font-size: 22rpx; color: #B0A99A; }
+.note-card__actions { display: flex; gap: 16rpx; }
+.note-card__btn {
+  font-size: 24rpx;
+  color: #854F0B;
+  padding: 4rpx 16rpx;
+  border-radius: 4rpx;
+  background: rgba(133, 79, 11, 0.08);
+}
+.note-card__btn--delete {
+  color: #A0522D;
+  background: rgba(160, 82, 45, 0.08);
+}
+.note-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  height: 96rpx;
+  border: 1px dashed #D5D0C5;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.5);
+}
+.note-empty__icon { font-size: 28rpx; color: #B0A99A; }
+.note-empty__text { font-size: 26rpx; color: #8B8578; }
+
+/* 笔记编辑弹层 */
+.note-input {
+  position: fixed;
+  left: 0; right: 0; top: 0; bottom: 0;
+  z-index: 300;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.note-input--show { opacity: 1; pointer-events: auto; }
+.note-input__mask {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+.note-input__panel {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  background: #FFFFFF;
+  border-radius: 24px 24px 0 0;
+  padding: 32rpx;
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+}
+.note-input__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24rpx;
+}
+.note-input__title { font-size: 32rpx; font-weight: 500; color: #2C2C2A; letter-spacing: 4rpx; }
+.note-input__close {
+  width: 56rpx; height: 56rpx;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28rpx; color: #8B8578;
+  background: #F3EFE6; border-radius: 50%;
+}
+.note-input__textarea {
+  width: 100%;
+  min-height: 240rpx;
+  max-height: 400rpx;
+  font-size: 28rpx;
+  line-height: 1.8;
+  color: #2C2C2A;
+  background: #F8F6F2;
+  border-radius: 12px;
+  padding: 24rpx;
+  box-sizing: border-box;
+}
+.note-input__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 24rpx;
+}
+.note-input__count { font-size: 22rpx; color: #B0A99A; }
+.note-input__save {
+  padding: 16rpx 48rpx;
+  background: #3B6D11;
+  color: #FFFFFF;
+  border-radius: 999rpx;
+  font-size: 28rpx;
+  letter-spacing: 4rpx;
+}
+.note-input__save:active { transform: scale(0.96); }

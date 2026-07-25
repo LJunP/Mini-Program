@@ -1,0 +1,72 @@
+<!-- pages/music/music.wxml -->
+<view class="page-bg">
+  <view class="page-header">
+    <view class="page-header__row">
+      <view class="page-header__titles">
+        <text class="page-header__title">听曲</text>
+        <text class="page-header__sub">丝竹之声 · 可以陶冶性情</text>
+      </view>
+      <view class="page-header__search" bindtap="goSearch">
+        <text class="page-header__search-icon">⌕</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 排序栏 -->
+  <view class="sort-bar">
+    <view class="sort-bar__tabs">
+      <view
+        wx:for="{{sortOptions}}"
+        wx:key="key"
+        class="sort-bar__item {{sort === item.key ? 'sort-bar__item--active' : ''}}"
+        data-key="{{item.key}}"
+        bindtap="onSortTap"
+      >
+        <text>{{item.name}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 分类 tab（含数量） -->
+  <scroll-view class="tabs" scroll-x="{{true}}" enhanced="{{true}}" show-scrollbar="{{false}}">
+    <view
+      wx:for="{{categories}}"
+      wx:key="key"
+      class="tabs__item {{currentCategory === item.key ? 'tabs__item--active' : ''}}"
+      data-key="{{item.key}}"
+      bindtap="onCategoryTap"
+    >
+      <text class="tabs__name">{{item.name}}</text>
+      <text class="tabs__count">{{item.count}}</text>
+    </view>
+  </scroll-view>
+
+  <!-- 加载骨架屏 -->
+  <view wx:if="{{loading && !list.length}}" class="skeleton-list">
+    <view wx:for="{{[1,2,3]}}" wx:key="*this" class="skeleton-card">
+      <view class="skeleton-card__cover skeleton-pulse"></view>
+      <view class="skeleton-card__body">
+        <view class="skeleton-card__title skeleton-pulse"></view>
+        <view class="skeleton-card__meta skeleton-pulse"></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 内容列表 -->
+  <view class="music-list" wx:if="{{!loading && list.length}}">
+    <content-card
+      wx:for="{{list}}"
+      wx:key="id"
+      domain="music"
+      contentId="{{item.id}}"
+      title="{{item.title}}"
+      summary="{{item.body}}"
+      coverImage="{{item.coverImage}}"
+      extra="{{item.instrument}}"
+      data="{{item}}"
+      bindtap="onMusicTap"
+    />
+  </view>
+
+  <empty-state wx:if="{{!loading && !list.length}}" text="暂无该分类内容" desc="试试其他分类" />
+</view>

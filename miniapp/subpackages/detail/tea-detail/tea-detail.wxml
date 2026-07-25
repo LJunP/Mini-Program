@@ -1,0 +1,391 @@
+<!-- subpackages/detail/tea-detail/tea-detail.wxml -->
+<view class="page-bg" wx:if="{{tea}}">
+
+  <!-- 主图区 -->
+  <view class="hero" style="background-color:{{heroColor}};">
+    <view class="hero__name">{{tea.name}}</view>
+    <view class="hero__meta">
+      <text>{{tea.origin}}</text>
+      <text class="hero__dot">·</text>
+      <text>{{tea.grade}}</text>
+      <text class="hero__dot">·</text>
+      <text>{{tea.season}}</text>
+    </view>
+    <view class="hero__rating">
+      <text class="hero__score">{{tea.ratingAvg}}</text>
+      <text class="hero__rating-count">{{tea.ratingCount}} 人评分</text>
+    </view>
+  </view>
+
+  <!-- 简介 -->
+  <view class="card">
+    <view class="section-title-inline">茶品简介</view>
+    <text class="intro">{{tea.description}}</text>
+    <view class="intro__tags">
+      <text wx:for="{{tea.styleTags}}" wx:key="*this" class="tag">{{item}}</text>
+    </view>
+    <view class="intro__stats">
+      <view class="intro__stat" bindtap="onToggleLike">
+        <text class="intro__stat-icon {{isLiked ? 'intro__stat-icon--liked' : ''}}">❤</text>
+        <text class="intro__stat-text">{{likeCount}}</text>
+      </view>
+      <view class="intro__stat">
+        <text class="intro__stat-icon">👁</text>
+        <text class="intro__stat-text">{{viewCount}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 口感雷达图 -->
+  <view class="section-title">口感画像</view>
+  <view class="card radar-card">
+    <radar-chart data="{{tea.tasteProfile}}" size="{{280}}" />
+    <view class="radar-card__legend">
+      <text>五维口感 · 满分 10 分</text>
+    </view>
+  </view>
+
+  <!-- 冲泡指南 -->
+  <view class="section-title">冲泡指南</view>
+  <view class="card brew">
+    <view class="brew__row">
+      <view class="brew__item">
+        <text class="brew__label">水温</text>
+        <text class="brew__value">{{tea.brewing.temperature}}℃</text>
+      </view>
+      <view class="brew__item">
+        <text class="brew__label">投茶</text>
+        <text class="brew__value">{{tea.brewing.dosage}}g</text>
+      </view>
+      <view class="brew__item">
+        <text class="brew__label">首泡</text>
+        <text class="brew__value">{{tea.brewing.firstSteep}}s</text>
+      </view>
+      <view class="brew__item">
+        <text class="brew__label">器具</text>
+        <text class="brew__value">{{tea.brewing.vessel}}</text>
+      </view>
+    </view>
+    <view class="brew__tip">
+      <text>可冲泡 {{tea.brewing.maxSteeps}} 次</text>
+    </view>
+    <view class="brew__start-btn" bindtap="onOpenBrewTimer">
+      <text>⏱ 开始冲泡计时</text>
+    </view>
+  </view>
+
+  <!-- 适饮场景 -->
+  <view class="section-title">适饮场景</view>
+  <view class="scenes">
+    <view wx:for="{{scenesText}}" wx:key="*this" class="scenes__item">
+      <text>{{item}}</text>
+    </view>
+  </view>
+
+  <!-- 点评统计 -->
+  <view class="section-title" wx:if="{{reviews.length}}">点评统计</view>
+  <view class="review-stats" wx:if="{{reviews.length}}">
+    <view class="review-stats__overview">
+      <view class="review-stats__average">
+        <text class="review-stats__average-num">{{averageRating}}</text>
+        <text class="review-stats__average-label">平均评分</text>
+      </view>
+      <view class="review-stats__distribution">
+        <view wx:for="{{ratingDistribution}}" wx:key="index" class="review-stats__bar">
+          <text class="review-stats__star">{{5 - index}}星</text>
+          <view class="review-stats__bar-bg">
+            <view class="review-stats__bar-fill" style="width: {{ratingPercentages[index]}}%"></view>
+          </view>
+          <text class="review-stats__bar-count">{{item}}</text>
+        </view>
+      </view>
+    </view>
+    <view class="review-stats__count">
+      <text>共 {{reviewCount}} 条点评</text>
+    </view>
+  </view>
+
+  <!-- 用户点评 -->
+  <view class="section-title" wx:if="{{reviews.length}}">茶友点评（{{reviewCount}}）</view>
+  <view class="reviews" wx:if="{{reviews.length}}">
+    <view wx:for="{{reviews}}" wx:key="id" class="review-card">
+      <view class="review-card__header">
+        <view class="review-card__avatar">{{item.user[0]}}</view>
+        <view class="review-card__info">
+          <text class="review-card__user">{{item.user}}</text>
+          <text class="review-card__date">{{item.date}}</text>
+        </view>
+        <view class="review-card__rating">
+          <text class="review-card__stars">{{item.rating >= 9 ? '★★★★★' : item.rating >= 7 ? '★★★★☆' : item.rating >= 5 ? '★★★☆☆' : item.rating >= 3 ? '★★☆☆☆' : '★☆☆☆☆'}}</text>
+          <text class="review-card__rating-num">{{item.rating}}</text>
+        </view>
+      </view>
+      <view class="review-card__tags">
+        <text wx:for="{{item.tags}}" wx:for-item="tag" wx:key="*this" class="review-card__tag">{{tag}}</text>
+      </view>
+      <text class="review-card__body">{{item.body}}</text>
+      <view class="review-card__actions">
+        <view class="review-card__action" data-review-id="{{item.id}}" bindtap="onToggleReviewLike">
+          <text class="review-card__action-icon {{item.isLiked ? 'review-card__action-icon--liked' : ''}}">❤</text>
+          <text class="review-card__action-text">{{item.likeCount || 0}}</text>
+        </view>
+        <view class="review-card__action" data-review-id="{{item.id}}" bindtap="onOpenComment">
+          <text class="review-card__action-icon">💬</text>
+          <text class="review-card__action-text">回复</text>
+        </view>
+      </view>
+      <!-- 回复列表 -->
+      <view class="review-card__replies" wx:if="{{item.replies && item.replies.length}}">
+        <view wx:for="{{item.replies}}" wx:for-item="reply" wx:key="id" class="reply-item">
+          <text class="reply-item__user">{{reply.user}}：</text>
+          <text class="reply-item__content">{{reply.content}}</text>
+          <text class="reply-item__date">{{reply.date}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 关联行旅内容 -->
+  <view class="section-title" wx:if="{{relatedTravel.length}}">去产地看看</view>
+  <view class="related" wx:if="{{relatedTravel.length}}">
+    <view
+      wx:for="{{relatedTravel}}"
+      wx:key="id"
+      class="related__item"
+      data-id="{{item.id || item.contentNo}}"
+      bindtap="onTravelTap"
+    >
+      <view class="related__cover" style="background-color:#5B8C85;">
+        <text class="related__cover-text">游</text>
+      </view>
+      <view class="related__body">
+        <text class="related__title ellipsis-2">{{item.title}}</text>
+        <text class="related__context">{{item.linkContext}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 关联养生内容 -->
+  <view class="section-title" wx:if="{{relatedWellness.length}}">茶与养生</view>
+  <view class="related" wx:if="{{relatedWellness.length}}">
+    <view
+      wx:for="{{relatedWellness}}"
+      wx:key="id"
+      class="related__item"
+      data-id="{{item.id || item.contentNo}}"
+      bindtap="onWellnessTap"
+    >
+      <view class="related__cover" style="background-color:#A0522D;">
+        <text class="related__cover-text">养</text>
+      </view>
+      <view class="related__body">
+        <text class="related__title ellipsis-2">{{item.title}}</text>
+        <text class="related__context">{{item.linkContext}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 相关推荐 -->
+  <view class="section-title" wx:if="{{recommendedTeas.length}}">相关推荐</view>
+  <view class="recommended" wx:if="{{recommendedTeas.length}}">
+    <view
+      wx:for="{{recommendedTeas}}"
+      wx:key="id"
+      class="recommended__item"
+      data-id="{{item.id}}"
+      bindtap="onRecommendTap"
+    >
+      <view class="recommended__cover" style="background-color:{{heroColor}};">
+        <text class="recommended__cover-text">{{item.name[0]}}</text>
+      </view>
+      <view class="recommended__body">
+        <text class="recommended__name">{{item.name}}</text>
+        <text class="recommended__meta">{{item.origin}} · {{item.grade}}</text>
+        <view class="recommended__tags">
+          <text wx:for="{{item.styleTags}}" wx:key="*this" wx:for-item="tag" class="tag tag--sm">{{tag}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 我的笔记 -->
+  <view class="section-title">我的笔记</view>
+  <view class="note-section">
+    <block wx:if="{{note}}">
+      <view class="note-card">
+        <text class="note-card__content">{{note.content}}</text>
+        <view class="note-card__footer">
+          <text class="note-card__time">最后编辑：{{noteEditTime}}</text>
+          <view class="note-card__actions">
+            <text class="note-card__btn" bindtap="onOpenNoteInput">编辑</text>
+            <text class="note-card__btn note-card__btn--delete" bindtap="onDeleteNote">删除</text>
+          </view>
+        </view>
+      </view>
+    </block>
+    <block wx:else>
+      <view class="note-empty" bindtap="onOpenNoteInput">
+        <text class="note-empty__icon">✎</text>
+        <text class="note-empty__text">写一条品茶笔记</text>
+      </view>
+    </block>
+  </view>
+
+  <!-- 占位高度，避免被底部按钮遮挡 -->
+  <view class="bottom-placeholder"></view>
+
+  <!-- 底部操作栏 -->
+  <view class="action-bar safe-bottom">
+    <view class="action-bar__review" bindtap="onOpenReview">
+      <text>写点评</text>
+    </view>
+    <view class="action-bar__poster" bindtap="onGeneratePoster">
+      <text>{{generatingPoster ? '生成中...' : '海报'}}</text>
+    </view>
+    <view class="action-bar__collect {{isCollected ? 'action-bar__collect--active' : ''}}" bindtap="onToggleCollect">
+      <text>{{isCollected ? '已收藏' : '收藏'}}</text>
+    </view>
+    <button class="action-bar__share" open-type="share">分享</button>
+  </view>
+
+  <!-- 隐藏的海报 canvas -->
+  <canvas type="2d" id="posterCanvas" style="position:fixed;left:-9999px;width:600px;height:960px;" />
+
+  <!-- 点评弹窗 -->
+  <review-modal
+    visible="{{showReviewModal}}"
+    teaName="{{tea.name}}"
+    bind:close="onCloseReview"
+    bind:submit="onReviewSubmit"
+  />
+
+  <!-- 评论输入框 -->
+  <view class="comment-input {{showCommentInput ? 'comment-input--show' : ''}}">
+    <view class="comment-input__mask" bindtap="onCloseComment"></view>
+    <view class="comment-input__body">
+      <input
+        class="comment-input__input"
+        placeholder="{{replyingTo ? '回复评论...' : '写评论...'}}"
+        value="{{commentText}}"
+        bindinput="onCommentInput"
+        focus="{{showCommentInput}}"
+      />
+      <view class="comment-input__btn" bindtap="onCommentSubmit">
+        <text>发送</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 冲泡计时器浮层 -->
+  <view class="brew-timer {{showBrewTimer ? 'brew-timer--show' : ''}}">
+    <view class="brew-timer__mask" bindtap="onCloseBrewTimer"></view>
+    <view class="brew-timer__panel">
+      <view class="brew-timer__header">
+        <text class="brew-timer__tea-name">{{tea.name}}</text>
+        <view class="brew-timer__close" bindtap="onCloseBrewTimer">
+          <text>✕</text>
+        </view>
+      </view>
+
+      <!-- 泡数指示器 -->
+      <view class="brew-timer__steeps">
+        <view 
+          wx:for="{{brewSteepDots}}" 
+          wx:key="num" 
+          class="brew-timer__steep-dot {{item.done ? 'brew-timer__steep-dot--done' : ''}} {{item.active ? 'brew-timer__steep-dot--active' : ''}}"
+        >
+          <text>{{item.num}}</text>
+        </view>
+      </view>
+      <view class="brew-timer__steep-label">
+        <text>第 {{brewSteep}} 泡 / 共 {{tea.brewing.maxSteeps}} 泡</text>
+      </view>
+
+      <!-- 计时器 -->
+      <view class="brew-timer__circle">
+        <view class="brew-timer__time-display">
+          <text class="brew-timer__time">{{brewDisplayTime}}</text>
+          <text class="brew-timer__status">{{brewFinished ? '✓ 已完成' : brewRunning ? '冲泡中...' : '已暂停'}}</text>
+        </view>
+        <view class="brew-timer__progress-bar">
+          <view class="brew-timer__progress-fill" style="width: {{brewProgress}}%;"></view>
+        </view>
+      </view>
+
+      <!-- 冲泡信息 -->
+      <view class="brew-timer__info">
+        <view class="brew-timer__info-item">
+          <text class="brew-timer__info-label">水温</text>
+          <text class="brew-timer__info-value">{{tea.brewing.temperature}}℃</text>
+        </view>
+        <view class="brew-timer__info-item">
+          <text class="brew-timer__info-label">投茶</text>
+          <text class="brew-timer__info-value">{{tea.brewing.dosage}}g</text>
+        </view>
+        <view class="brew-timer__info-item">
+          <text class="brew-timer__info-label">器具</text>
+          <text class="brew-timer__info-value">{{tea.brewing.vessel}}</text>
+        </view>
+      </view>
+
+      <!-- 操作按钮 -->
+      <view class="brew-timer__actions">
+        <block wx:if="{{brewFinished}}">
+          <view class="brew-timer__btn brew-timer__btn--next" bindtap="onNextSteep" wx:if="{{brewSteep < tea.brewing.maxSteeps}}">
+            <text>下一泡 →</text>
+          </view>
+          <view class="brew-timer__btn brew-timer__btn--reset" bindtap="onResetBrewTimer">
+            <text>重新开始</text>
+          </view>
+        </block>
+        <block wx:else>
+          <view class="brew-timer__btn brew-timer__btn--reset" bindtap="onResetBrewTimer">
+            <text>重置</text>
+          </view>
+          <view class="brew-timer__btn {{brewRunning ? 'brew-timer__btn--pause' : 'brew-timer__btn--start'}}" bindtap="onToggleBrewTimer">
+            <text>{{brewRunning ? '暂停' : '开始'}}</text>
+          </view>
+        </block>
+      </view>
+    </view>
+  </view>
+
+  <!-- 冲泡计时器最小化浮动按钮 -->
+  <view class="brew-minimized {{brewMinimized ? 'brew-minimized--show' : ''}}" bindtap="onRestoreBrewTimer">
+    <text class="brew-minimized__icon">⏱</text>
+    <view class="brew-minimized__info">
+      <text class="brew-minimized__label">第{{brewSteep}}泡</text>
+      <text class="brew-minimized__time">{{brewDisplayTime}}</text>
+    </view>
+  </view>
+
+  <!-- 笔记编辑弹层 -->
+  <view class="note-input {{showNoteInput ? 'note-input--show' : ''}}">
+    <view class="note-input__mask" bindtap="onCloseNoteInput"></view>
+    <view class="note-input__panel">
+      <view class="note-input__header">
+        <text class="note-input__title">{{note ? '编辑笔记' : '写笔记'}}</text>
+        <view class="note-input__close" bindtap="onCloseNoteInput">
+          <text>✕</text>
+        </view>
+      </view>
+      <textarea
+        class="note-input__textarea"
+        placeholder="记录你此刻的品茶感受..."
+        value="{{noteText}}"
+        bindinput="onNoteInput"
+        maxlength="500"
+        auto-height
+        focus="{{showNoteInput}}"
+      />
+      <view class="note-input__footer">
+        <text class="note-input__count">{{noteText.length}}/500</text>
+        <view class="note-input__save" bindtap="onSaveNote">
+          <text>保存</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<view wx:else class="loading">载入中...</view>

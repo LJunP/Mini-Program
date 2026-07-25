@@ -1,0 +1,726 @@
+/* pages/index/index.wxss */
+.page-bg { padding-bottom: 40rpx; }
+
+/* Hero */
+.hero {
+  padding: 48rpx 16rpx 32rpx;
+  text-align: center;
+}
+.hero__title {
+  font-size: 56rpx;
+  font-weight: 500;
+  letter-spacing: 12rpx;
+  color: #2C2C2A;
+}
+.hero__subtitle {
+  font-size: 26rpx;
+  color: #8B8578;
+  margin-top: 12rpx;
+  letter-spacing: 4rpx;
+}
+.hero__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16rpx;
+}
+.hero__titles {
+  flex: 1;
+}
+.hero__search {
+  width: 72rpx;
+  height: 72rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #FFFFFFFC;
+  border: 0.5px solid #EAE5DC;
+  border-radius: 50%;
+  margin-left: 24rpx;
+  flex-shrink: 0;
+}
+.hero__search-icon {
+  font-size: 36rpx;
+  color: #8B8578;
+}
+
+/* 六雅宫格 */
+.realms {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 16rpx 0 32rpx;
+}
+.realms__item {
+  width: 33.33%;
+  padding: 24rpx 16rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+}
+.realms__icon {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16rpx;
+  position: relative;
+}
+.realms__badge {
+  position: absolute;
+  top: -6rpx;
+  right: -6rpx;
+  min-width: 32rpx;
+  height: 32rpx;
+  border-radius: 999rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.15);
+}
+.realms__badge--bookmark {
+  background: linear-gradient(135deg, #E74C3C, #C0392B);
+}
+.realms__badge-num {
+  font-size: 20rpx;
+  color: #FFFFFF;
+  font-weight: 600;
+  line-height: 1;
+}
+.realms__char {
+  font-size: 40rpx;
+  color: #FFFFFF;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+.realms__name {
+  font-size: 28rpx;
+  color: #2C2C2A;
+  font-weight: 500;
+}
+.realms__sub {
+  font-size: 22rpx;
+  color: #8B8578;
+  margin-top: 4rpx;
+}
+
+/* 每日风雅卡片 */
+.daily-elegance {
+  background-color: #FFFFFFFC;
+  border: 0.5px solid #EAE5DC;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 24rpx;
+}
+.daily-elegance__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 24rpx 0;
+}
+.daily-elegance__viewed {
+  font-size: 20rpx;
+  color: #8B8578;
+  background: rgba(139, 133, 120, 0.1);
+  padding: 4rpx 12rpx;
+  border-radius: 4px;
+}
+.daily-elegance__badge {
+  display: flex;
+  align-items: center;
+  padding: 8rpx 16rpx;
+  border-radius: 999rpx;
+}
+.daily-elegance__badge-char {
+  font-size: 24rpx;
+  font-weight: 500;
+  color: #FFFFFF;
+  margin-right: 8rpx;
+}
+.daily-elegance__badge-name {
+  font-size: 22rpx;
+  color: #FFFFFF;
+  letter-spacing: 2rpx;
+}
+.daily-elegance__streak {
+  display: flex;
+  align-items: baseline;
+}
+.daily-elegance__streak-num {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #3B6D11;
+}
+.daily-elegance__streak-label {
+  font-size: 20rpx;
+  color: #8B8578;
+  margin-left: 4rpx;
+}
+.daily-elegance__cover {
+  height: 280rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-top: 16rpx;
+}
+.daily-elegance__img {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.daily-elegance__cover-text {
+  font-size: 56rpx;
+  color: #FFFFFF;
+  font-weight: 500;
+  letter-spacing: 16rpx;
+  opacity: 0.85;
+}
+.daily-elegance__body {
+  padding: 24rpx;
+}
+.daily-elegance__title {
+  font-size: 34rpx;
+  font-weight: 500;
+  color: #2C2C2A;
+  display: block;
+}
+.daily-elegance__desc {
+  font-size: 26rpx;
+  color: #5A554C;
+  line-height: 1.7;
+  margin-top: 12rpx;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+
+/* 打卡日历 */
+.daily-elegance__checkin {
+  padding: 20rpx 24rpx 24rpx;
+  border-top: 0.5px solid #EAE5DC;
+}
+.checkin-calendar {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+}
+.checkin-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10rpx;
+}
+.checkin-day__name {
+  font-size: 22rpx;
+  color: #8B8578;
+}
+.checkin-day__dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  background-color: #EAE5DC;
+}
+.checkin-day--checked .checkin-day__dot {
+  background-color: #3B6D11;
+}
+.checkin-day--today .checkin-day__name {
+  color: #3B6D11;
+  font-weight: 500;
+}
+.checkin-day--today .checkin-day__dot {
+  border: 2px solid #3B6D11;
+  background-color: transparent;
+}
+.checkin-day--today.checkin-day--checked .checkin-day__dot {
+  background-color: #3B6D11;
+  border: 2px solid #3B6D11;
+}
+.checkin-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16rpx;
+  background-color: #3B6D11;
+  border-radius: 12px;
+}
+.checkin-btn text {
+  font-size: 26rpx;
+  color: #FFFFFF;
+  font-weight: 500;
+  letter-spacing: 4rpx;
+}
+.checkin-btn--done {
+  background-color: #EAE5DC;
+}
+.checkin-btn--done text {
+  color: #B5B0A6;
+}
+
+/* 当季推荐 */
+.seasonal-section {
+  margin-bottom: 24rpx;
+}
+.seasonal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16rpx;
+  padding: 0 4rpx;
+}
+.seasonal-header__left {
+  display: flex;
+  align-items: center;
+}
+.seasonal-header__badge {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 12rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16rpx;
+}
+.seasonal-header__char {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #FFFFFF;
+}
+.seasonal-header__info {
+  display: flex;
+  flex-direction: column;
+}
+.seasonal-header__title {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #2C2C2A;
+}
+.seasonal-header__sub {
+  font-size: 22rpx;
+  color: #8B8578;
+  margin-top: 2rpx;
+}
+.seasonal-header__next {
+  font-size: 22rpx;
+  color: #B5B0A6;
+}
+.seasonal-scroll {
+  white-space: nowrap;
+}
+.seasonal-card {
+  display: inline-block;
+  width: 480rpx;
+  background-color: #FFFFFFFC;
+  border: 0.5px solid #EAE5DC;
+  border-radius: 12px;
+  padding: 24rpx;
+  margin-right: 16rpx;
+  vertical-align: top;
+  white-space: normal;
+}
+.seasonal-card__tag {
+  display: inline-block;
+  padding: 4rpx 12rpx;
+  border-radius: 4rpx;
+  font-size: 22rpx;
+  margin-bottom: 12rpx;
+}
+.seasonal-card__title {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #2C2C2A;
+  margin-bottom: 8rpx;
+}
+.seasonal-card__summary {
+  display: block;
+  font-size: 24rpx;
+  color: #5A554C;
+  line-height: 1.6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+.seasonal-card__footer {
+  margin-top: 12rpx;
+}
+.seasonal-card__term {
+  font-size: 20rpx;
+  color: #B5B0A6;
+}
+
+/* 发现好工具 */
+.tools-mini {
+  margin-bottom: 24rpx;
+}
+.tools-mini__item {
+  display: flex;
+  align-items: center;
+  background-color: #FFFFFFFC;
+  border: 0.5px solid #EAE5DC;
+  border-radius: 12px;
+  padding: 24rpx;
+  margin-bottom: 16rpx;
+}
+.tools-mini__icon {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.tools-mini__icon--study {
+  background-color: #854F0B;
+}
+.tools-mini__icon--dnf {
+  background-color: #1a1a2e;
+}
+.tools-mini__icon--gold {
+  background-color: #B8860B;
+}
+.tools-mini__icon--more {
+  background-color: #5B8C85;
+}
+.tools-mini__char {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #FFFFFF;
+}
+.tools-mini__body {
+  flex: 1;
+  min-width: 0;
+  margin-left: 24rpx;
+}
+.tools-mini__name {
+  display: block;
+  font-size: 28rpx;
+  color: #2C2C2A;
+  font-weight: 500;
+}
+.tools-mini__desc {
+  display: block;
+  font-size: 22rpx;
+  color: #8B8578;
+  margin-top: 6rpx;
+}
+.tools-mini__arrow {
+  font-size: 36rpx;
+  color: #B5B0A6;
+  flex-shrink: 0;
+  margin-left: 16rpx;
+}
+
+/* 底部 */
+.footer-end {
+  text-align: center;
+  color: #B5B0A6;
+  font-size: 24rpx;
+  padding: 60rpx 120rpx 40rpx;
+  letter-spacing: 8rpx;
+}
+
+/* 骨架屏 */
+@keyframes skeleton-shimmer {
+  0% { opacity: 1; }
+  50% { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+.skeleton-block {
+  background-color: #E8E3DA;
+  border-radius: 8rpx;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}
+.skeleton-daily {
+  background-color: #FFFFFFFC;
+  border: 0.5px solid #EAE5DC;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 24rpx;
+  padding-bottom: 24rpx;
+}
+.skeleton-cover {
+  height: 280rpx;
+  border-radius: 0;
+  margin-bottom: 24rpx;
+}
+.skeleton-line {
+  margin: 0 24rpx 16rpx;
+}
+.skeleton-line--lg {
+  height: 36rpx;
+  width: 60%;
+}
+.skeleton-line--md {
+  height: 28rpx;
+  width: 80%;
+}
+.skeleton-line--sm {
+  height: 24rpx;
+  width: 40%;
+}
+.skeleton-feed {
+  margin-bottom: 24rpx;
+}
+.skeleton-feed__item {
+  display: flex;
+  align-items: center;
+  background-color: #FFFFFFFC;
+  border: 0.5px solid #EAE5DC;
+  border-radius: 12px;
+  padding: 24rpx;
+  margin-bottom: 16rpx;
+}
+.skeleton-feed__cover {
+  width: 160rpx;
+  height: 120rpx;
+  flex-shrink: 0;
+  margin-right: 24rpx;
+}
+.skeleton-feed__text {
+  flex: 1;
+  min-width: 0;
+}
+.skeleton-feed__text .skeleton-line {
+  margin: 0 0 16rpx;
+}
+.skeleton-feed__text .skeleton-line:last-child {
+  margin-bottom: 0;
+}
+
+/* === 六雅宫格 sticky === */
+.realms-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background-color: #FAF8F3;
+  padding-bottom: 8rpx;
+}
+.realms-sticky .realms {
+  padding: 8rpx 0 12rpx;
+}
+
+/* === 紧凑打卡条 === */
+.checkin-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx 24rpx;
+  margin: 0 16rpx 24rpx;
+  background-color: #FFFFFFFC;
+  border: 0.5px solid #EAE5DC;
+  border-radius: 12px;
+}
+.checkin-bar__info {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+.checkin-bar__streak {
+  font-size: 24rpx;
+  color: #5A554C;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+.checkin-bar__dots {
+  display: flex;
+  gap: 8rpx;
+}
+.checkin-bar__dot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  background-color: #EAE5DC;
+}
+.checkin-bar__dot--checked {
+  background-color: #3B6D11;
+}
+.checkin-bar__dot--today {
+  border: 2px solid #3B6D11;
+  background-color: transparent;
+}
+.checkin-bar__dot--today.checkin-bar__dot--checked {
+  background-color: #3B6D11;
+  border: 2px solid #3B6D11;
+}
+.checkin-bar__btn {
+  padding: 10rpx 28rpx;
+  background: linear-gradient(135deg, #3B6D11, #5A8F2E);
+  border-radius: 20rpx;
+  flex-shrink: 0;
+}
+.checkin-bar__btn text {
+  font-size: 24rpx;
+  color: #FFFFFF;
+  letter-spacing: 2rpx;
+}
+.checkin-bar__btn--done {
+  background-color: #EAE5DC;
+}
+.checkin-bar__btn--done text {
+  color: #B5B0A6;
+}
+
+/* === section-title 增强 === */
+.section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.section-title__action {
+  padding: 6rpx 20rpx;
+  background-color: rgba(59, 109, 17, 0.08);
+  border-radius: 16rpx;
+}
+.section-title__action text {
+  font-size: 24rpx;
+  color: #3B6D11;
+}
+
+/* === 当季推荐查看更多 === */
+.seasonal-more {
+  text-align: center;
+  padding: 16rpx 0 8rpx;
+}
+.seasonal-more text {
+  font-size: 24rpx;
+  color: #8B8578;
+}
+
+/* === 浮动快捷导航按钮 === */
+.fab-nav {
+  position: fixed;
+  right: 32rpx;
+  bottom: 200rpx;
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3B6D11, #5A8F2E);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 24rpx rgba(59, 109, 17, 0.35);
+  z-index: 50;
+}
+.fab-nav__icon {
+  font-size: 40rpx;
+  color: #FFFFFF;
+  font-weight: 300;
+}
+
+/* === 快捷导航面板 === */
+.nav-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 99;
+  animation: navMaskFadeIn 0.2s ease-out;
+}
+@keyframes navMaskFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.nav-panel {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #FAF8F3;
+  border-radius: 24rpx 24rpx 0 0;
+  padding: 32rpx 24rpx 48rpx;
+  z-index: 100;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+}
+.nav-panel--open {
+  transform: translateY(0);
+}
+.nav-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32rpx;
+}
+.nav-panel__title {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #2C2C2A;
+  letter-spacing: 4rpx;
+}
+.nav-panel__close {
+  width: 56rpx;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  color: #8B8578;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 50%;
+}
+.nav-panel__grid {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 24rpx;
+}
+.nav-panel__item {
+  width: 33.33%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16rpx 8rpx;
+  box-sizing: border-box;
+}
+.nav-panel__icon {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12rpx;
+  font-size: 36rpx;
+  color: #FFFFFF;
+  font-weight: 500;
+}
+.nav-panel__icon--search {
+  background-color: #8B8578 !important;
+}
+.nav-panel__icon--study {
+  background-color: #2C2C2A !important;
+}
+.nav-panel__icon--dnf {
+  background-color: #A0522D !important;
+}
+.nav-panel__name {
+  font-size: 24rpx;
+  color: #5A554C;
+}
+.nav-panel__section {
+  display: flex;
+  border-top: 0.5px solid #EAE5DC;
+  padding-top: 24rpx;
+}
+.nav-panel__section .nav-panel__item {
+  width: 33.33%;
+}
+
+.nav-panel__section-title {
+  font-size: 24rpx;
+  color: #8B8578;
+  margin: 20rpx 0 12rpx;
+  padding-left: 8rpx;
+}

@@ -1,0 +1,104 @@
+<!-- pages/subscribe/subscribe.wxml -->
+<view class="page-bg">
+  <!-- 页面标题 -->
+  <view class="page-header">
+    <view class="page-header__top">
+      <view class="back-btn" bindtap="onBack">
+        <text class="back-btn__icon">‹</text>
+        <text class="back-btn__text">返回</text>
+      </view>
+    </view>
+    <text class="page-title">消息订阅管理</text>
+    <text class="page-desc">管理您的消息订阅设置，及时获取感兴趣的内容更新</text>
+  </view>
+
+  <!-- 订阅统计 -->
+  <view class="subscribe-stats card">
+    <view class="stats-item">
+      <text class="stats-num">{{enabledCount}}</text>
+      <text class="stats-label">已开启</text>
+    </view>
+    <view class="stats-divider"></view>
+    <view class="stats-item">
+      <text class="stats-num">{{totalCount}}</text>
+      <text class="stats-label">可订阅</text>
+    </view>
+    <view class="stats-divider"></view>
+    <view class="stats-item">
+      <text class="stats-num">{{totalCount - enabledCount}}</text>
+      <text class="stats-label">未开启</text>
+    </view>
+  </view>
+
+  <!-- 订阅列表 -->
+  <view class="section-title">订阅项目</view>
+  <view class="subscribe-list card">
+    <view 
+      wx:for="{{templates}}" 
+      wx:key="key"
+      class="subscribe-item"
+      data-key="{{item.key}}"
+      bindtap="onToggleSubscribe"
+    >
+      <view class="subscribe-item__info">
+        <view class="subscribe-item__header">
+          <text class="subscribe-item__name">{{item.name}}</text>
+          <view class="subscribe-item__badge {{subscribeStatus[item.key] ? 'subscribe-item__badge--active' : ''}}">
+            <text>{{subscribeStatus[item.key] ? '已开启' : '未开启'}}</text>
+          </view>
+        </view>
+        <text class="subscribe-item__desc">{{item.description}}</text>
+      </view>
+      <view class="subscribe-item__toggle">
+        <view class="toggle-switch {{subscribeStatus[item.key] ? 'toggle-switch--active' : ''}}">
+          <view class="toggle-switch__dot"></view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="action-buttons">
+    <view class="action-btn action-btn--primary" bindtap="onEnableAll">
+      <text>一键开启所有订阅</text>
+    </view>
+    <view class="action-btn action-btn--secondary" bindtap="onDisableAll">
+      <text>关闭所有订阅</text>
+    </view>
+  </view>
+
+  <!-- 权限设置 -->
+  <view class="section-title">权限管理</view>
+  <view class="permission-card card">
+    <view class="permission-item" bindtap="onOpenSetting">
+      <view class="permission-item__info">
+        <text class="permission-item__name">微信订阅权限设置</text>
+        <text class="permission-item__desc">管理微信订阅消息权限，包括已拒绝的订阅请求</text>
+      </view>
+      <text class="permission-item__arrow">›</text>
+    </view>
+  </view>
+
+  <!-- 说明文字 -->
+  <view class="subscribe-notice">
+    <text class="notice-title">订阅说明</text>
+    <view class="notice-list">
+      <view class="notice-item">
+        <text class="notice-dot">•</text>
+        <text class="notice-text">开启订阅后，可及时获取内容更新、签到提醒等通知</text>
+      </view>
+      <view class="notice-item">
+        <text class="notice-dot">•</text>
+        <text class="notice-text">订阅消息仅用于重要内容通知，不会频繁打扰您</text>
+      </view>
+      <view class="notice-item">
+        <text class="notice-dot">•</text>
+        <text class="notice-text">您可随时在此页面管理订阅设置</text>
+      </view>
+      <view class="notice-item">
+        <text class="notice-dot">•</text>
+        <text class="notice-text">如遇订阅问题，可前往微信设置检查权限</text>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,102 @@
+<view class="page-bg">
+  <!-- 数据源提示 -->
+  <view class="mock-notice">
+    <text class="mock-notice__text">📚 题库数据为本地示例，正式上线后将替换为云端数据</text>
+  </view>
+
+  <view class="study-hero">
+    <view class="study-hero__kicker">学习模式</view>
+    <view class="study-hero__title">把长期积累变成系统</view>
+    <view class="study-hero__desc">教程、知识科普、面试题库、错题和复习队列都会在这里收敛。</view>
+  </view>
+
+  <view class="study-stats">
+    <view class="study-stats__item" wx:for="{{stats}}" wx:key="label">
+      <text class="study-stats__value">{{item.value}}</text>
+      <text class="study-stats__label">{{item.label}}</text>
+    </view>
+  </view>
+
+  <!-- 每日一题 -->
+  <view class="section-title">每日一题</view>
+  <view class="daily-question-card" wx:if="{{dailyQuestion}}" data-id="{{dailyQuestion.id}}" bindtap="onDailyQuestionTap">
+    <view class="daily-question-card__header">
+      <view class="daily-question-card__badge">{{dailyQuestion.type}}</view>
+      <view class="daily-question-card__streak" wx:if="{{dailyStreak > 0}}">
+        <text class="daily-question-card__streak-num">{{dailyStreak}}</text>
+        <text class="daily-question-card__streak-label">天连续</text>
+      </view>
+      <view class="daily-question-card__viewed" wx:if="{{dailyQuestion.isViewed}}">
+        <text>已查看</text>
+      </view>
+    </view>
+    <text class="daily-question-card__title">{{dailyQuestion.title}}</text>
+    <text class="daily-question-card__question">{{dailyQuestion.question}}</text>
+    <view class="daily-question-card__footer">
+      <view class="daily-question-card__meta">
+        <text>{{dailyQuestion.track}}</text>
+        <text class="daily-question-card__dot">·</text>
+        <text>难度 {{dailyQuestion.difficulty}}</text>
+        <text class="daily-question-card__dot" wx:if="{{dailyQuestion.frequency}}">·</text>
+        <text wx:if="{{dailyQuestion.frequency}}">高频</text>
+      </view>
+      <view class="daily-question-card__go">
+        <text>{{dailyQuestion.isViewed ? '再看看' : '去答题'}}</text>
+        <text class="daily-question-card__arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="section-title">学习入口</view>
+  <view class="study-modules">
+    <view
+      wx:for="{{modules}}"
+      wx:key="key"
+      class="study-module"
+      data-key="{{item.key}}"
+      bindtap="onModuleTap"
+    >
+      <view class="study-module__mark" style="background-color:{{item.color}};">{{item.badge}}</view>
+      <view class="study-module__body">
+        <text class="study-module__title">{{item.title}}</text>
+        <text class="study-module__subtitle">{{item.subtitle}}</text>
+      </view>
+      <view class="study-module__count">{{item.count}}</view>
+      <text class="study-module__arrow">›</text>
+    </view>
+  </view>
+
+  <view class="section-title">推荐学习路径</view>
+  <view class="tech-stacks">
+    <view
+      class="tech-stack"
+      wx:for="{{techStacks}}"
+      wx:key="name"
+      data-keyword="{{item.keyword}}"
+      data-topic="{{item.topic}}"
+      bindtap="onTechStackTap"
+    >
+      <view class="tech-stack__icon" style="background-color:{{item.bgColor}};">
+        <text class="tech-stack__char">{{item.char}}</text>
+      </view>
+      <view class="tech-stack__info">
+        <text class="tech-stack__name">{{item.name}}</text>
+        <text class="tech-stack__desc">{{item.desc}}</text>
+      </view>
+      <text class="tech-stack__arrow">›</text>
+    </view>
+  </view>
+
+  <view class="section-title">今日复习</view>
+  <view class="review-card" bindtap="onReviewTap">
+    <view class="review-card__title">{{review.title}}</view>
+    <view class="review-card__summary">{{review.summary}}</view>
+    <view class="review-card__action">{{review.action}}</view>
+  </view>
+
+  <!-- 明日预告 -->
+  <view class="tomorrow-preview" wx:if="{{tomorrowQuestion}}">
+    <text class="tomorrow-preview__label">明日预告</text>
+    <text class="tomorrow-preview__title">{{tomorrowQuestion.title}}</text>
+  </view>
+</view>

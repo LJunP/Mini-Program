@@ -1,0 +1,129 @@
+<!-- pages/tea/tea.wxml -->
+<view class="page-bg">
+  <view class="page-header">
+    <view class="page-header__row">
+      <view>
+        <text class="page-header__title">茶库</text>
+        <text class="page-header__sub">六大茶类 · 慢慢品味{{!compareMode ? ' · 长按茶品可对比' : ' · 点击选择茶品'}}</text>
+      </view>
+      <view class="page-header__search" bindtap="goSearch">
+        <text class="page-header__search-icon">⌕</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 内嵌搜索框 -->
+  <view class="search-bar">
+    <input
+      class="search-bar__input"
+      placeholder="搜索茶品名称、产地、风格标签…"
+      placeholder-style="color:#B0A99A;"
+      value="{{searchKeyword}}"
+      bindinput="onSearchInput"
+      bindfocus="onSearchFocus"
+    />
+    <view wx:if="{{showSearch}}" class="search-bar__cancel" bindtap="onSearchCancel">
+      <text>取消</text>
+    </view>
+  </view>
+
+  <!-- 搜索结果 -->
+  <view class="search-results" wx:if="{{showSearch && searchResults.length}}">
+    <view
+      wx:for="{{searchResults}}"
+      wx:key="id"
+      class="search-results__item"
+      data-id="{{item.id}}"
+      bindtap="onSearchResultTap"
+    >
+      <text class="search-results__name">{{item.name}}</text>
+      <text class="search-results__meta">{{item.origin}} · {{item.grade}}</text>
+    </view>
+  </view>
+  <view class="search-results" wx:if="{{showSearch && searchKeyword && !searchResults.length}}">
+    <view class="search-results__empty">未找到相关茶品</view>
+  </view>
+
+  <!-- 非搜索态才显示排序和列表 -->
+  <block wx:if="{{!showSearch}}">
+
+  <!-- 排序栏 -->
+  <view class="sort-bar">
+    <view class="sort-bar__tabs">
+      <view
+        wx:for="{{sortOptions}}"
+        wx:key="key"
+        class="sort-bar__item {{sort === item.key ? 'sort-bar__item--active' : ''}}"
+        data-key="{{item.key}}"
+        bindtap="onSortTap"
+      >
+        <text>{{item.name}}</text>
+      </view>
+    </view>
+    <view class="sort-bar__compare {{compareMode ? 'sort-bar__compare--active' : ''}}" bindtap="onToggleCompareMode">
+      <text>⚖ 对比</text>
+    </view>
+  </view>
+
+  <!-- 茶类横向 tab -->
+  <scroll-view class="tabs" scroll-x="true" enhanced="true" show-scrollbar="false">
+    <view
+      wx:for="{{categories}}"
+      wx:key="key"
+      class="tabs__item {{currentCategory === item.key ? 'tabs__item--active' : ''}}"
+      data-key="{{item.key}}"
+      bindtap="onCategoryTap"
+    >
+      <text class="tabs__name">{{item.name}}</text>
+      <text class="tabs__count">{{item.count}}</text>
+    </view>
+  </scroll-view>
+
+  <!-- 茶品列表 -->
+  <view class="tea-list" wx:if="{{list.length}}">
+    <tea-card
+      wx:for="{{list}}"
+      wx:key="id"
+      tea="{{item}}"
+      data-tea="{{item}}"
+      bindtap="onTeaTap"
+      bindlongpress="onTeaLongPress"
+      class="{{compareMode && compareList[0].id === item.id ? 'tea-card--selected' : ''}} {{compareMode && compareList[1] && compareList[1].id === item.id ? 'tea-card--selected' : ''}}"
+    />
+  </view>
+
+  <!-- 对比模式浮层 -->
+  <view class="compare-bar safe-bottom" wx:if="{{compareMode}}">
+    <view class="compare-bar__info">
+      <text class="compare-bar__text">已选 {{compareList.length}}/2 款茶品</text>
+      <text class="compare-bar__hint" wx:if="{{compareList.length < 2}}">再选 1 款即可对比</text>
+    </view>
+    <view class="compare-bar__actions">
+      <view class="compare-bar__cancel" bindtap="exitCompare">
+        <text>取消</text>
+      </view>
+      <view class="compare-bar__start {{compareList.length === 2 ? 'compare-bar__start--active' : ''}}" bindtap="onStartCompare">
+        <text>开始对比</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载更多 -->
+  <view class="load-more" wx:if="{{list.length}}">
+    <view wx:if="{{loading}}" class="load-more__loading">
+      <view class="load-more__dot"></view>
+      <view class="load-more__dot"></view>
+      <view class="load-more__dot"></view>
+    </view>
+    <text wx:elif="{{!hasMore}}" class="load-more__end">— 已经到底了 —</text>
+  </view>
+
+  <empty-state wx:if="{{!list.length && !loading && !showSearch}}" text="暂无该茶类茶品" desc="试试其他茶类" />
+
+  </block> <!-- end !showSearch -->
+
+  <!-- 返回顶部 -->
+  <view class="back-to-top {{showBackTop ? 'back-to-top--show' : ''}}" bindtap="onBackToTop">
+    <text class="back-to-top__arrow">↑</text>
+  </view>
+</view>

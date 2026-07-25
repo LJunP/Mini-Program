@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "教程",
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "empty-state": "/components/empty-state/empty-state"
+  }
+}

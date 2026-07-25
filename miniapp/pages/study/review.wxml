@@ -1,0 +1,185 @@
+<view class="page-bg">
+  <view class="page-header">
+    <text class="page-header__title">复习与错题</text>
+    <text class="page-header__sub">科学复习 · 让记忆更持久</text>
+  </view>
+
+  <!-- Tab 切换 -->
+  <view class="review-tabs">
+    <view
+      class="review-tabs__item {{activeTab === 'review' ? 'review-tabs__item--active' : ''}}"
+      data-tab="review"
+      bindtap="onTabTap"
+    >
+      <text>今日复习</text>
+      <text class="review-tabs__count" wx:if="{{list.length}}">{{list.length}}</text>
+    </view>
+    <view
+      class="review-tabs__item {{activeTab === 'wrong' ? 'review-tabs__item--active' : ''}}"
+      data-tab="wrong"
+      bindtap="onTabTap"
+    >
+      <text>错题本</text>
+      <text class="review-tabs__count review-tabs__count--wrong" wx:if="{{wrongStats.total}}">{{wrongStats.total}}</text>
+    </view>
+  </view>
+
+  <!-- 今日复习统计 -->
+  <view class="review-stats" wx:if="{{activeTab === 'review'}}">
+    <view class="review-stats__item">
+      <text class="review-stats__value">{{list.length}}</text>
+      <text class="review-stats__label">今日待复习</text>
+    </view>
+    <view class="review-stats__item">
+      <text class="review-stats__value review-stats__value--muted">{{list.length === 0 ? '保持得很好' : '加油复习吧'}}</text>
+    </view>
+  </view>
+
+  <!-- 今日复习列表 -->
+  <block wx:if="{{activeTab === 'review'}}">
+    <view class="question-list" wx:if="{{list.length}}">
+      <view class="flip-card {{flippedCards[item.id] ? 'flip-card--flipped' : ''}}" wx:for="{{list}}" wx:key="id">
+        <!-- 正面：题目 -->
+        <view class="flip-card__front">
+          <view class="question-card">
+            <!-- 记忆曲线信息栏 -->
+            <view class="memory-bar">
+              <view class="memory-bar__item">
+                <text class="memory-bar__label">状态</text>
+                <text class="memory-bar__value memory-bar__value--{{item.progress.status === 'mastered' ? 'mastered' : (item.progress.status === 'weak' ? 'weak' : 'learning')}}">
+                  {{item.progress.status === 'mastered' ? '已掌握' : (item.progress.status === 'weak' ? '薄弱' : '学习中')}}
+                </text>
+              </view>
+              <view class="memory-bar__item">
+                <text class="memory-bar__label">间隔</text>
+                <text class="memory-bar__value">{{item.intervalText}}</text>
+              </view>
+              <view class="memory-bar__item">
+                <text class="memory-bar__label">下次复习</text>
+                <text class="memory-bar__value memory-bar__value--next">{{item.nextReviewText}}</text>
+              </view>
+            </view>
+
+            <!-- 记忆等级可视化 -->
+            <view class="memory-level">
+              <view class="memory-level__progress">
+                <view class="memory-level__track">
+                  <view class="memory-level__fill" style="width:{{item.memoryLevel * 25}}%;"></view>
+                </view>
+                <view class="memory-level__dots">
+                  <view class="memory-level__dot {{item.memoryLevel >= 1 ? 'memory-level__dot--active' : ''}}"></view>
+                  <view class="memory-level__dot {{item.memoryLevel >= 2 ? 'memory-level__dot--active' : ''}}"></view>
+                  <view class="memory-level__dot {{item.memoryLevel >= 3 ? 'memory-level__dot--active' : ''}}"></view>
+                  <view class="memory-level__dot {{item.memoryLevel >= 4 ? 'memory-level__dot--active' : ''}}"></view>
+                </view>
+              </view>
+              <text class="memory-level__text">{{['未开始', '初步记忆', '短期巩固', '中期巩固', '长期记忆'][item.memoryLevel]}}</text>
+              <text class="memory-bar__meta">复习{{item.progress.reviewCount}}次 · 错{{item.progress.wrongCount}}次</text>
+            </view>
+
+            <text class="question-card__title">{{item.title}}</text>
+            <text class="question-card__question ellipsis-3">{{item.question}}</text>
+
+            <view class="question-card__actions">
+              <view class="action-btn action-btn--flip" data-id="{{item.id}}" catchtap="onFlipCard">
+                <text>查看答案</text>
+              </view>
+              <view class="action-btn action-btn--wrong" data-id="{{item.id}}" catchtap="onQuickWrong">需重温</view>
+              <view class="action-btn action-btn--master" data-id="{{item.id}}" catchtap="onQuickMaster">已掌握</view>
+            </view>
+          </view>
+        </view>
+
+        <!-- 背面：答案 -->
+        <view class="flip-card__back">
+          <view class="question-card question-card--back">
+            <view class="question-card__header">
+              <text class="question-card__type question-card__type--answer">答案</text>
+              <text class="question-card__meta">{{item.track}} · {{item.topic}}</text>
+            </view>
+            <text class="question-card__answer ellipsis-5">{{item.answer}}</text>
+            <view class="question-card__actions">
+              <view class="action-btn action-btn--flip" data-id="{{item.id}}" catchtap="onFlipCard">
+                <text>收起答案</text>
+              </view>
+              <view class="action-btn action-btn--wrong" data-id="{{item.id}}" catchtap="onQuickWrong">又错了</view>
+              <view class="action-btn action-btn--master" data-id="{{item.id}}" catchtap="onQuickMaster">已掌握</view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <empty-state wx:else text="今天暂无待复习" desc="继续保持，标记学习中、薄弱点或错题后会生成复习队列" />
+  </block>
+
+  <!-- 错题本列表 -->
+  <block wx:if="{{activeTab === 'wrong'}}">
+    <!-- 错题统计 -->
+    <view class="wrong-stats" wx:if="{{wrongStats.total > 0}}">
+      <view class="wrong-stats__item">
+        <text class="wrong-stats__value">{{wrongStats.total}}</text>
+        <text class="wrong-stats__label">总错题</text>
+      </view>
+      <view class="wrong-stats__item">
+        <text class="wrong-stats__value wrong-stats__value--weak">{{wrongStats.stillWeak}}</text>
+        <text class="wrong-stats__label">仍未掌握</text>
+      </view>
+      <view class="wrong-stats__item">
+        <text class="wrong-stats__value wrong-stats__value--mastered">{{wrongStats.mastered}}</text>
+        <text class="wrong-stats__label">已攻克</text>
+      </view>
+      <view class="wrong-stats__item">
+        <text class="wrong-stats__value">{{wrongStats.totalWrongCount}}</text>
+        <text class="wrong-stats__label">总错次</text>
+      </view>
+    </view>
+
+    <view class="question-list" wx:if="{{wrongList.length}}">
+      <view class="flip-card {{flippedCards[item.id] ? 'flip-card--flipped' : ''}}" wx:for="{{wrongList}}" wx:key="id">
+        <!-- 正面 -->
+        <view class="flip-card__front">
+          <view class="question-card question-card--wrong">
+            <view class="question-card__header">
+              <text class="question-card__type {{item.progress.status === 'mastered' ? 'question-card__type--mastered' : ''}}">
+                {{item.progress.status === 'mastered' ? '已攻克' : (item.progress.status === 'weak' ? '薄弱点' : '学习中')}}
+              </text>
+              <text class="question-card__meta">下次复习: {{item.nextReviewText}} · 间隔{{item.intervalText}}</text>
+            </view>
+            <text class="question-card__title">{{item.title}}</text>
+            <text class="question-card__question ellipsis-2">{{item.question}}</text>
+            <view class="question-card__track">{{item.track}} · {{item.topic}}</view>
+            <view class="question-card__actions">
+              <view class="action-btn action-btn--flip" data-id="{{item.id}}" catchtap="onFlipCard">
+                <text>查看答案</text>
+              </view>
+              <view class="action-btn action-btn--wrong" data-id="{{item.id}}" catchtap="onQuickWrong">又错了</view>
+              <view class="action-btn action-btn--master" data-id="{{item.id}}" catchtap="onQuickMaster">已掌握</view>
+              <view class="action-btn action-btn--remove" data-id="{{item.id}}" catchtap="onRemoveFromWrong">移出</view>
+            </view>
+          </view>
+        </view>
+
+        <!-- 背面 -->
+        <view class="flip-card__back">
+          <view class="question-card question-card--back">
+            <view class="question-card__header">
+              <text class="question-card__type question-card__type--answer">答案</text>
+              <text class="question-card__meta">{{item.track}}</text>
+            </view>
+            <text class="question-card__answer ellipsis-5">{{item.answer}}</text>
+            <view class="question-card__actions">
+              <view class="action-btn action-btn--flip" data-id="{{item.id}}" catchtap="onFlipCard">
+                <text>收起答案</text>
+              </view>
+              <view class="action-btn action-btn--wrong" data-id="{{item.id}}" catchtap="onQuickWrong">又错了</view>
+              <view class="action-btn action-btn--master" data-id="{{item.id}}" catchtap="onQuickMaster">已掌握</view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <empty-state wx:else text="错题本为空" desc="标记错题后，题目会自动加入错题本" />
+  </block>
+</view>

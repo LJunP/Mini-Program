@@ -1,0 +1,10 @@
+/* components/radar-chart/radar-chart.wxss */
+.radar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+.radar__canvas {
+  display: block;
+}

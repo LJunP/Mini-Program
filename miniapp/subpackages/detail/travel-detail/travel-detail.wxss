@@ -1,0 +1,240 @@
+/* subpackages/detail/travel-detail/travel-detail.wxss */
+.page-bg {
+  padding-bottom: 0;
+}
+
+/* 封面 */
+.hero {
+  padding: 80rpx 32rpx 64rpx;
+  text-align: center;
+  background-color: #5B8C85;
+}
+.hero__dest {
+  font-size: 32rpx;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 8rpx;
+  margin-bottom: 16rpx;
+}
+.hero__title {
+  font-size: 44rpx;
+  font-weight: 500;
+  color: #FFFFFF;
+  letter-spacing: 4rpx;
+  line-height: 1.5;
+}
+.hero__meta {
+  margin-top: 24rpx;
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.85);
+}
+.hero__dot {
+  margin: 0 12rpx;
+}
+
+/* 档案 */
+.archive__item {
+  padding: 16rpx 0;
+}
+.archive__label {
+  font-size: 24rpx;
+  color: #5B8C85;
+  font-weight: 500;
+  letter-spacing: 4rpx;
+  display: block;
+  margin-bottom: 12rpx;
+}
+.archive__text {
+  font-size: 26rpx;
+  color: #5A554C;
+  line-height: 1.8;
+  display: block;
+}
+.archive__divider {
+  height: 0.5px;
+  background-color: #EAE5DC;
+  margin: 16rpx 0;
+}
+
+/* 随笔 */
+.essay {
+  font-size: 28rpx;
+  color: #2C2C2A;
+  line-height: 2;
+  letter-spacing: 1rpx;
+  display: block;
+}
+
+/* 路线 */
+.route {
+  margin-bottom: 24rpx;
+}
+.route__day {
+  margin-bottom: 32rpx;
+}
+.route__header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+.route__badge {
+  background-color: #5B8C85;
+  color: #FFFFFF;
+  font-size: 22rpx;
+  padding: 4rpx 16rpx;
+  border-radius: 4px;
+  margin-right: 16rpx;
+  letter-spacing: 2rpx;
+}
+.route__title {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #2C2C2A;
+}
+.route__spots {
+  padding-left: 32rpx;
+  border-left: 0.5px solid #EAE5DC;
+  margin-left: 40rpx;
+}
+.spot {
+  display: flex;
+  margin-bottom: 24rpx;
+  position: relative;
+}
+.spot__dot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  background-color: #5B8C85;
+  margin-top: 12rpx;
+  margin-right: 20rpx;
+  margin-left: -38rpx;
+  flex-shrink: 0;
+}
+.spot__body {
+  flex: 1;
+}
+.spot__name {
+  font-size: 28rpx;
+  color: #2C2C2A;
+  font-weight: 500;
+  display: block;
+}
+.spot__desc {
+  font-size: 24rpx;
+  color: #5A554C;
+  line-height: 1.7;
+  margin-top: 8rpx;
+  display: block;
+}
+
+/* 关联内容 */
+.linked {
+  background-color: #FFFFFFFC;
+  border: 0.5px solid #EAE5DC;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 24rpx;
+}
+.linked__item {
+  display: flex;
+  align-items: center;
+  padding: 24rpx;
+  border-bottom: 0.5px solid #EAE5DC;
+}
+.linked__item:last-child {
+  border-bottom: none;
+}
+.linked__cover {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 8px;
+  margin-right: 24rpx;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.linked__cover-text {
+  font-size: 28rpx;
+  color: #FFFFFF;
+  font-weight: 500;
+}
+.linked__body {
+  flex: 1;
+  min-width: 0;
+}
+.linked__header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8rpx;
+}
+.linked__name {
+  font-size: 28rpx;
+  color: #2C2C2A;
+  font-weight: 500;
+  margin-left: 12rpx;
+  flex: 1;
+}
+.linked__context {
+  font-size: 22rpx;
+  color: #8B8578;
+  display: block;
+}
+.linked__arrow {
+  font-size: 32rpx;
+  color: #B5B0A6;
+  margin-left: 16rpx;
+}
+
+/* 底部 */
+.bottom-placeholder {
+  height: 120rpx;
+}
+.action-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  padding: 16rpx 24rpx;
+  background-color: #FFFFFFFC;
+  border-top: 0.5px solid #EAE5DC;
+  z-index: 10;
+}
+.action-bar__collect,
+.action-bar__share {
+  flex: 1;
+  height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  border-radius: 40px;
+  margin: 0 8rpx;
+  letter-spacing: 4rpx;
+}
+.action-bar__collect {
+  background-color: #F3EFE6;
+  color: #5A554C;
+}
+.action-bar__collect--active {
+  background-color: #5B8C85;
+  color: #FFFFFF;
+}
+.action-bar__share {
+  background-color: #5B8C85;
+  color: #FFFFFF;
+  padding: 0;
+  border: none;
+  line-height: 80rpx;
+}
+.action-bar__share::after {
+  border: none;
+}
+
+.loading {
+  padding: 200rpx 0;
+  text-align: center;
+  color: #8B8578;
+  font-size: 28rpx;
+}

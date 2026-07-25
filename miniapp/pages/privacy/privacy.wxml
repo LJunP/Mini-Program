@@ -1,0 +1,85 @@
+<!-- pages/privacy/privacy.wxml -->
+<view class="page-bg">
+  <view class="container">
+    <view class="title">隐私政策</view>
+    <view class="update-date">更新日期：2026年7月24日</view>
+
+    <view class="section">
+      <view class="section-title">一、引言</view>
+      <view class="section-content">
+        欢迎使用"妙不可园"小程序（以下简称"本小程序"）。我们非常重视您的隐私保护。本隐私政策旨在向您说明我们如何收集、使用、存储和保护您的个人信息。
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">二、信息收集</view>
+      <view class="section-content">
+        <view class="item">1. 微信授权信息：当您使用登录功能时，我们通过微信云开发获取您的唯一标识（openid），用于创建和管理您的账户。</view>
+        <view class="item">2. 用户资料：您主动填写的昵称、头像、简介、性别、生日、个人标签等信息。</view>
+        <view class="item">3. 使用数据：您的浏览记录、收藏内容、签到记录、学习进度等使用数据，通过微信云开发存储在云端数据库中。</view>
+        <view class="item">4. 设备信息：为提供更好的服务，我们可能收集您的设备型号、操作系统版本等基本信息（通过微信系统接口获取）。</view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">三、信息使用</view>
+      <view class="section-content">
+        <view class="item">1. 提供服务：我们使用收集的信息为您提供登录、收藏、签到、学习进度追踪等核心功能。</view>
+        <view class="item">2. 个性化推荐：根据您的浏览和收藏记录，为您推荐相关的风雅内容。</view>
+        <view class="item">3. 服务改进：使用匿名化的统计数据来分析和改进本小程序的服务质量。</view>
+        <view class="item">4. 消息通知：在您授权后，通过微信订阅消息向您发送签到提醒、内容推荐等通知。</view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">四、信息存储与保护</view>
+      <view class="section-content">
+        <view class="item">1. 云端存储：您的用户信息、收藏记录、签到记录等数据通过微信云开发存储在腾讯云服务器上，采用微信平台标准的安全机制进行保护。</view>
+        <view class="item">2. 本地缓存：部分非敏感数据（如浏览历史、偏好设置）会缓存在您的设备本地，以提升使用体验。</view>
+        <view class="item">3. 安全措施：我们通过微信云开发的安全规则限制数据访问权限，确保只有您本人可以访问自己的数据。</view>
+        <view class="item">4. 数据保留：您的数据将保留至您主动清除或卸载本小程序。如需删除云端数据，请通过微信设置管理。</view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">五、信息共享</view>
+      <view class="section-content">
+        <view class="item">1. 我们不会向任何第三方出售、交易或转让您的个人信息。</view>
+        <view class="item">2. 未经您的明确同意，我们不会与任何第三方共享您的个人信息。</view>
+        <view class="item">3. 法律要求：在法律法规要求的情况下，我们可能需要披露您的个人信息。</view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">六、您的权利</view>
+      <view class="section-content">
+        <view class="item">1. 访问权：您可以随时在"我的"页面查看您的个人资料和使用数据。</view>
+        <view class="item">2. 删除权：您可以清除本地缓存数据，或通过微信设置管理云端数据。</view>
+        <view class="item">3. 撤回同意：您可以随时通过设置页面撤回对本隐私政策的同意。</view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">七、未成年人保护</view>
+      <view class="section-content">
+        我们非常重视对未成年人个人信息的保护。如果您是未成年人，请在法定监护人的陪同下阅读本隐私政策，并在获得监护人同意后使用本小程序。
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">八、隐私政策更新</view>
+      <view class="section-content">
+        我们可能会不时更新本隐私政策。更新后的隐私政策将在本小程序内发布，继续使用本小程序即表示您同意接受更新后的隐私政策。
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">九、联系我们</view>
+      <view class="section-content">
+        如果您对本隐私政策有任何疑问或建议，请通过以下方式联系我们：
+        <view class="contact">邮箱：privacy@miaobukeyuan.com</view>
+        <view class="contact">微信公众号：妙不可园</view>
+      </view>
+    </view>
+  </view>
+</view>

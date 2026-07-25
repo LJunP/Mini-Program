@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "我的",
+  "usingComponents": {
+    "domain-tag": "/components/domain-tag/domain-tag"
+  }
+}

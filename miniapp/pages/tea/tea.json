@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "茶库",
+  "enablePullDownRefresh": true,
+  "onReachBottomDistance": 100,
+  "usingComponents": {
+    "tea-card": "/components/tea-card/tea-card",
+    "empty-state": "/components/empty-state/empty-state"
+  }
+}
