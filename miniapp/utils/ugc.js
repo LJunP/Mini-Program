@@ -209,7 +209,7 @@ function formatDateShort(dateStr) {
 }
 
 // ====== 社区模拟数据 ======
-// 模拟公开社区 Feed（未来替换为云端数据）
+// 仅用于开发稿参考的模拟内容；不得进入用户可见社区 Feed。
 const MOCK_PUBLIC_POSTS = [
   {
     id: 'mock_001',
@@ -298,10 +298,10 @@ const MOCK_PUBLIC_POSTS = [
   }
 ];
 
-// 获取社区 Feed（本地公开投稿 + 模拟公开投稿）
+// 获取社区 Feed：仅返回用户真实创建并主动设为公开的本地投稿。
 function getCommunityFeed(domain) {
   const localPublic = getAllPosts().filter(p => p.isPublic === true);
-  const allPosts = localPublic.concat(MOCK_PUBLIC_POSTS);
+  const allPosts = localPublic;
   if (domain && domain !== 'all') {
     return allPosts.filter(p => p.domain === domain);
   }

@@ -104,7 +104,8 @@ function getTeaReviews(itemNo, limit = 3) {
     url: '/teas/' + itemNo + '/reviews',
     method: 'GET',
     data: { limit },
-    mockHandler: () => mock.getReviewsByTeaId(itemNo, limit)
+    // 没有真实点评服务时返回空列表，不能把演示点评冒充真实用户评价。
+    mockHandler: () => []
   });
 }
 

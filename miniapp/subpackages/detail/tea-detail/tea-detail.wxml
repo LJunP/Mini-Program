@@ -11,7 +11,7 @@
       <text class="hero__dot">·</text>
       <text>{{tea.season}}</text>
     </view>
-    <view class="hero__rating">
+    <view class="hero__rating" wx:if="{{tea.ratingSource === 'verified' && tea.ratingCount > 0}}">
       <text class="hero__score">{{tea.ratingAvg}}</text>
       <text class="hero__rating-count">{{tea.ratingCount}} 人评分</text>
     </view>

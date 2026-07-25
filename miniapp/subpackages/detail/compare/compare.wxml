@@ -10,7 +10,7 @@
       <text class="compare-header__name">{{teaA.name || '待选择'}}</text>
       <text class="compare-header__origin">{{teaA.origin || ''}}</text>
       <view class="compare-header__score">
-        <text class="compare-header__score-num">{{teaA.ratingAvg || '—'}}</text>
+        <text class="compare-header__score-num">{{teaA.ratingSource === 'verified' && teaA.ratingCount > 0 ? teaA.ratingAvg : '—'}}</text>
         <text class="compare-header__score-label">评分</text>
       </view>
     </view>
@@ -26,7 +26,7 @@
       <text class="compare-header__name">{{teaB.name || '待选择'}}</text>
       <text class="compare-header__origin">{{teaB.origin || ''}}</text>
       <view class="compare-header__score">
-        <text class="compare-header__score-num">{{teaB.ratingAvg || '—'}}</text>
+        <text class="compare-header__score-num">{{teaB.ratingSource === 'verified' && teaB.ratingCount > 0 ? teaB.ratingAvg : '—'}}</text>
         <text class="compare-header__score-label">评分</text>
       </view>
     </view>

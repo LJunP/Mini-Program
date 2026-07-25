@@ -30,6 +30,18 @@
     </view>
   </view>
 
+  <view
+    wx:if="{{domain === 'wellness' || domain === 'incense'}}"
+    class="content-safety-note"
+  >
+    <text wx:if="{{domain === 'wellness'}}">
+      本页为一般生活方式信息，不构成医疗建议，也不能替代诊断、药物或治疗；持续或明显不适请及时就医。
+    </text>
+    <text wx:if="{{domain === 'incense'}}">
+      本页介绍香材文化与嗅觉体验，不宣称医疗功效。燃烧香品请保持通风、远离可燃物，并全程看护火源。
+    </text>
+  </view>
+
   <!-- 音乐播放器（仅音乐板块显示） -->
   <view wx:if="{{domain === 'music'}}" class="section-title">聆听</view>
   <audio-player 

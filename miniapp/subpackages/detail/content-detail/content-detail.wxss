@@ -491,6 +491,17 @@
   margin-top: 6rpx;
   color: #9A9285;
 }
+.content-safety-note {
+  display: block;
+  padding: 18rpx 22rpx;
+  margin: 20rpx 0 4rpx;
+  border: 1rpx solid #E7DEC8;
+  border-radius: 14rpx;
+  background: #FBF7EC;
+  font-size: 22rpx;
+  line-height: 1.7;
+  color: #796B4E;
+}
 .note-card__btn {
   font-size: 24rpx;
   color: #854F0B;

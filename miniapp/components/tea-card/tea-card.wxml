@@ -22,7 +22,7 @@
       <text class="tea-card__grade" wx:if="{{tea.grade}}">{{tea.grade}}</text>
     </view>
 
-    <view class="tea-card__rating">
+    <view class="tea-card__rating" wx:if="{{tea.ratingSource === 'verified' && tea.ratingCount > 0}}">
       <text class="tea-card__score">{{tea.ratingAvg}}</text>
       <text class="tea-card__rating-count">({{tea.ratingCount}}人评分)</text>
       <text wx:if="{{isCollected}}" class="tea-card__collected-text">已收藏</text>

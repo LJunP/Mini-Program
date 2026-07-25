@@ -6,9 +6,9 @@
 // 四季定义
 const SEASONS = {
   spring: { name: '春', range: [3, 5], color: '#8DB86A', desc: '万物生发，品春茶新芽' },
-  summer: { name: '夏', range: [6, 8], color: '#5B8C85', desc: '清凉消暑，冷泡静心' },
-  autumn: { name: '秋', range: [9, 11], color: '#A0522D', desc: '秋燥润肺，养收藏神' },
-  winter: { name: '冬', range: [12, 2], color: '#4A6B7C', desc: '冬藏温补，围炉煮茶' }
+  summer: { name: '夏', range: [6, 8], color: '#5B8C85', desc: '暑热时节，补水避晒' },
+  autumn: { name: '秋', range: [9, 11], color: '#A0522D', desc: '气候转凉，按需补水' },
+  winter: { name: '冬', range: [12, 2], color: '#4A6B7C', desc: '寒冷时节，注意保暖' }
 };
 
 // 二十四节气（简化版，按公历日期近似）
@@ -64,7 +64,7 @@ const SEASONAL_CONTENT = [
     solarTerm: '清明',
     domain: 'tea',
     title: '明前龙井·一口春鲜',
-    summary: '清明前后采制的龙井茶，氨基酸含量最高，鲜爽度最佳。一杯入口，满嘴春意。',
+    summary: '“明前”指清明前采制的时间概念，成茶常见清鲜风格；采摘期不能单独证明产地和品质。',
     tags: ['明前茶', '龙井', '春鲜'],
     refId: 'tea_001',
     priority: 1
@@ -74,9 +74,9 @@ const SEASONAL_CONTENT = [
     season: 'spring',
     solarTerm: '惊蛰',
     domain: 'wellness',
-    title: '春季养肝·疏肝理气',
-    summary: '春属木，对应肝脏。宜食春芽（香椿、豆芽），晨起伸展，疏畅气机。',
-    tags: ['养肝', '春季养生'],
+    title: '春日作息·晨光与伸展',
+    summary: '春季昼长增加，可保持规律起床、适量户外活动和多样饮食；持续不适应咨询专业医务人员。',
+    tags: ['规律作息', '户外活动'],
     refId: 'wellness_001',
     priority: 1
   },
@@ -86,7 +86,7 @@ const SEASONAL_CONTENT = [
     solarTerm: '春分',
     domain: 'travel',
     title: '江南春行·采茶时节',
-    summary: '春分时节，江南茶山正忙。探访龙井村、碧螺春原产地，体验采茶制茶全流程。',
+    summary: '春季可探访江南茶区；采茶、制茶体验受产期、天气和预约影响，应以正规场所当日安排为准。',
     tags: ['茶山', '江南', '春季'],
     refId: 'travel_004',
     priority: 2
@@ -96,9 +96,9 @@ const SEASONAL_CONTENT = [
     season: 'spring',
     solarTerm: '谷雨',
     domain: 'incense',
-    title: '春末焚香·祛湿辟秽',
-    summary: '谷雨前后湿气渐重，焚沉香或檀香可祛湿辟秽，清神醒脑。',
-    tags: ['沉香', '祛湿'],
+    title: '春末用香·气味与通风',
+    summary: '沉香或檀香可作为传统用香文化体验，但不宣称祛湿或提神功效；燃烧时保持通风并看护火源。',
+    tags: ['沉香', '用香安全'],
     refId: 'incense_001',
     priority: 2
   },
@@ -110,8 +110,8 @@ const SEASONAL_CONTENT = [
     solarTerm: '夏至',
     domain: 'tea',
     title: '夏日冷泡白茶',
-    summary: '白牡丹或寿眉冷泡4-6小时，清甜爽口，消暑不伤胃。夏日饮茶首选。',
-    tags: ['冷泡茶', '白茶', '消暑'],
+    summary: '白牡丹或寿眉可按产品状态尝试冷泡；全程冷藏、器具清洁并及时饮用，且仍需留意咖啡因。',
+    tags: ['冷泡茶', '白茶', '食品安全'],
     refId: 'tea_012',
     priority: 1
   },
@@ -120,9 +120,9 @@ const SEASONAL_CONTENT = [
     season: 'summer',
     solarTerm: '小暑',
     domain: 'wellness',
-    title: '三伏天·冬病夏治',
-    summary: '三伏贴、艾灸关元足三里，冬病夏治最佳时机。忌贪凉饮冷。',
-    tags: ['三伏', '艾灸', '冬病夏治'],
+    title: '暑热天气·补水与防晒',
+    summary: '高温时优先补水、遮阳、通风并减少正午暴晒；头晕、恶心或意识异常时应及时降温并寻求医疗帮助。',
+    tags: ['补水', '防晒', '中暑警示'],
     refId: 'wellness_002',
     priority: 1
   },
@@ -131,9 +131,9 @@ const SEASONAL_CONTENT = [
     season: 'summer',
     solarTerm: '大暑',
     domain: 'music',
-    title: '夏日听荷·古琴消暑',
-    summary: '酷暑难耐时听一曲《流水》或《平沙落雁》，心静自然凉。',
-    tags: ['古琴', '消暑', '静心'],
+    title: '夏日听曲·留一段安静时间',
+    summary: '可用安全音量聆听《流水》或《平沙落雁》；音乐感受因人而异，不能替代降温、补水或医疗处理。',
+    tags: ['古琴', '安全音量'],
     refId: 'music_001',
     priority: 2
   },
@@ -153,9 +153,9 @@ const SEASONAL_CONTENT = [
     season: 'summer',
     solarTerm: '夏至',
     domain: 'incense',
-    title: '夏夜焚香·驱蚊安神',
-    summary: '艾草、薄荷制香，既驱蚊虫，又安神助眠。夏夜读书焚一炉最佳。',
-    tags: ['艾草', '驱蚊', '安神'],
+    title: '夏夜用香·烟雾与火源安全',
+    summary: '艾草、薄荷相关香品只作为气味与民俗体验，不替代正规驱蚊或睡眠诊疗；室内燃烧需通风并全程看护。',
+    tags: ['艾草', '用香安全'],
     refId: 'incense_004',
     priority: 3
   },
@@ -166,9 +166,9 @@ const SEASONAL_CONTENT = [
     season: 'autumn',
     solarTerm: '秋分',
     domain: 'tea',
-    title: '秋日老白茶·润燥养胃',
-    summary: '秋燥时节，煮一壶三年以上老白茶，枣香药韵，润肺养胃。',
-    tags: ['老白茶', '秋燥', '润肺'],
+    title: '秋日老白茶·辨香与仓储',
+    summary: '部分老白茶会呈枣香、木质香等陈香；年份不能替代原料与仓储判断，也不代表润肺或养胃功效。',
+    tags: ['老白茶', '仓储'],
     refId: 'tea_017',
     priority: 1
   },
@@ -177,9 +177,9 @@ const SEASONAL_CONTENT = [
     season: 'autumn',
     solarTerm: '白露',
     domain: 'wellness',
-    title: '秋燥润肺·白色食物',
-    summary: '秋属金，对应肺。宜食百合、银耳、雪梨、莲藕等白色食物，滋阴润燥。',
-    tags: ['润肺', '秋燥', '白色食物'],
+    title: '秋日舒适·补水与室内湿度',
+    summary: '空气干燥时可适量饮水、通风并按需使用洁净加湿设备；普通食物不能替代咳嗽、过敏等问题的诊疗。',
+    tags: ['补水', '室内湿度'],
     refId: 'wellness_004',
     priority: 1
   },
@@ -189,7 +189,7 @@ const SEASONAL_CONTENT = [
     solarTerm: '寒露',
     domain: 'incense',
     title: '秋夜焚香·桂花沉水',
-    summary: '寒露时节，合桂花制香，甜润清幽，与秋月最配。',
+    summary: '桂花调合香可作为秋季气味体验；香材成分以产品标识为准，燃烧时注意通风和火源。',
     tags: ['桂花', '合香'],
     refId: 'incense_005',
     priority: 2
@@ -200,7 +200,7 @@ const SEASONAL_CONTENT = [
     solarTerm: '霜降',
     domain: 'travel',
     title: '秋日行旅·红叶茶会',
-    summary: '霜降后红叶漫山，携茶具入山，枫下设席，煮茶赏秋色。',
+    summary: '秋季可选择开放步道观赏红叶；户外茶席须遵守景区防火、垃圾管理和明火规定。',
     tags: ['红叶', '茶会', '秋游'],
     refId: 'travel_003',
     priority: 2
@@ -211,7 +211,7 @@ const SEASONAL_CONTENT = [
     solarTerm: '秋分',
     domain: 'film',
     title: '秋日观影·小津安二郎',
-    summary: '秋分时节最适合看小津安二郎的电影，《秋刀鱼之味》与秋意最配。',
+    summary: '秋日可观看小津安二郎的《秋刀鱼之味》，从家庭变化、代际关系和日常空间理解影片。',
     tags: ['小津安二郎', '秋刀鱼之味'],
     refId: 'film_001',
     priority: 3
@@ -224,8 +224,8 @@ const SEASONAL_CONTENT = [
     solarTerm: '冬至',
     domain: 'tea',
     title: '围炉煮茶·冬日暖饮',
-    summary: '冬至日围炉煮老普洱或老白茶，加陈皮红枣，暖胃驱寒。',
-    tags: ['煮茶', '冬至', '暖胃'],
+    summary: '冬日煮茶应使用适合煮饮的茶品和耐热器具，控制温度并防烫伤；茶饮不承担暖胃或驱寒治疗作用。',
+    tags: ['煮茶', '冬至', '防烫伤'],
     refId: 'tea_052',
     priority: 1
   },
@@ -234,9 +234,9 @@ const SEASONAL_CONTENT = [
     season: 'winter',
     solarTerm: '立冬',
     domain: 'wellness',
-    title: '冬季养藏·温补肾阳',
-    summary: '冬属水，对应肾。宜早睡晚起，食温补之物（核桃、栗子、羊肉），温补肾阳。',
-    tags: ['养肾', '冬藏', '温补'],
+    title: '冬季作息·保暖与规律活动',
+    summary: '寒冷天气可关注保暖、规律睡眠、适量活动和多样饮食；不把单一食物描述为补肾或治疗方法。',
+    tags: ['保暖', '规律作息'],
     refId: 'wellness_009',
     priority: 1
   },
@@ -245,9 +245,9 @@ const SEASONAL_CONTENT = [
     season: 'winter',
     solarTerm: '大雪',
     domain: 'incense',
-    title: '雪夜焚香·暖香助阳',
-    summary: '大雪时节焚檀香或丁香，性温暖中，驱寒助阳，适合冬日读书时使用。',
-    tags: ['檀香', '驱寒'],
+    title: '雪夜用香·木香与辛香',
+    summary: '檀香或丁香调可提供木质、辛香等嗅觉体验，但不宣称驱寒或“助阳”；使用时保持通风并看护火源。',
+    tags: ['檀香', '用香安全'],
     refId: 'incense_002',
     priority: 2
   },
@@ -257,7 +257,7 @@ const SEASONAL_CONTENT = [
     solarTerm: '小寒',
     domain: 'music',
     title: '冬夜听梅·琴曲傲雪',
-    summary: '小寒时节听《梅花三弄》，琴声清冽如雪中梅香，最合冬夜意境。',
+    summary: '小寒时节可听《梅花三弄》，并把“雪中梅香”等画面理解为个人音乐联想。',
     tags: ['梅花三弄', '古琴', '冬夜'],
     refId: 'music_007',
     priority: 2
@@ -267,9 +267,9 @@ const SEASONAL_CONTENT = [
     season: 'winter',
     solarTerm: '冬至',
     domain: 'travel',
-    title: '冬日温泉·汤池品茗',
-    summary: '冬至后泡温泉最佳，汤池边放一壶热茶，寒热交替间体验极致放松。',
-    tags: ['温泉', '品茗', '冬至'],
+    title: '冬日温泉·安全与补水',
+    summary: '泡温泉应遵守场馆水温、时长和健康提示，及时补水；避免在池边使用玻璃茶具，身体不适应立即离池。',
+    tags: ['温泉', '补水', '安全提示'],
     refId: 'travel_005',
     priority: 3
   }
