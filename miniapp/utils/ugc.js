@@ -33,6 +33,27 @@ function _callCloud(data) {
   })
 }
 
+// 记录云端文档 ID，同时保留本地稳定 ID，避免后续编辑重复创建投稿。
+function _rememberCloudId(localId, cloudId) {
+  if (!localId || !cloudId) return
+
+  const posts = getAllPosts()
+  const idx = posts.findIndex(p => p.id === localId)
+  if (idx < 0 || posts[idx].cloudId === cloudId) return
+
+  posts[idx] = { ...posts[idx], cloudId }
+  wx.setStorageSync(STORAGE_KEY, posts)
+}
+
+function _syncPostToCloud(post) {
+  return _callCloud({ action: 'save', post }).then(res => {
+    if (res.code === 0 && res.id) {
+      _rememberCloudId(post.id, res.id)
+    }
+    return res
+  })
+}
+
 // 六雅领域配置
 const DOMAIN_OPTIONS = [
   { key: 'tea',      name: '茶', label: '茶评', color: '#3B6D11', bgColor: 'rgba(59, 109, 17, 0.06)',  placeholder: '记录这杯茶的色香味韵…' },
@@ -87,7 +108,7 @@ function savePost(post) {
 
       // 已登录则同步云端
       if (_isLoggedIn()) {
-        _callCloud({ action: 'save', post: { ...posts[idx], _id: posts[idx].id } }).catch(() => {});
+        _syncPostToCloud(posts[idx]).catch(() => {});
       }
 
       return posts[idx];
@@ -119,7 +140,7 @@ function savePost(post) {
 
   // 已登录则同步到云端
   if (_isLoggedIn()) {
-    _callCloud({ action: 'save', post: newPost }).catch(() => {});
+    _syncPostToCloud(newPost).catch(() => {});
   }
 
   return newPost;
@@ -128,12 +149,17 @@ function savePost(post) {
 // 删除投稿
 function deletePost(id) {
   const posts = getAllPosts();
+  const post = posts.find(p => p.id === id);
   const filtered = posts.filter(p => p.id !== id);
   wx.setStorageSync(STORAGE_KEY, filtered);
 
   // 已登录则同步云端
   if (_isLoggedIn()) {
-    _callCloud({ action: 'delete', id }).catch(() => {});
+    _callCloud({
+      action: 'delete',
+      id: (post && post.cloudId) || id,
+      clientId: id
+    }).catch(() => {});
   }
 
   return filtered.length < posts.length;
@@ -309,7 +335,8 @@ function syncFromCloud() {
 
     const localPosts = getAllPosts()
     const cloudPosts = res.list.map(item => ({
-      id: item.id,
+      id: item.client_id || item.id,
+      cloudId: item.id,
       title: item.title,
       domain: item.domain,
       content: item.content,
@@ -326,11 +353,16 @@ function syncFromCloud() {
       updatedAt: item.updated_at
     }))
 
-    // 合并：云端为准，保留本地未同步的草稿
-    const localIds = new Set(localPosts.map(p => p.id))
+    // 合并：同一条记录以云端为准，保留云端列表中不存在的本地记录。
+    // 同时比较稳定本地 ID 和云端文档 ID，兼容 client_id 上线前的数据。
+    const cloudIds = new Set()
+    cloudPosts.forEach(p => {
+      if (p.id) cloudIds.add(p.id)
+      if (p.cloudId) cloudIds.add(p.cloudId)
+    })
     const merged = [...cloudPosts]
     localPosts.forEach(p => {
-      if (!localIds.has(p.id) && p.id && !p.id.startsWith('cloud_')) {
+      if (p.id && !cloudIds.has(p.id) && (!p.cloudId || !cloudIds.has(p.cloudId))) {
         merged.push(p)
       }
     })
@@ -352,7 +384,7 @@ function syncToCloud() {
   const posts = getAllPosts()
   let successCount = 0
   const promises = posts.map(post =>
-    _callCloud({ action: 'save', post }).then(res => {
+    _syncPostToCloud(post).then(res => {
       if (res.code === 0) successCount++
     }).catch(() => {})
   )

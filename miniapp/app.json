@@ -101,10 +101,5 @@
   "style": "v2",
   "sitemapLocation": "sitemap.json",
   "lazyCodeLoading": "requiredComponents",
-  "permission": {
-    "scope.writePhotosAlbum": {
-      "desc": "用于保存分享海报到相册"
-    }
-  },
   "__usePrivacyCheck__": true
 }

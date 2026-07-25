@@ -63,6 +63,7 @@ Page({
           tags: post.tags || [],
           images: post.images || [],
           rating: post.rating || 0,
+          isPublic: post.isPublic !== false,
           location: post.location || '',
           linkedContent: post.linkedContent || null,
           contentCount: (post.content || '').length,
@@ -86,6 +87,7 @@ Page({
                 content: draft.content || '',
                 tags: draft.tags || [],
                 rating: draft.rating || 0,
+                isPublic: draft.isPublic !== false,
                 location: draft.location || '',
                 contentCount: (draft.content || '').length
               });
@@ -109,6 +111,7 @@ Page({
         content: this.data.content,
         tags: this.data.tags,
         rating: this.data.rating,
+        isPublic: this.data.isPublic,
         location: this.data.location,
         linkedContent: this.data.linkedContent
       });

@@ -303,7 +303,7 @@ Page({
           setTimeout(() => wx.vibrateShort({ type: 'medium' }), 1000);
           // 记录焚香历史
           try {
-            const interaction = require('../../utils/content-interaction.js');
+            const interaction = require('../../../utils/content-interaction.js');
             const duration = this.data.incenseTotalTime / 60;
             interaction.addIncenseRecord({
               incenseId: this.data.id || '',
@@ -394,7 +394,7 @@ Page({
         wx.removeStorageSync('content_incense_timer');
         // 记录焚香历史
         try {
-          const interaction = require('../../utils/content-interaction.js');
+          const interaction = require('../../../utils/content-interaction.js');
           const duration = state.totalSeconds / 60;
           interaction.addIncenseRecord({
             incenseId: state.contentId || '',

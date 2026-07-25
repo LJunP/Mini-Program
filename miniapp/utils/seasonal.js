@@ -294,46 +294,38 @@ const DOMAIN_COLORS = {
   wellness: '#A0522D'
 };
 
-// 获取当前季节
-function getCurrentSeason() {
-  const now = new Date();
-  const month = now.getMonth() + 1;
-  for (const key in SEASONS) {
-    const range = SEASONS[key].range;
-    if (key === 'winter') {
-      if (month === 12 || month === 1 || month === 2) return key;
-    } else {
-      if (month >= range[0] && month <= range[1]) return key;
-    }
-  }
-  return 'spring';
-}
-
 // 获取当前节气
-function getCurrentSolarTerm() {
-  const now = new Date();
+function getCurrentSolarTerm(date) {
+  const now = date || new Date();
   const month = now.getMonth() + 1;
   const day = now.getDate();
-  
-  let current = SOLAR_TERMS[0];
+
+  // 列表按“立春 → 大寒”的节气周期排列，并非公历月份顺序。
+  // 以月日数值选择距离当前最近且已经发生的节气；元旦到小寒前沿用冬至。
+  const winterSolstice = SOLAR_TERMS.find(t => t.name === '冬至');
+  let current = winterSolstice || SOLAR_TERMS[0];
+  let currentValue = 0;
+  const todayValue = month * 100 + day;
+
   for (const term of SOLAR_TERMS) {
-    if (term.month < month || (term.month === month && term.day <= day)) {
+    const termValue = term.month * 100 + term.day;
+    if (termValue <= todayValue && termValue >= currentValue) {
       current = term;
+      currentValue = termValue;
     }
   }
-  // 如果月份在 1-2 月，需要检查是否还在大寒之后、立春之前
-  if (month === 1 || (month === 2 && day < 4)) {
-    current = SOLAR_TERMS.find(t => t.name === '小寒') || current;
-    if (month === 1 && day >= 20) {
-      current = SOLAR_TERMS.find(t => t.name === '大寒') || current;
-    }
-  }
+
   return current;
 }
 
+// 获取当前季节，以节气所属季节为准，避免 2 月立春、5 月立夏等边界错位。
+function getCurrentSeason(date) {
+  return getCurrentSolarTerm(date).season;
+}
+
 // 获取下一个节气
-function getNextSolarTerm() {
-  const current = getCurrentSolarTerm();
+function getNextSolarTerm(date) {
+  const current = getCurrentSolarTerm(date);
   const idx = SOLAR_TERMS.findIndex(t => t.name === current.name);
   return SOLAR_TERMS[(idx + 1) % SOLAR_TERMS.length];
 }
@@ -353,9 +345,9 @@ function getSolarTermContent(solarTermName) {
 }
 
 // 获取当季推荐内容（综合季节+节气）
-function getRecommendedContent() {
-  const season = getCurrentSeason();
-  const solarTerm = getCurrentSolarTerm();
+function getRecommendedContent(date) {
+  const season = getCurrentSeason(date);
+  const solarTerm = getCurrentSolarTerm(date);
   const seasonInfo = SEASONS[season];
   
   // 优先返回节气相关内容
@@ -376,10 +368,10 @@ function getRecommendedContent() {
 }
 
 // 获取季节信息
-function getSeasonInfo() {
-  const season = getCurrentSeason();
-  const solarTerm = getCurrentSolarTerm();
-  const nextTerm = getNextSolarTerm();
+function getSeasonInfo(date) {
+  const season = getCurrentSeason(date);
+  const solarTerm = getCurrentSolarTerm(date);
+  const nextTerm = getNextSolarTerm(date);
   
   return {
     key: season,

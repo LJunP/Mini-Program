@@ -72,6 +72,6 @@ exports.main = async (event) => {
     return { code: -1, message: '未知操作: ' + action }
   } catch (err) {
     console.error('[preferences] error:', err)
-    return { code: -1, message: '操作失败', detail: err.message }
+    return { code: -1, message: '操作失败' }
   }
 }

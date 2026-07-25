@@ -4,6 +4,7 @@ cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 
 const db = cloud.database()
 const _ = db.command
+const { canReadPost } = require('./policy')
 
 exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext()
@@ -37,38 +38,71 @@ exports.main = async (event) => {
       if (post.domain && (typeof post.domain !== 'string' || post.domain.length > 30)) {
         return { code: -1, message: '板块参数非法' }
       }
+      if (post.id !== undefined && (typeof post.id !== 'string' || post.id.length > 100)) {
+        return { code: -1, message: '本地ID参数非法' }
+      }
+      if (post.cloudId !== undefined && (typeof post.cloudId !== 'string' || post.cloudId.length > 100)) {
+        return { code: -1, message: '云端ID参数非法' }
+      }
 
       const now = new Date().toISOString()
 
       // 更新已有投稿
-      if (post.id) {
+      let existing = []
+      if (post.cloudId) {
+        const { data } = await db.collection('ugc_posts')
+          .where({ _openid: OPENID, _id: post.cloudId })
+          .limit(1)
+          .get()
+        existing = data
+      }
+
+      if (existing.length === 0 && post.id) {
+        const { data } = await db.collection('ugc_posts')
+          .where({ _openid: OPENID, client_id: post.id })
+          .limit(1)
+          .get()
+        existing = data
+      }
+
+      // 兼容 client_id 上线前，本地 ID 就是云端文档 ID 的记录。
+      if (existing.length === 0 && post.id) {
         const { data } = await db.collection('ugc_posts')
           .where({ _openid: OPENID, _id: post.id })
+          .limit(1)
           .get()
+        existing = data
+      }
 
-        if (data.length > 0) {
-          const updateData = {}
-          if (post.title !== undefined) updateData.title = post.title
-          if (post.domain !== undefined) updateData.domain = post.domain
-          if (post.content !== undefined) updateData.content = post.content
-          if (post.tags !== undefined) updateData.tags = post.tags
-          if (post.images !== undefined) updateData.images = post.images
-          if (post.rating !== undefined) updateData.rating = post.rating
-          if (post.location !== undefined) updateData.location = post.location
-          if (post.linkedContent !== undefined) updateData.linkedContent = post.linkedContent
-          if (post.isPublic !== undefined) updateData.isPublic = post.isPublic
-          updateData.updated_at = now
+      if (existing.length > 0) {
+        const updateData = {}
+        if (post.title !== undefined) updateData.title = post.title
+        if (post.domain !== undefined) updateData.domain = post.domain
+        if (post.content !== undefined) updateData.content = post.content
+        if (post.tags !== undefined) updateData.tags = post.tags
+        if (post.images !== undefined) updateData.images = post.images
+        if (post.rating !== undefined) updateData.rating = post.rating
+        if (post.location !== undefined) updateData.location = post.location
+        if (post.linkedContent !== undefined) updateData.linkedContent = post.linkedContent
+        if (post.isPublic !== undefined) updateData.isPublic = post.isPublic
+        if (post.id !== undefined) updateData.client_id = post.id
+        updateData.updated_at = now
 
-          await db.collection('ugc_posts').doc(data[0]._id).update({
-            data: updateData
-          })
+        await db.collection('ugc_posts').doc(existing[0]._id).update({
+          data: updateData
+        })
 
-          return { code: 0, id: data[0]._id, message: '投稿已更新' }
+        return {
+          code: 0,
+          id: existing[0]._id,
+          client_id: post.id || existing[0].client_id || existing[0]._id,
+          message: '投稿已更新'
         }
       }
 
       // 新建投稿
       const newPost = {
+        client_id: post.id || '',
         title: post.title || '',
         domain: post.domain || 'tea',
         content: post.content || '',
@@ -86,20 +120,35 @@ exports.main = async (event) => {
 
       const addRes = await db.collection('ugc_posts').add({ data: newPost })
 
-      return { code: 0, id: addRes._id, post: { ...newPost, id: addRes._id }, message: '投稿已发布' }
+      return {
+        code: 0,
+        id: addRes._id,
+        client_id: newPost.client_id || addRes._id,
+        post: { ...newPost, id: addRes._id },
+        message: '投稿已发布'
+      }
     }
 
     // 删除投稿
     if (action === 'delete') {
-      const { id } = event
+      const { id, clientId } = event
 
       if (!id || typeof id !== 'string' || id.length > 100) {
         return { code: -1, message: 'ID参数非法' }
       }
+      if (clientId !== undefined && (typeof clientId !== 'string' || clientId.length > 100)) {
+        return { code: -1, message: '本地ID参数非法' }
+      }
 
-      await db.collection('ugc_posts')
+      const { stats } = await db.collection('ugc_posts')
         .where({ _openid: OPENID, _id: id })
         .remove()
+
+      if ((!stats || stats.removed === 0) && clientId) {
+        await db.collection('ugc_posts')
+          .where({ _openid: OPENID, client_id: clientId })
+          .remove()
+      }
 
       return { code: 0, message: '已删除' }
     }
@@ -127,6 +176,7 @@ exports.main = async (event) => {
         code: 0,
         list: list.map(item => ({
           id: item._id,
+          client_id: item.client_id || '',
           title: item.title,
           domain: item.domain,
           content: item.content,
@@ -197,6 +247,9 @@ exports.main = async (event) => {
       if (!data) {
         return { code: -1, message: '投稿不存在' }
       }
+      if (!canReadPost(data, OPENID)) {
+        return { code: -1, message: '投稿不存在或无权访问' }
+      }
 
       return {
         code: 0,
@@ -237,6 +290,6 @@ exports.main = async (event) => {
     return { code: -1, message: '未知操作: ' + action }
   } catch (err) {
     console.error('[ugc] error:', err)
-    return { code: -1, message: '操作失败', detail: err.message }
+    return { code: -1, message: '操作失败' }
   }
 }

@@ -4,6 +4,7 @@ cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 
 const db = cloud.database()
 const _ = db.command
+const { validateNote } = require('./validation')
 
 exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext()
@@ -24,8 +25,9 @@ exports.main = async (event) => {
   if (target_ref_id && (typeof target_ref_id !== 'string' || target_ref_id.length > 100)) {
     return { code: -1, message: 'ID参数非法' }
   }
-  if (note && typeof note !== 'string' && note.length > 500) {
-    return { code: -1, message: '备注过长' }
+  const noteError = validateNote(note)
+  if (noteError) {
+    return { code: -1, message: noteError }
   }
 
   try {
@@ -108,6 +110,6 @@ exports.main = async (event) => {
     return { code: -1, message: '未知操作: ' + action }
   } catch (err) {
     console.error('[collection] error:', err)
-    return { code: -1, message: '操作失败', detail: err.message }
+    return { code: -1, message: '操作失败' }
   }
 }

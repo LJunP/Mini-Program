@@ -113,6 +113,10 @@ App({
       const ugc = require('./utils/ugc.js')
       ugc.syncFromCloud().then(res => {
         if (res.synced) console.log('[cloud sync] UGC投稿同步完成，拉取', res.count, '条')
+        // 拉取合并后再回推，确保登录前产生的本地投稿不会永久滞留在单机。
+        return ugc.syncToCloud()
+      }).then(res => {
+        if (res.synced) console.log('[cloud sync] UGC本地投稿回推完成', res.successCount, '条')
       })
     } catch (e) {
       console.warn('[cloud sync] ugc failed:', e)
@@ -179,10 +183,12 @@ App({
     this.syncLocalStudyData()
 
     try {
-      const sysInfo = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync()
-      this.globalData.systemInfo = sysInfo
+      this.globalData.systemInfo = {
+        ...wx.getDeviceInfo(),
+        ...wx.getWindowInfo()
+      }
     } catch (e) {
-      console.warn('[app] getSystemInfo failed', e)
+      console.warn('[app] get device/window info failed', e)
     }
 
     // 5. 静默登录（走云函数）

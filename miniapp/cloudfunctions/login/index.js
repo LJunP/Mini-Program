@@ -61,6 +61,6 @@ exports.main = async (event) => {
     }
   } catch (err) {
     console.error('[login] error:', err)
-    return { code: -1, message: '登录失败', detail: err.message }
+    return { code: -1, message: '登录失败' }
   }
 }

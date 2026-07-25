@@ -199,6 +199,6 @@ exports.main = async (event) => {
     }
   } catch (err) {
     console.error('[tts] error:', err)
-    return { code: -1, message: '语音合成失败', detail: err.message }
+    return { code: -1, message: '语音合成失败' }
   }
 }

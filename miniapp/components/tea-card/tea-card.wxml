@@ -6,7 +6,7 @@
     <view wx:else class="tea-card__cover-text">{{tea.name}}</view>
     <!-- 已收藏标记 -->
     <view wx:if="{{isCollected}}" class="tea-card__collected-badge">
-      <text>♥</text>
+      <text class="tea-card__collected-icon">♥</text>
     </view>
   </view>
 

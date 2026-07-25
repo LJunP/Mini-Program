@@ -77,6 +77,6 @@ exports.main = async (event) => {
     }
   } catch (err) {
     console.error('[updateProfile] error:', err)
-    return { code: -1, message: '更新失败', detail: err.message }
+    return { code: -1, message: '更新失败' }
   }
 }

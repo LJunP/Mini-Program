@@ -9,7 +9,7 @@
     </view>
     <!-- 已浏览标记 -->
     <view wx:if="{{isViewed}}" class="cc__viewed-badge">
-      <text>已浏览</text>
+      <text class="cc__viewed-text">已浏览</text>
     </view>
   </view>
 

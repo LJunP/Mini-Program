@@ -82,13 +82,12 @@ function init() {
   // 已在模块加载时执行，此处保留兼容
 }
 
-// 缓存 isDevTools 结果，避免每次调用 getImageUrl 都调用 getSystemInfoSync
+// 缓存 isDevTools 结果，避免每次调用 getImageUrl 都读取设备信息。
 let _isDevTools = null
 function _checkIsDevTools() {
   if (_isDevTools !== null) return _isDevTools
   try {
-    const sysInfo = (wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync())
-    _isDevTools = (sysInfo.platform === 'devtools')
+    _isDevTools = wx.getDeviceInfo().platform === 'devtools'
   } catch (e) {
     _isDevTools = false
   }

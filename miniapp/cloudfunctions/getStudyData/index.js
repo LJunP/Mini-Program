@@ -102,6 +102,6 @@ exports.main = async (event) => {
     return { code: 0, data }
   } catch (err) {
     console.error('[getStudyData] error:', err)
-    return { code: -1, message: '数据获取失败', detail: err.message }
+    return { code: -1, message: '数据获取失败' }
   }
 }

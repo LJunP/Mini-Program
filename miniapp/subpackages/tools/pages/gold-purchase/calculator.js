@@ -306,7 +306,7 @@ Page({
 
         const canvas = res[0].node;
         const ctx = canvas.getContext('2d');
-        const dpr = (wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync()).pixelRatio || 1;
+        const dpr = wx.getWindowInfo().pixelRatio || 1;
         const width = 600;
         const height = 900;
         canvas.width = width * dpr;
