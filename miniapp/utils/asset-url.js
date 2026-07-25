@@ -6,7 +6,10 @@ const CLOUD_IMAGE_FILE_ROOT =
 
 const LOCAL_IMAGE_PREFIX = '/assets/images/';
 const TEMP_URL_BATCH_SIZE = 50;
+// CloudBase 临时地址会失效。客户端只缓存较短时间，避免页面复用已过期签名。
+const TEMP_URL_CACHE_TTL = 5 * 60 * 1000;
 const tempUrlCache = new Map();
+const tempUrlFetchedAt = new Map();
 
 function toCloudFileId(path) {
   if (typeof path !== 'string' || !path.startsWith(LOCAL_IMAGE_PREFIX)) {
@@ -17,7 +20,19 @@ function toCloudFileId(path) {
 }
 
 function getTempFileUrls(fileIds) {
-  const missing = Array.from(new Set(fileIds)).filter(fileId => !tempUrlCache.has(fileId));
+  const now = Date.now();
+  const missing = Array.from(new Set(fileIds)).filter(fileId => {
+    const fetchedAt = tempUrlFetchedAt.get(fileId) || 0;
+    const isFresh = tempUrlCache.has(fileId) &&
+      (now - fetchedAt) < TEMP_URL_CACHE_TTL;
+
+    if (!isFresh) {
+      // 刷新失败时也不能继续返回旧签名，否则渲染层会持续收到 403。
+      tempUrlCache.delete(fileId);
+      tempUrlFetchedAt.delete(fileId);
+    }
+    return !isFresh;
+  });
   if (!missing.length) {
     return Promise.resolve(tempUrlCache);
   }
@@ -49,6 +64,7 @@ function getTempFileUrls(fileIds) {
         (result.fileList || []).forEach(file => {
           if (file.status === 0 && file.tempFileURL) {
             tempUrlCache.set(file.fileID, file.tempFileURL);
+            tempUrlFetchedAt.set(file.fileID, Date.now());
           } else {
             failed.push({
               status: file.status,
@@ -128,6 +144,7 @@ function resolveAssetTree(value) {
 
 module.exports = {
   CLOUD_IMAGE_FILE_ROOT,
+  TEMP_URL_CACHE_TTL,
   toCloudFileId,
   getTempFileUrls,
   resolveAssetTree,

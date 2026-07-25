@@ -3,6 +3,29 @@ const router = require('../../utils/router.js');
 const tracker = require('../../utils/tracker.js');
 const studyProgress = require('../../utils/study-progress.js');
 
+function toQuestionCard(question, progressMap) {
+  const progress = progressMap[question.id] || {};
+  const status = progress.status || '';
+  return {
+    id: question.id,
+    type: question.type,
+    track: question.track,
+    difficulty: question.difficulty,
+    frequency: question.frequency,
+    title: question.title,
+    question: question.question,
+    keyPoints: question.keyPoints || [],
+    studyStatus: status,
+    studyStatusText: status === 'mastered'
+      ? '已掌握'
+      : status === 'weak'
+        ? '薄弱'
+        : status === 'learning'
+          ? '学习中'
+          : ''
+  };
+}
+
 Page({
   data: {
     types: [],
@@ -12,7 +35,6 @@ Page({
     currentTrack: 'all',
     currentTopic: 'all',
     keyword: '',
-    allList: [],
     list: [],
     pageSize: 20,
     currentPage: 1,
@@ -39,6 +61,7 @@ Page({
     }
 
     this._loadList();
+    this._hasLoaded = true;
     tracker.track('page_view', { page_path: 'pages/study/interview', target_domain: 'interview' });
   },
 
@@ -48,16 +71,15 @@ Page({
       track: this.data.currentTrack,
       topic: this.data.currentTopic,
       keyword: this.data.keyword
-    }).map(q => {
-      const progress = studyProgress.getRecord(q.id);
-      return Object.assign({}, q, {
-        studyStatus: progress.status || '',
-        studyStatusText: progress.status === 'mastered' ? '已掌握' : progress.status === 'weak' ? '薄弱' : progress.status === 'learning' ? '学习中' : ''
-      });
     });
+    const progressMap = studyProgress.readMap();
+    this._allList = allList;
     this.setData({
-      allList,
-      list: allList.slice(0, this.data.pageSize),
+      // 只向渲染层传卡片需要的字段；完整答案留在逻辑层，避免 901 题
+      // 形成约 1.8 MB 的 setData。
+      list: allList
+        .slice(0, this.data.pageSize)
+        .map(question => toQuestionCard(question, progressMap)),
       currentPage: 1,
       hasMore: allList.length > this.data.pageSize
     });
@@ -69,13 +91,37 @@ Page({
     const nextPage = this.data.currentPage + 1;
     const start = this.data.currentPage * this.data.pageSize;
     const end = start + this.data.pageSize;
-    const newItems = this.data.allList.slice(start, end);
+    const allList = this._allList || [];
+    const progressMap = studyProgress.readMap();
+    const newItems = allList
+      .slice(start, end)
+      .map(question => toQuestionCard(question, progressMap));
     this.setData({
       list: this.data.list.concat(newItems),
       currentPage: nextPage,
-      hasMore: end < this.data.allList.length,
+      hasMore: end < allList.length,
       loadingMore: false
     });
+  },
+
+  onShow() {
+    if (this._hasLoaded && this._needsProgressRefresh) {
+      this._needsProgressRefresh = false;
+      this._loadList();
+    }
+  },
+
+  onHide() {
+    // 从题目详情返回时刷新当前可见卡片的学习状态。
+    this._needsProgressRefresh = true;
+  },
+
+  onUnload() {
+    if (this._searchTimer) {
+      clearTimeout(this._searchTimer);
+      this._searchTimer = null;
+    }
+    this._allList = [];
   },
 
   onPageScroll(e) {

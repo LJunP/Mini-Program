@@ -77,6 +77,18 @@ function testPurePolicies() {
     'utf8'
   )
   assert(retryBarSource.includes('wx:if="{{show}}"'))
+
+  const interviewSource = fs.readFileSync(
+    fromRoot('miniapp/pages/study/interview.js'),
+    'utf8'
+  )
+  const interviewDataBlock = interviewSource.match(
+    /data:\s*\{([\s\S]*?)\n\s*\},\n\n\s*onLoad/
+  )
+  assert(interviewDataBlock, '应能识别面试列表 data 定义')
+  assert(!interviewDataBlock[1].includes('allList'), '完整 901 题不得进入渲染层 data')
+  assert(interviewSource.includes('this._allList = allList'))
+  assert(interviewSource.includes('toQuestionCard(question, progressMap)'))
 }
 
 function testContentDetailRequirePaths() {
@@ -143,6 +155,9 @@ function testSeasonalBoundaries() {
 
 async function testCloudAssetResolver() {
   const calls = []
+  const originalDateNow = Date.now
+  let now = 1784959000000
+  Date.now = () => now
   global.wx = {
     cloud: {
       callFunction({ name, data, success }) {
@@ -167,56 +182,66 @@ async function testCloudAssetResolver() {
   clearModule(assetPath)
   const assets = require(assetPath)
 
-  assert(assets.CLOUD_IMAGE_FILE_ROOT.endsWith('/app-assets/images'))
-  assert.strictEqual(
-    assets.toCloudFileId('/assets/images/tea/longjing.jpg'),
-    `${assets.CLOUD_IMAGE_FILE_ROOT}/tea/longjing.jpg`
-  )
-  assert.strictEqual(
-    assets.toCloudFileId('https://example.com/image.jpg'),
-    'https://example.com/image.jpg'
-  )
+  try {
+    assert(assets.CLOUD_IMAGE_FILE_ROOT.endsWith('/app-assets/images'))
+    assert.strictEqual(
+      assets.toCloudFileId('/assets/images/tea/longjing.jpg'),
+      `${assets.CLOUD_IMAGE_FILE_ROOT}/tea/longjing.jpg`
+    )
+    assert.strictEqual(
+      assets.toCloudFileId('https://example.com/image.jpg'),
+      'https://example.com/image.jpg'
+    )
 
-  const input = Array.from({ length: 51 }, (_, index) => ({
-    coverImage: `/assets/images/tea/item-${index}.jpg`,
-    untouched: `/assets/images/tea/not-a-cover-${index}.jpg`
-  }))
-  input.push({
-    nested: {
-      refCover: '/assets/images/film/reference.jpg'
-    }
-  })
+    const input = Array.from({ length: 51 }, (_, index) => ({
+      coverImage: `/assets/images/tea/item-${index}.jpg`,
+      untouched: `/assets/images/tea/not-a-cover-${index}.jpg`
+    }))
+    input.push({
+      nested: {
+        refCover: '/assets/images/film/reference.jpg'
+      }
+    })
 
-  const resolved = await assets.resolveAssetTree(input)
-  assert.strictEqual(calls.length, 2, '临时地址请求应按 50 个 File ID 分批')
-  assert.strictEqual(calls.flat().length, 52)
-  assert(resolved[0].coverImage.startsWith('https://temp.example/'))
-  assert.strictEqual(
-    resolved[0].untouched,
-    '/assets/images/tea/not-a-cover-0.jpg',
-    '非图片地址字段不得被递归误改'
-  )
-  assert(resolved[51].nested.refCover.startsWith('https://temp.example/'))
-  assert.strictEqual(input[0].coverImage, '/assets/images/tea/item-0.jpg', '解析过程不得修改原始数据')
+    const resolved = await assets.resolveAssetTree(input)
+    assert.strictEqual(calls.length, 2, '临时地址请求应按 50 个 File ID 分批')
+    assert.strictEqual(calls.flat().length, 52)
+    assert(resolved[0].coverImage.startsWith('https://temp.example/'))
+    assert.strictEqual(
+      resolved[0].untouched,
+      '/assets/images/tea/not-a-cover-0.jpg',
+      '非图片地址字段不得被递归误改'
+    )
+    assert(resolved[51].nested.refCover.startsWith('https://temp.example/'))
+    assert.strictEqual(input[0].coverImage, '/assets/images/tea/item-0.jpg', '解析过程不得修改原始数据')
 
-  const cloudSource = fs.readFileSync(
-    fromRoot('miniapp/cloudfunctions/getStudyData/index.js'),
-    'utf8'
-  )
-  assert(cloudSource.includes("event.action === 'getAssetUrls'"))
-  assert(cloudSource.includes("fileID.startsWith(ASSET_FILE_ROOT)"))
-  assert(cloudSource.includes('fileList.length > ASSET_BATCH_LIMIT'))
-  assert(cloudSource.includes('/study/study_data.json'))
-  assert(cloudSource.includes('cloud.downloadFile({ fileID: STUDY_DATA_FILE_ID })'))
-  assert(cloudSource.includes("text.startsWith('{')"))
-  assert(cloudSource.includes("event.action === 'getStudyIndex'"))
-  assert(cloudSource.includes("event.action === 'getStudyTopics'"))
-  assert(cloudSource.includes('topicKeys.length > STUDY_TOPIC_BATCH_LIMIT'))
+    await assets.resolveAssetTree(input.slice(0, 1))
+    assert.strictEqual(calls.length, 2, '有效期内应复用临时地址')
+    now += assets.TEMP_URL_CACHE_TTL + 1
+    await assets.resolveAssetTree(input.slice(0, 1))
+    assert.strictEqual(calls.length, 3, '临时地址缓存到期后必须重新签发')
 
-  const appSource = fs.readFileSync(fromRoot('miniapp/app.js'), 'utf8')
-  assert(appSource.includes("action: 'getStudyIndex'"))
-  assert(appSource.includes("action: 'getStudyTopics'"))
-  assert(appSource.includes('const batchSize = 3'))
+    const cloudSource = fs.readFileSync(
+      fromRoot('miniapp/cloudfunctions/getStudyData/index.js'),
+      'utf8'
+    )
+    assert(cloudSource.includes("event.action === 'getAssetUrls'"))
+    assert(cloudSource.includes("fileID.startsWith(ASSET_FILE_ROOT)"))
+    assert(cloudSource.includes('fileList.length > ASSET_BATCH_LIMIT'))
+    assert(cloudSource.includes('/study/study_data.json'))
+    assert(cloudSource.includes('cloud.downloadFile({ fileID: STUDY_DATA_FILE_ID })'))
+    assert(cloudSource.includes("text.startsWith('{')"))
+    assert(cloudSource.includes("event.action === 'getStudyIndex'"))
+    assert(cloudSource.includes("event.action === 'getStudyTopics'"))
+    assert(cloudSource.includes('topicKeys.length > STUDY_TOPIC_BATCH_LIMIT'))
+
+    const appSource = fs.readFileSync(fromRoot('miniapp/app.js'), 'utf8')
+    assert(appSource.includes("action: 'getStudyIndex'"))
+    assert(appSource.includes("action: 'getStudyTopics'"))
+    assert(appSource.includes('const batchSize = 3'))
+  } finally {
+    Date.now = originalDateNow
+  }
 }
 
 async function testClientUgcSync() {
