@@ -50,8 +50,21 @@ Component({
       if (newSrc) {
         this.setData({ hasAudio: true });
         if (this._inited) {
-          this._destroyAudio();
+          const shouldContinue = Boolean(this._continuePlayback);
+          this._continuePlayback = false;
+          this._destroyAudio(true);
+          this.setData({
+            isPlaying: false,
+            currentTime: 0,
+            duration: 0,
+            progress: 0,
+            currentTimeText: '00:00',
+            durationText: '00:00'
+          });
           this._initAudio();
+          if (shouldContinue) {
+            setTimeout(() => this._startAudio(), 0);
+          }
         }
       } else {
         this.setData({ hasAudio: false });
@@ -93,9 +106,6 @@ Component({
       if (!this.data.src) return;
       this._inited = true;
 
-      // 使用 BackgroundAudioManager 支持后台播放
-      this._useBackgroundAudio();
-
       // 恢复上次播放进度
       if (this.data.trackId) {
         const saved = this._getSavedProgress(this.data.trackId);
@@ -105,13 +115,29 @@ Component({
       }
     },
 
+    _startAudio() {
+      if (!this.data.src) return;
+      this._useBackgroundAudio();
+    },
+
     _useBackgroundAudio() {
       const bgAudio = wx.getBackgroundAudioManager();
       this.audioCtx = bgAudio;
       this._isBackground = true;
 
+      // BackgroundAudioManager 是全局单例。组件重新挂载时先移除旧监听，
+      // 避免一次播放触发多组回调。
+      [
+        'offPlay', 'offPause', 'offStop', 'offTimeUpdate',
+        'offEnded', 'offError', 'offPrev', 'offNext'
+      ].forEach(method => {
+        if (typeof bgAudio[method] === 'function') bgAudio[method]();
+      });
+
       bgAudio.title = this.data.title || '妙不可园';
       bgAudio.singer = '妙不可园';
+      // BackgroundAudioManager 设置 src 会立即播放，因此只在用户点击播放
+      // 或已在播放中的上一首/下一首切换时执行到这里。
       bgAudio.src = this.data.src;
 
       bgAudio.onPlay(() => {
@@ -161,6 +187,7 @@ Component({
           currentTimeText: '00:00'
         });
         // 自动播放下一首
+        this._continuePlayback = true;
         this.onNext();
       });
 
@@ -232,6 +259,7 @@ Component({
           currentTime: 0,
           currentTimeText: '00:00'
         });
+        this._continuePlayback = true;
         this.onNext();
       });
 
@@ -241,11 +269,13 @@ Component({
       });
     },
 
-    _destroyAudio() {
+    _destroyAudio(stopBackground = false) {
       if (this.audioCtx) {
         if (this._isBackground) {
-          // BackgroundAudioManager 不需要 destroy，只需 stop
-          // 但 stop 会清除系统通知，我们保留播放状态
+          // 页面离开时保留后台播放；只有切换 src 时主动停止旧曲目。
+          if (stopBackground && typeof this.audioCtx.stop === 'function') {
+            this.audioCtx.stop();
+          }
         } else {
           this.audioCtx.stop();
           this.audioCtx.destroy();
@@ -294,7 +324,7 @@ Component({
     // ====== 播放控制 ======
     onTogglePlay() {
       if (!this.audioCtx) {
-        this._initAudio();
+        this._startAudio();
         return;
       }
 
@@ -335,6 +365,7 @@ Component({
     onPrev() {
       const list = this.data.playlist;
       if (!list.length || this.data.currentIndex < 0) return;
+      this._continuePlayback = this.data.isPlaying;
       const prevIdx = this.data.currentIndex > 0
         ? this.data.currentIndex - 1
         : list.length - 1;
@@ -345,6 +376,7 @@ Component({
     onNext() {
       const list = this.data.playlist;
       if (!list.length || this.data.currentIndex < 0) return;
+      this._continuePlayback = this._continuePlayback || this.data.isPlaying;
       const nextIdx = this.data.currentIndex < list.length - 1
         ? this.data.currentIndex + 1
         : 0;

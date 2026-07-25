@@ -15,9 +15,11 @@ const SECRET_KEY = process.env.STUDY_DATA_KEY || ''
 const STUDY_DATA_FILE_ID = process.env.STUDY_DATA_FILE_ID ||
   'cloud://cloud1-d6gh3spr3b2bd51d8.636c-cloud1-d6gh3spr3b2bd51d8-1449934595/study/study_data.json'
 const DATA_URL = process.env.STUDY_DATA_URL || ''
-const ASSET_FILE_ROOT = 'cloud://cloud1-d6gh3spr3b2bd51d8.636c-cloud1-d6gh3spr3b2bd51d8-1449934595/app-assets/images/'
+const ASSET_IMAGE_FILE_ROOT = 'cloud://cloud1-d6gh3spr3b2bd51d8.636c-cloud1-d6gh3spr3b2bd51d8-1449934595/app-assets/images/'
+const ASSET_AUDIO_FILE_ROOT = 'cloud://cloud1-d6gh3spr3b2bd51d8.636c-cloud1-d6gh3spr3b2bd51d8-1449934595/app-assets/audio/'
 const ASSET_BATCH_LIMIT = 50
-const ASSET_FILE_PATTERN = /\.(?:jpe?g|png|webp)$/i
+const ASSET_IMAGE_FILE_PATTERN = /\.(?:jpe?g|png|webp)$/i
+const ASSET_AUDIO_FILE_PATTERN = /\.(?:mp3|m4a|aac|ogg)$/i
 const STUDY_TOPIC_BATCH_LIMIT = 3
 const STUDY_TOPIC_KEY_PATTERN = /^[a-z0-9_]+$/
 
@@ -120,10 +122,14 @@ function parseStudyData(rawText) {
 }
 
 function isAllowedAssetFile(fileID) {
-  return typeof fileID === 'string' &&
-    fileID.startsWith(ASSET_FILE_ROOT) &&
-    !fileID.includes('..') &&
-    ASSET_FILE_PATTERN.test(fileID)
+  if (typeof fileID !== 'string' || fileID.includes('..')) return false
+  return (
+    fileID.startsWith(ASSET_IMAGE_FILE_ROOT) &&
+    ASSET_IMAGE_FILE_PATTERN.test(fileID)
+  ) || (
+    fileID.startsWith(ASSET_AUDIO_FILE_ROOT) &&
+    ASSET_AUDIO_FILE_PATTERN.test(fileID)
+  )
 }
 
 async function getAssetUrls(fileList) {
@@ -131,7 +137,7 @@ async function getAssetUrls(fileList) {
       fileList.length < 1 ||
       fileList.length > ASSET_BATCH_LIMIT ||
       fileList.some(fileID => !isAllowedAssetFile(fileID))) {
-    return { code: -1, message: '图片文件列表不合法' }
+    return { code: -1, message: '素材文件列表不合法' }
   }
 
   try {
@@ -143,12 +149,12 @@ async function getAssetUrls(fileList) {
         fileID: file.fileID,
         status: file.status,
         tempFileURL: file.tempFileURL || '',
-        errMsg: file.status === 0 ? '' : '图片地址获取失败'
+        errMsg: file.status === 0 ? '' : '素材地址获取失败'
       }))
     }
   } catch (err) {
     console.error('[getStudyData:getAssetUrls] error:', err)
-    return { code: -1, message: '图片地址获取失败' }
+    return { code: -1, message: '素材地址获取失败' }
   }
 }
 

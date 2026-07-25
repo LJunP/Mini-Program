@@ -31,9 +31,9 @@
   </view>
 
   <!-- 音乐播放器（仅音乐板块显示） -->
-  <view wx:if="{{domain === 'music' && detail.audioSrc}}" class="section-title">聆听</view>
+  <view wx:if="{{domain === 'music'}}" class="section-title">聆听</view>
   <audio-player 
-    wx:if="{{domain === 'music' && detail.audioSrc}}" 
+    wx:if="{{domain === 'music'}}"
     src="{{detail.audioSrc}}" 
     title="{{detail.title}}"
     playlist="{{musicPlaylist}}"
@@ -41,6 +41,20 @@
     trackId="{{detail.id}}"
     bind:trackchange="onTrackChange"
   />
+  <view
+    wx:if="{{domain === 'music' && detail.audioLicense}}"
+    class="audio-license"
+  >
+    <view class="audio-license__header">
+      <text class="audio-license__title">音频来源与许可</text>
+      <text class="audio-license__copy" bindtap="onCopyAudioLicense">复制信息</text>
+    </view>
+    <text class="audio-license__line">演奏：{{detail.audioLicense.performer}}</text>
+    <text wx:if="{{detail.audioLicense.recorder}}" class="audio-license__line">录制：{{detail.audioLicense.recorder}}</text>
+    <text class="audio-license__line">来源：{{detail.audioLicense.sourceName}}</text>
+    <text class="audio-license__line">许可：{{detail.audioLicense.licenseName}}</text>
+    <text class="audio-license__note">{{detail.audioLicense.changeNote}}</text>
+  </view>
 
   <!-- 正文 -->
   <view class="section-title">正文</view>

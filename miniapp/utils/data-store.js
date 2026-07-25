@@ -4320,7 +4320,7 @@ const musicData = [
     "instrument": "古琴",
     "dynasty": "先秦",
     "difficulty": 2,
-    "duration": "7分钟",
+    "duration": "8分13秒",
     "body": "《流水》是中国最古老的琴曲之一，讲的是伯牙和钟子期的故事。伯牙弹琴，钟子期听出'巍巍乎志在高山'和'洋洋乎志在流水'。后来钟子期死了，伯牙摔琴，从此不再弹——因为没人能听懂他的音乐了。这首曲子从低音缓缓升起，像山间的溪流，然后逐渐激昂，变成瀑布飞泻，最后又归于平静。听这首曲子，你会明白什么叫'知音难觅'。1977年，《流水》被刻在金唱片上，随着旅行者号飞向太空——如果外星人听到，他们会知道地球上有一种文明，叫'中国'。\n\n【指法曲律】：古琴名曲《高山》底层曲谱使用特殊的“减字谱”记录指法。核心物理演奏手法包括：左手大指与无名指在琴弦上的“吟”、“猱”（产生类似于弦乐物理揉弦的微小频率抖动，形成幽远的声韵），右手“挑”、“劈”激发琴弦的物理基音。泛音段落清亮空灵，象征着冰山融水与高山耸立的空静。\n【乐教哲学】：伯牙子期“高山流水”典故代表着人与人之间跨越语言阻碍的灵魂共鸣。古琴音量微弱，其共鸣箱物理材质为古松木与生漆鹿角霜胶合，声音沉浊内敛，体现了道家“大音希声”的留白折中之美。最宜在清晨烹茶后、身心处于绝对放松时静默聆听。",
     "tips": [
       "听《流水》要闭眼，想象自己坐在山涧旁",
@@ -4340,7 +4340,15 @@ const musicData = [
         "context": "沉香配古琴，静心绝配"
       }
     ],
-    "audioSrc": "",
+    "audioSrc": "/assets/audio/liushui.mp3",
+    "audioLicense": {
+      "performer": "Charlie Huang",
+      "sourceName": "Wikimedia Commons",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Liu_Shui.ogg",
+      "licenseName": "CC BY 2.5",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.5",
+      "changeNote": "使用 Wikimedia Commons 自动生成的 MP3 格式转码，未作内容剪辑"
+    },
     "coverImage": "/assets/images/music/gaoshan.jpg"
   },
   {
@@ -4382,7 +4390,7 @@ const musicData = [
     "instrument": "二胡",
     "dynasty": "近代",
     "difficulty": 2,
-    "duration": "8分钟",
+    "duration": "4分28秒",
     "body": "阿炳是无锡的瞎子艺人，每天在街头拉琴。这首曲子是他即兴创作的，没有名字，后来别人给它起了《二泉映月》。二胡的声音很'苦'，像人在深夜里独自流泪。但《二泉映月》不只是苦，它还有一种'不服'——阿炳眼睛瞎了，穷得叮当响，但他还在拉琴，还在表达。小泽征尔听完这首曲子说：'这种音乐应该跪着听。'听这首曲子，你会明白什么叫'苦难中的尊严'。\n\n【乐曲声学】：本曲在音阶排列上遵循中国传统五声音阶（宫、商、角、徵、羽），在物理上与人体心、肝、脾、肺、肾的生物频率产生同频共振。建议使用高保真无损音源配合开放式耳机聆听，能完美还原古乐器的物理泛音细节，达到物理级别的身心疗愈。",
     "tips": [
       "深夜独处时听最有效果",
@@ -4397,7 +4405,16 @@ const musicData = [
         "context": "普洱配二胡，苦尽甘来"
       }
     ],
-    "audioSrc": "",
+    "audioSrc": "/assets/audio/erquan-yingyue.mp3",
+    "audioLicense": {
+      "performer": "张沛坚（Zhang Peijian）",
+      "recorder": "David290",
+      "sourceName": "Wikimedia Commons",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:%E4%BA%8C%E6%B3%89%E6%98%A0%E6%9C%88.ogg",
+      "licenseName": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "changeNote": "使用 Wikimedia Commons 自动生成的 MP3 格式转码，未作内容剪辑"
+    },
     "coverImage": "/assets/images/music/erquan.jpg"
   },
   {
@@ -4532,7 +4549,7 @@ const musicData = [
     "instrument": "古琴",
     "dynasty": "明代",
     "difficulty": 2,
-    "duration": "7分钟",
+    "duration": "7分14秒",
     "body": "《平沙落雁》描绘的是秋天的傍晚，大雁落在沙滩上休息的场景。曲子开头很空旷，像无边的沙漠；然后大雁的声音从远处传来，越来越近；最后群雁落下，嘎嘎叫着，热闹非凡。这首曲子的意境是'闲适'——大雁飞了一天，终于可以休息了，那种放松的感觉，你听完也会有。秋天的下午，配一杯乌龙茶，听一曲《平沙落雁》，你会觉得'躺平'也是一种智慧。\n\n【乐曲声学】：本曲在音阶排列上遵循中国传统五声音阶（宫、商、角、徵、羽），在物理上与人体心、肝、脾、肺、肾的生物频率产生同频共振。建议使用高保真无损音源配合开放式耳机聆听，能完美还原古乐器的物理泛音细节，达到物理级别的身心疗愈。",
     "tips": [
       "秋天听最有感觉，尤其是傍晚",
@@ -4552,7 +4569,15 @@ const musicData = [
         "context": "秋季养生，顺应自然"
       }
     ],
-    "audioSrc": "",
+    "audioSrc": "/assets/audio/pingsha-luoyan.mp3",
+    "audioLicense": {
+      "performer": "Charlie Huang",
+      "sourceName": "Wikimedia Commons",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Pingsha_Luoyan.ogg",
+      "licenseName": "CC BY 2.5",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.5",
+      "changeNote": "使用 Wikimedia Commons 自动生成的 MP3 格式转码，未作内容剪辑"
+    },
     "coverImage": "/assets/images/music/pingsha-luoyan.jpg"
   },
   {
@@ -4563,7 +4588,7 @@ const musicData = [
     "instrument": "古琴",
     "dynasty": "唐代",
     "difficulty": 2,
-    "duration": "6分钟",
+    "duration": "5分50秒",
     "body": "《阳关三叠》是根据王维的诗《送元二使安西》改编的琴曲。'渭城朝雨浥轻尘，客舍青青柳色新。劝君更尽一杯酒，西出阳关无故人。'曲子把这首诗唱了三遍，每遍都有变化，像朋友在离别时反复叮嘱。这首曲子特别适合送别的时候听——但不只是送朋友，也可以送自己。每次换工作、搬家、或者结束一段关系的时候，听一曲《阳关三叠》，你会明白：离别不是结束，是新的开始。\n\n【乐曲声学】：本曲在音阶排列上遵循中国传统五声音阶（宫、商、角、徵、羽），在物理上与人体心、肝、脾、肺、肾的生物频率产生同频共振。建议使用高保真无损音源配合开放式耳机聆听，能完美还原古乐器的物理泛音细节，达到物理级别的身心疗愈。",
     "tips": [
       "离别的时候听，会有特别的感受",
@@ -4578,7 +4603,15 @@ const musicData = [
         "context": "君山银针配《阳关》，依依惜别"
       }
     ],
-    "audioSrc": "",
+    "audioSrc": "/assets/audio/yangguan-sandie.mp3",
+    "audioLicense": {
+      "performer": "Charlie Huang（Charles R Tsua）",
+      "sourceName": "Wikimedia Commons",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Guqin-Yangguan_Sandie.ogg",
+      "licenseName": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "changeNote": "使用 Wikimedia Commons 自动生成的 MP3 格式转码，未作内容剪辑"
+    },
     "coverImage": "/assets/images/music/yangguan-sandie.jpg"
   },
   {

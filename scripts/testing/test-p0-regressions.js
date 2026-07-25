@@ -106,6 +106,33 @@ function testContentDetailRequirePaths() {
   })
 }
 
+function testLicensedMusicPlaybackContract() {
+  const dataStore = require(fromRoot('miniapp/utils/data-store.js'))
+  const playable = dataStore.music.filter(item => Boolean(item.audioSrc))
+
+  assert.deepStrictEqual(
+    playable.map(item => item.id),
+    ['music_001', 'music_003', 'music_008', 'music_009'],
+    '播放列表只能包含已有真实授权录音的曲目'
+  )
+  playable.forEach(item => {
+    assert(item.audioSrc.startsWith('/assets/audio/'), `${item.id} 应使用私有云音频逻辑路径`)
+    assert(item.audioLicense && item.audioLicense.sourceUrl, `${item.id} 缺少来源链接`)
+    assert(item.audioLicense.licenseName, `${item.id} 缺少许可名称`)
+    assert(item.audioLicense.licenseUrl, `${item.id} 缺少许可链接`)
+  })
+
+  const playerSource = fs.readFileSync(
+    fromRoot('miniapp/components/audio-player/audio-player.js'),
+    'utf8'
+  )
+  const initAudio = playerSource.match(/_initAudio\(\)\s*\{([\s\S]*?)\n\s*\},\n\n\s*_startAudio/)
+  assert(initAudio, '应能识别播放器初始化方法')
+  assert(!initAudio[1].includes('_useBackgroundAudio'), '组件挂载时不得自动开始播放')
+  assert(playerSource.includes('onTogglePlay()'))
+  assert(playerSource.includes('this._startAudio();'), '首次播放必须由用户操作触发')
+}
+
 function testDeploymentGuideInventory() {
   const cloudRoot = fromRoot('miniapp/cloudfunctions')
   const functionNames = fs.readdirSync(cloudRoot)
@@ -184,6 +211,7 @@ async function testCloudAssetResolver() {
 
   try {
     assert(assets.CLOUD_IMAGE_FILE_ROOT.endsWith('/app-assets/images'))
+    assert(assets.CLOUD_AUDIO_FILE_ROOT.endsWith('/app-assets/audio'))
     assert.strictEqual(
       assets.toCloudFileId('/assets/images/tea/longjing.jpg'),
       `${assets.CLOUD_IMAGE_FILE_ROOT}/tea/longjing.jpg`
@@ -192,6 +220,10 @@ async function testCloudAssetResolver() {
       assets.toCloudFileId('https://example.com/image.jpg'),
       'https://example.com/image.jpg'
     )
+    assert.strictEqual(
+      assets.toCloudFileId('/assets/audio/liushui.mp3'),
+      `${assets.CLOUD_AUDIO_FILE_ROOT}/liushui.mp3`
+    )
 
     const input = Array.from({ length: 51 }, (_, index) => ({
       coverImage: `/assets/images/tea/item-${index}.jpg`,
@@ -199,13 +231,14 @@ async function testCloudAssetResolver() {
     }))
     input.push({
       nested: {
-        refCover: '/assets/images/film/reference.jpg'
+        refCover: '/assets/images/film/reference.jpg',
+        audioSrc: '/assets/audio/liushui.mp3'
       }
     })
 
     const resolved = await assets.resolveAssetTree(input)
     assert.strictEqual(calls.length, 2, '临时地址请求应按 50 个 File ID 分批')
-    assert.strictEqual(calls.flat().length, 52)
+    assert.strictEqual(calls.flat().length, 53)
     assert(resolved[0].coverImage.startsWith('https://temp.example/'))
     assert.strictEqual(
       resolved[0].untouched,
@@ -213,6 +246,7 @@ async function testCloudAssetResolver() {
       '非图片地址字段不得被递归误改'
     )
     assert(resolved[51].nested.refCover.startsWith('https://temp.example/'))
+    assert(resolved[51].nested.audioSrc.startsWith('https://temp.example/'))
     assert.strictEqual(input[0].coverImage, '/assets/images/tea/item-0.jpg', '解析过程不得修改原始数据')
 
     await assets.resolveAssetTree(input.slice(0, 1))
@@ -226,7 +260,8 @@ async function testCloudAssetResolver() {
       'utf8'
     )
     assert(cloudSource.includes("event.action === 'getAssetUrls'"))
-    assert(cloudSource.includes("fileID.startsWith(ASSET_FILE_ROOT)"))
+    assert(cloudSource.includes("fileID.startsWith(ASSET_IMAGE_FILE_ROOT)"))
+    assert(cloudSource.includes("fileID.startsWith(ASSET_AUDIO_FILE_ROOT)"))
     assert(cloudSource.includes('fileList.length > ASSET_BATCH_LIMIT'))
     assert(cloudSource.includes('/study/study_data.json'))
     assert(cloudSource.includes('cloud.downloadFile({ fileID: STUDY_DATA_FILE_ID })'))
@@ -483,12 +518,13 @@ async function testCloudUgcIdempotencyAndPrivacy() {
 async function main() {
   testPurePolicies()
   testContentDetailRequirePaths()
+  testLicensedMusicPlaybackContract()
   testDeploymentGuideInventory()
   testSeasonalBoundaries()
   await testCloudAssetResolver()
   await testClientUgcSync()
   await testCloudUgcIdempotencyAndPrivacy()
-  console.log('P0 regression tests: 7 groups passed')
+  console.log('P0 regression tests: 8 groups passed')
 }
 
 main().catch(err => {

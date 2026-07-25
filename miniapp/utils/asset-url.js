@@ -1,10 +1,14 @@
 // 云端产品素材地址。
-// 本地源文件保留在 assets/images 便于维护，但通过 project.config.json
-// 排除出上传包；运行时批量换取临时 HTTPS 地址，避免开放整个存储桶。
+// 本地路径只作为稳定的素材标识；图片源文件保留在 assets/images 便于维护，
+// 音频源文件直接存放在私有云存储。运行时统一换取短期 HTTPS 地址，
+// 避免开放整个存储桶或把大音频打进小程序包。
 const CLOUD_IMAGE_FILE_ROOT =
   'cloud://cloud1-d6gh3spr3b2bd51d8.636c-cloud1-d6gh3spr3b2bd51d8-1449934595/app-assets/images';
+const CLOUD_AUDIO_FILE_ROOT =
+  'cloud://cloud1-d6gh3spr3b2bd51d8.636c-cloud1-d6gh3spr3b2bd51d8-1449934595/app-assets/audio';
 
 const LOCAL_IMAGE_PREFIX = '/assets/images/';
+const LOCAL_AUDIO_PREFIX = '/assets/audio/';
 const TEMP_URL_BATCH_SIZE = 50;
 // CloudBase 临时地址会失效。客户端只缓存较短时间，避免页面复用已过期签名。
 const TEMP_URL_CACHE_TTL = 5 * 60 * 1000;
@@ -12,11 +16,17 @@ const tempUrlCache = new Map();
 const tempUrlFetchedAt = new Map();
 
 function toCloudFileId(path) {
-  if (typeof path !== 'string' || !path.startsWith(LOCAL_IMAGE_PREFIX)) {
+  if (typeof path !== 'string') {
     return path;
   }
 
-  return `${CLOUD_IMAGE_FILE_ROOT}/${path.slice(LOCAL_IMAGE_PREFIX.length)}`;
+  if (path.startsWith(LOCAL_IMAGE_PREFIX)) {
+    return `${CLOUD_IMAGE_FILE_ROOT}/${path.slice(LOCAL_IMAGE_PREFIX.length)}`;
+  }
+  if (path.startsWith(LOCAL_AUDIO_PREFIX)) {
+    return `${CLOUD_AUDIO_FILE_ROOT}/${path.slice(LOCAL_AUDIO_PREFIX.length)}`;
+  }
+  return path;
 }
 
 function getTempFileUrls(fileIds) {
@@ -57,7 +67,7 @@ function getTempFileUrls(fileIds) {
         const result = (res && res.result) || {};
         const failed = [];
         if (result.code !== 0) {
-          console.warn('[assets] 云端图片地址批量获取失败');
+          console.warn('[assets] 云端素材地址批量获取失败');
           resolve();
           return;
         }
@@ -75,7 +85,7 @@ function getTempFileUrls(fileIds) {
         if (failed.length) {
           const first = failed[0];
           console.warn(
-            '[assets] 云端图片地址获取失败',
+            '[assets] 云端素材地址获取失败',
             failed.length,
             '项，首项状态：',
             first.status,
@@ -85,16 +95,25 @@ function getTempFileUrls(fileIds) {
         resolve();
       },
       fail: () => {
-        console.warn('[assets] 云端图片地址批量获取失败');
+        console.warn('[assets] 云端素材地址批量获取失败');
         resolve();
       },
     });
   }))).then(() => tempUrlCache);
 }
 
-function collectImagePaths(value, output) {
+function isResolvableAssetField(key, value) {
+  if (typeof value !== 'string') return false;
+  if ((key === 'coverImage' || key === 'refCover') &&
+      value.startsWith(LOCAL_IMAGE_PREFIX)) {
+    return true;
+  }
+  return key === 'audioSrc' && value.startsWith(LOCAL_AUDIO_PREFIX);
+}
+
+function collectAssetPaths(value, output) {
   if (Array.isArray(value)) {
-    value.forEach(item => collectImagePaths(item, output));
+    value.forEach(item => collectAssetPaths(item, output));
     return;
   }
 
@@ -102,19 +121,17 @@ function collectImagePaths(value, output) {
 
   Object.keys(value).forEach(key => {
     const child = value[key];
-    if ((key === 'coverImage' || key === 'refCover') &&
-        typeof child === 'string' &&
-        child.startsWith(LOCAL_IMAGE_PREFIX)) {
+    if (isResolvableAssetField(key, child)) {
       output.push(child);
       return;
     }
-    collectImagePaths(child, output);
+    collectAssetPaths(child, output);
   });
 }
 
-function replaceImagePaths(value, cache) {
+function replaceAssetPaths(value, cache) {
   if (Array.isArray(value)) {
-    return value.map(item => replaceImagePaths(item, cache));
+    return value.map(item => replaceAssetPaths(item, cache));
   }
 
   if (!value || typeof value !== 'object') return value;
@@ -122,28 +139,27 @@ function replaceImagePaths(value, cache) {
   const result = {};
   Object.keys(value).forEach(key => {
     const child = value[key];
-    if ((key === 'coverImage' || key === 'refCover') &&
-        typeof child === 'string' &&
-        child.startsWith(LOCAL_IMAGE_PREFIX)) {
+    if (isResolvableAssetField(key, child)) {
       result[key] = cache.get(toCloudFileId(child)) || '';
       return;
     }
-    result[key] = replaceImagePaths(child, cache);
+    result[key] = replaceAssetPaths(child, cache);
   });
   return result;
 }
 
 function resolveAssetTree(value) {
-  const imagePaths = [];
-  collectImagePaths(value, imagePaths);
-  if (!imagePaths.length) return Promise.resolve(value);
+  const assetPaths = [];
+  collectAssetPaths(value, assetPaths);
+  if (!assetPaths.length) return Promise.resolve(value);
 
-  const fileIds = imagePaths.map(toCloudFileId);
-  return getTempFileUrls(fileIds).then(cache => replaceImagePaths(value, cache));
+  const fileIds = assetPaths.map(toCloudFileId);
+  return getTempFileUrls(fileIds).then(cache => replaceAssetPaths(value, cache));
 }
 
 module.exports = {
   CLOUD_IMAGE_FILE_ROOT,
+  CLOUD_AUDIO_FILE_ROOT,
   TEMP_URL_CACHE_TTL,
   toCloudFileId,
   getTempFileUrls,

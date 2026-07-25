@@ -98,11 +98,13 @@ Page({
     if (!music) return;
     // 存储当前列表作为播放列表，供详情页 audio-player 使用
     const app = getApp();
-    const playlist = this.data.list.map(item => ({
-      id: item.id,
-      title: item.title,
-      audioSrc: item.audioSrc || ''
-    }));
+    const playlist = this.data.list
+      .filter(item => item.audioSrc)
+      .map(item => ({
+        id: item.id,
+        title: item.title,
+        audioSrc: item.audioSrc
+      }));
     const currentIndex = playlist.findIndex(item => item.id === music.id);
     app.globalData.musicPlaylist = playlist;
     app.globalData.musicPlaylistIndex = currentIndex >= 0 ? currentIndex : 0;

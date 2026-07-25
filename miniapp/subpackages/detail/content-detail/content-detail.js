@@ -120,6 +120,26 @@ Page({
     });
   },
 
+  onCopyAudioLicense() {
+    const license = this.data.detail && this.data.detail.audioLicense;
+    if (!license) return;
+    const lines = [
+      `演奏：${license.performer || '未注明'}`,
+      license.recorder ? `录制：${license.recorder}` : '',
+      `来源：${license.sourceName || 'Wikimedia Commons'}`,
+      `原始页面：${license.sourceUrl || ''}`,
+      `许可：${license.licenseName || ''}`,
+      `许可文本：${license.licenseUrl || ''}`,
+      license.changeNote ? `变更说明：${license.changeNote}` : ''
+    ].filter(Boolean);
+    wx.setClipboardData({
+      data: lines.join('\n'),
+      success: () => {
+        wx.showToast({ title: '来源与许可已复制', icon: 'none' });
+      }
+    });
+  },
+
   // 跳转关联行旅
   onTravelTap(e) {
     const { id } = e.currentTarget.dataset;

@@ -454,6 +454,43 @@
   display: flex;
   gap: 16rpx;
 }
+
+.audio-license {
+  padding: 22rpx 24rpx;
+  margin: -4rpx 0 28rpx;
+  border: 1rpx solid #E7E1D7;
+  border-radius: 16rpx;
+  background: #F8F6F2;
+}
+.audio-license__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12rpx;
+}
+.audio-license__title {
+  font-size: 25rpx;
+  font-weight: 500;
+  color: #4A463D;
+}
+.audio-license__copy {
+  padding: 6rpx 16rpx;
+  border-radius: 999rpx;
+  background: rgba(74, 107, 124, 0.1);
+  font-size: 22rpx;
+  color: #4A6B7C;
+}
+.audio-license__line,
+.audio-license__note {
+  display: block;
+  font-size: 22rpx;
+  line-height: 1.7;
+  color: #777064;
+}
+.audio-license__note {
+  margin-top: 6rpx;
+  color: #9A9285;
+}
 .note-card__btn {
   font-size: 24rpx;
   color: #854F0B;

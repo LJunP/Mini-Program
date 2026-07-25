@@ -122,6 +122,8 @@ function getImageUrl(path) {
 function getAudioUrl(path) {
   if (!path) return ''
   if (path.startsWith('http')) return path
+  // 私有云存储音频由 request.js 统一批量换取临时 HTTPS 地址。
+  if (path.startsWith('/assets/audio/')) return path
   return getCdnBaseUrl() + path
 }
 
