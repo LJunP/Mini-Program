@@ -155,9 +155,12 @@ exports.main = async (event) => {
     // 检查 API 返回
     if (result.Response && result.Response.Error) {
       console.error('[tts] API error:', result.Response.Error)
+      const vendorMessage = result.Response.Error.Message || ''
+      const quotaExhausted = /resource pack|allowance|exhausted/i.test(vendorMessage)
       return {
         code: -1,
-        message: result.Response.Error.Message || '语音合成失败'
+        reason: quotaExhausted ? 'quota_exhausted' : 'provider_error',
+        message: quotaExhausted ? '语音服务额度已用完' : '语音合成失败'
       }
     }
 

@@ -97,6 +97,10 @@ function _checkIsDevTools() {
 function getImageUrl(path) {
   if (!path) return ''
   if (path.startsWith('http') || path.startsWith('wxfile://') || path.startsWith('data:')) return path
+
+  // 产品内容图片由 request.js 统一批量换取 CloudBase 临时 HTTPS 地址。
+  // 这里保留规范化本地路径，避免真机环境先拼接到已失效的历史 CDN。
+  if (path.startsWith('/assets/images/')) return path
   
   // 引入本地局域网 CDN 调试环境
   if (localEnv && localEnv.useLocalCdn) {

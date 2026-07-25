@@ -84,7 +84,7 @@ exports.main = async (event) => {
         if (post.rating !== undefined) updateData.rating = post.rating
         if (post.location !== undefined) updateData.location = post.location
         if (post.linkedContent !== undefined) updateData.linkedContent = post.linkedContent
-        if (post.isPublic !== undefined) updateData.isPublic = post.isPublic
+        if (post.isPublic !== undefined) updateData.isPublic = post.isPublic === true
         if (post.id !== undefined) updateData.client_id = post.id
         updateData.updated_at = now
 
@@ -112,7 +112,8 @@ exports.main = async (event) => {
         location: post.location || '',
         linkedContent: post.linkedContent || null,
         status: 'published',
-        isPublic: post.isPublic !== false,
+        // 隐私优先：字段缺失或异常值一律按私密处理。
+        isPublic: post.isPublic === true,
         likeCount: 0,
         created_at: now,
         updated_at: now
@@ -185,7 +186,7 @@ exports.main = async (event) => {
           rating: item.rating || 0,
           location: item.location || '',
           linkedContent: item.linkedContent || null,
-          isPublic: item.isPublic !== false,
+          isPublic: item.isPublic === true,
           likeCount: item.likeCount || 0,
           created_at: item.created_at,
           updated_at: item.updated_at
@@ -263,7 +264,7 @@ exports.main = async (event) => {
           rating: data.rating || 0,
           location: data.location || '',
           linkedContent: data.linkedContent || null,
-          isPublic: data.isPublic !== false,
+          isPublic: data.isPublic === true,
           likeCount: data.likeCount || 0,
           created_at: data.created_at,
           updated_at: data.updated_at,

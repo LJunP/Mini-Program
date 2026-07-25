@@ -52,29 +52,58 @@ App({
         }
       })
     } else {
-      // 通过云函数获取已解密的学习数据（密钥不暴露在客户端）
-      wx.cloud.callFunction({
-        name: 'getStudyData',
-        success: (res) => {
-          const result = (res && res.result) || {}
-          if (result.code === 0 && result.data) {
-            const data = result.data
-            if (data.tutorials) wx.setStorageSync('local_study_tutorials', data.tutorials)
-            if (data.knowledge) wx.setStorageSync('local_study_knowledge', data.knowledge)
-            if (data.topics) {
-              Object.keys(data.topics).forEach(topicKey => {
-                wx.setStorageSync('local_study_topic_' + topicKey, data.topics[topicKey])
-              })
-            }
-            wx.setStorageSync('local_study_sync_done', true)
-          } else {
-            console.warn('[cloud sync] 云函数返回异常，将降级使用包内精简版数据')
-          }
-        },
-        fail: () => {
-          console.warn('[cloud sync] 云函数调用失败，将降级使用包内精简版数据')
-        }
+      // 云函数按索引 + 专题批次返回，避免全量题库超过同步响应体限制。
+      const callStudyFunction = data => new Promise((resolve, reject) => {
+        wx.cloud.callFunction({
+          name: 'getStudyData',
+          data,
+          success: res => resolve((res && res.result) || {}),
+          fail: reject
+        })
       })
+
+      callStudyFunction({ action: 'getStudyIndex' })
+        .then(async result => {
+          if (result.code !== 0 || !result.data) {
+            throw new Error('题库索引返回异常')
+          }
+
+          const data = result.data
+          wx.setStorageSync('local_study_tutorials', data.tutorials || [])
+          wx.setStorageSync('local_study_knowledge', data.knowledge || [])
+
+          const topicKeys = Array.isArray(data.topicKeys) ? data.topicKeys : []
+          const batchSize = 3
+          for (let index = 0; index < topicKeys.length; index += batchSize) {
+            const topicKeysBatch = topicKeys.slice(index, index + batchSize)
+            const batchResult = await callStudyFunction({
+              action: 'getStudyTopics',
+              topicKeys: topicKeysBatch
+            })
+            if (batchResult.code !== 0 ||
+                !batchResult.data ||
+                !batchResult.data.topics) {
+              throw new Error('题库专题批次返回异常')
+            }
+            Object.keys(batchResult.data.topics).forEach(topicKey => {
+              wx.setStorageSync(
+                'local_study_topic_' + topicKey,
+                batchResult.data.topics[topicKey]
+              )
+            })
+          }
+
+          wx.setStorageSync('local_study_question_count', data.totalQuestions || 0)
+          wx.setStorageSync('local_study_sync_done', true)
+          console.log('[cloud sync] 全量题库同步完成，共', data.totalQuestions || 0, '题')
+        })
+        .catch(err => {
+          const reason = err && (err.errMsg || err.message)
+          console.warn(
+            '[cloud sync] 云函数调用失败，将降级使用包内精简版数据',
+            reason || ''
+          )
+        })
     }
   },
 

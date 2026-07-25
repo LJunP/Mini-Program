@@ -416,9 +416,16 @@ Page({
 
         const result = (res && res.result) || {};
         if (result.code !== 0 || !result.tempUrl) {
-          console.warn('[TTS] 合成失败，跳过:', result.message);
-          this._queueIndex++;
-          this._synthAndPlay();
+          const quotaExhausted = result.reason === 'quota_exhausted';
+          console.warn('[TTS] 合成失败:', result.message || result.reason || '');
+          this._stopReading();
+          if (quotaExhausted) {
+            this.setData({ ttsAvailable: false });
+          }
+          wx.showToast({
+            title: quotaExhausted ? '语音服务额度已用完' : '语音合成失败',
+            icon: 'none'
+          });
           return;
         }
 
@@ -449,14 +456,8 @@ Page({
       fail: (err) => {
         console.error('[TTS] 云函数调用失败:', err);
         if (!this.data.isReading) return;
-        // 尝试跳过这一段
-        this._queueIndex++;
-        if (this._queueIndex >= this._playQueue.length) {
-          this._stopReading();
-          wx.showToast({ title: '语音合成失败', icon: 'none' });
-        } else {
-          this._synthAndPlay();
-        }
+        this._stopReading();
+        wx.showToast({ title: '语音合成失败', icon: 'none' });
       }
     });
   },

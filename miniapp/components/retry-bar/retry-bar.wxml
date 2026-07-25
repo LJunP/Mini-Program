@@ -1,5 +1,5 @@
 <!-- components/retry-bar/retry-bar.wxml -->
-<view class="retry-bar {{show ? 'retry-bar--show' : ''}}">
+<view wx:if="{{show}}" class="retry-bar retry-bar--show">
   <view class="retry-bar__body">
     <text class="retry-bar__icon">⚠</text>
     <text class="retry-bar__msg">{{message}}</text>

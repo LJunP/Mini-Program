@@ -1,7 +1,7 @@
 <view class="page-bg">
   <!-- 数据源提示 -->
   <view class="mock-notice">
-    <text class="mock-notice__text">📚 题库数据为本地示例，正式上线后将替换为云端数据</text>
+    <text class="mock-notice__text">📚 已接入云端全量题库；网络异常时自动使用离线精简版</text>
   </view>
 
   <view class="study-hero">

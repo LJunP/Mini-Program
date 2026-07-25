@@ -3,6 +3,7 @@ const cloud = require('wx-server-sdk')
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 
 const db = cloud.database()
+const { sanitizeEvent } = require('./validation')
 
 exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext()
@@ -13,7 +14,10 @@ exports.main = async (event) => {
   }
 
   // 限制单次最多 50 条
-  const batch = events.slice(0, 50)
+  const batch = events.slice(0, 50).map(sanitizeEvent).filter(Boolean)
+  if (batch.length === 0) {
+    return { code: -1, message: '事件参数非法' }
+  }
 
   try {
     // 批量写入（逐条 add，云数据库不支持真正的 batch insert）
@@ -21,7 +25,8 @@ exports.main = async (event) => {
       return db.collection('events').add({
         data: {
           ...evt,
-          openid: OPENID || evt.openid || null,
+          // 身份只信任云端上下文，不接收客户端声明的 openid / _openid。
+          openid: OPENID || null,
           created_at: Date.now()
         }
       }).catch(err => {
@@ -31,9 +36,12 @@ exports.main = async (event) => {
       })
     })
 
-    await Promise.all(tasks)
+    const results = await Promise.all(tasks)
+    const successCount = results.filter(Boolean).length
 
-    return { code: 0, count: batch.length }
+    return successCount > 0
+      ? { code: 0, count: successCount }
+      : { code: -1, message: '上报失败' }
   } catch (err) {
     console.error('[track] error:', err)
     return { code: -1, message: '上报失败' }

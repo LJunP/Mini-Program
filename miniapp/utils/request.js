@@ -1,4 +1,5 @@
 const config = require('./config.js')
+const { resolveAssetTree } = require('./asset-url.js')
 
 const REQUEST_TIMEOUT = 15000
 const MAX_RETRY = 2
@@ -27,10 +28,9 @@ function _log(method, url, status, duration) {
 
 function request(options) {
   if (options.mockHandler && config.isMockEnabled()) {
-    return new Promise((resolve) => {
-      const result = options.mockHandler()
-      resolve({ data: result })
-    })
+    return Promise.resolve(options.mockHandler())
+      .then(resolveAssetTree)
+      .then(result => ({ data: result }))
   }
 
   return new Promise((resolve, reject) => {

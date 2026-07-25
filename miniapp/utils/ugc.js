@@ -128,7 +128,8 @@ function savePost(post) {
     linkedContent: post.linkedContent || null,
     status: post.status || 'published',
     // 社区字段（预留云切换）
-    isPublic: post.isPublic !== false, // 默认公开
+    // 隐私优先：只有用户明确选择公开时才进入社区流。
+    isPublic: post.isPublic === true,
     authorId: 'local_user', // 预留云切换
     authorName: '我',
     likeCount: 0,
@@ -299,7 +300,7 @@ const MOCK_PUBLIC_POSTS = [
 
 // 获取社区 Feed（本地公开投稿 + 模拟公开投稿）
 function getCommunityFeed(domain) {
-  const localPublic = getAllPosts().filter(p => p.isPublic !== false);
+  const localPublic = getAllPosts().filter(p => p.isPublic === true);
   const allPosts = localPublic.concat(MOCK_PUBLIC_POSTS);
   if (domain && domain !== 'all') {
     return allPosts.filter(p => p.domain === domain);
@@ -345,7 +346,7 @@ function syncFromCloud() {
       rating: item.rating || 0,
       location: item.location || '',
       linkedContent: item.linkedContent || null,
-      isPublic: item.isPublic !== false,
+      isPublic: item.isPublic === true,
       authorId: 'cloud_user',
       authorName: '我',
       likeCount: item.likeCount || 0,

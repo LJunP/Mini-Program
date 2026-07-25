@@ -22,6 +22,7 @@ function flushPromises() {
 function testPurePolicies() {
   const { canReadPost } = require(fromRoot('miniapp/cloudfunctions/ugc/policy.js'))
   const { validateNote } = require(fromRoot('miniapp/cloudfunctions/collection/validation.js'))
+  const { sanitizeEvent } = require(fromRoot('miniapp/cloudfunctions/track/validation.js'))
 
   assert.strictEqual(canReadPost({ _openid: 'owner', isPublic: false }, 'owner'), true)
   assert.strictEqual(canReadPost({ _openid: 'owner', isPublic: true }, 'visitor'), true)
@@ -33,6 +34,49 @@ function testPurePolicies() {
   assert.strictEqual(validateNote('x'.repeat(500)), null)
   assert.strictEqual(validateNote('x'.repeat(501)), '备注过长')
   assert.strictEqual(validateNote({ text: '非法类型' }), '备注过长')
+
+  const sanitizedEvent = sanitizeEvent({
+    event_name: 'page_view',
+    event_params: { source: 'test' },
+    page_path: 'pages/index/index',
+    openid: 'spoofed',
+    _openid: 'spoofed'
+  })
+  assert.strictEqual(sanitizedEvent.event_name, 'page_view')
+  assert.strictEqual(sanitizedEvent.event_params.source, 'test')
+  assert.strictEqual('openid' in sanitizedEvent, false)
+  assert.strictEqual('_openid' in sanitizedEvent, false)
+  assert.strictEqual(sanitizeEvent({ event_name: '' }), null)
+  assert.strictEqual(sanitizeEvent([]), null)
+
+  const ugcClientSource = fs.readFileSync(fromRoot('miniapp/utils/ugc.js'), 'utf8')
+  const contributeSource = fs.readFileSync(fromRoot('miniapp/pages/contribute/contribute.js'), 'utf8')
+  const ugcCloudSource = fs.readFileSync(fromRoot('miniapp/cloudfunctions/ugc/index.js'), 'utf8')
+  assert(ugcClientSource.includes('isPublic: post.isPublic === true'))
+  assert(ugcClientSource.includes('filter(p => p.isPublic === true)'))
+  assert(contributeSource.includes('isPublic: false'))
+  assert(ugcCloudSource.includes('isPublic: post.isPublic === true'))
+
+  const trackSource = fs.readFileSync(fromRoot('miniapp/cloudfunctions/track/index.js'), 'utf8')
+  assert(trackSource.includes("require('./validation')"))
+  assert(trackSource.includes('openid: OPENID || null'))
+  assert(!trackSource.includes('OPENID || evt.openid'))
+
+  const ttsClientSource = fs.readFileSync(
+    fromRoot('miniapp/subpackages/detail/question-detail/question-detail.js'),
+    'utf8'
+  )
+  const ttsCloudSource = fs.readFileSync(fromRoot('miniapp/cloudfunctions/tts/index.js'), 'utf8')
+  assert(ttsClientSource.includes("result.reason === 'quota_exhausted'"))
+  assert(ttsClientSource.includes("title: quotaExhausted ? '语音服务额度已用完'"))
+  assert(!ttsClientSource.includes('合成失败，跳过'))
+  assert(ttsCloudSource.includes("reason: quotaExhausted ? 'quota_exhausted'"))
+
+  const retryBarSource = fs.readFileSync(
+    fromRoot('miniapp/components/retry-bar/retry-bar.wxml'),
+    'utf8'
+  )
+  assert(retryBarSource.includes('wx:if="{{show}}"'))
 }
 
 function testContentDetailRequirePaths() {
@@ -95,6 +139,84 @@ function testSeasonalBoundaries() {
     assert.strictEqual(info.nextTerm, nextTerm, `${dateText} 下一节气`)
     assert.strictEqual(info.key, season, `${dateText} 当前季节`)
   })
+}
+
+async function testCloudAssetResolver() {
+  const calls = []
+  global.wx = {
+    cloud: {
+      callFunction({ name, data, success }) {
+        assert.strictEqual(name, 'getStudyData')
+        assert.strictEqual(data.action, 'getAssetUrls')
+        calls.push(data.fileList)
+        success({
+          result: {
+            code: 0,
+            fileList: data.fileList.map(fileID => ({
+              fileID,
+              status: 0,
+              tempFileURL: `https://temp.example/${encodeURIComponent(fileID)}`
+            }))
+          }
+        })
+      }
+    }
+  }
+
+  const assetPath = fromRoot('miniapp/utils/asset-url.js')
+  clearModule(assetPath)
+  const assets = require(assetPath)
+
+  assert(assets.CLOUD_IMAGE_FILE_ROOT.endsWith('/app-assets/images'))
+  assert.strictEqual(
+    assets.toCloudFileId('/assets/images/tea/longjing.jpg'),
+    `${assets.CLOUD_IMAGE_FILE_ROOT}/tea/longjing.jpg`
+  )
+  assert.strictEqual(
+    assets.toCloudFileId('https://example.com/image.jpg'),
+    'https://example.com/image.jpg'
+  )
+
+  const input = Array.from({ length: 51 }, (_, index) => ({
+    coverImage: `/assets/images/tea/item-${index}.jpg`,
+    untouched: `/assets/images/tea/not-a-cover-${index}.jpg`
+  }))
+  input.push({
+    nested: {
+      refCover: '/assets/images/film/reference.jpg'
+    }
+  })
+
+  const resolved = await assets.resolveAssetTree(input)
+  assert.strictEqual(calls.length, 2, '临时地址请求应按 50 个 File ID 分批')
+  assert.strictEqual(calls.flat().length, 52)
+  assert(resolved[0].coverImage.startsWith('https://temp.example/'))
+  assert.strictEqual(
+    resolved[0].untouched,
+    '/assets/images/tea/not-a-cover-0.jpg',
+    '非图片地址字段不得被递归误改'
+  )
+  assert(resolved[51].nested.refCover.startsWith('https://temp.example/'))
+  assert.strictEqual(input[0].coverImage, '/assets/images/tea/item-0.jpg', '解析过程不得修改原始数据')
+
+  const cloudSource = fs.readFileSync(
+    fromRoot('miniapp/cloudfunctions/getStudyData/index.js'),
+    'utf8'
+  )
+  assert(cloudSource.includes("event.action === 'getAssetUrls'"))
+  assert(cloudSource.includes("fileID.startsWith(ASSET_FILE_ROOT)"))
+  assert(cloudSource.includes('fileList.length > ASSET_BATCH_LIMIT'))
+  assert(cloudSource.includes('/study/study_data.json'))
+  assert(cloudSource.includes('cloud.downloadFile({ fileID: STUDY_DATA_FILE_ID })'))
+  assert(cloudSource.includes("text.startsWith('{')"))
+  assert(cloudSource.includes("event.action === 'getStudyIndex'"))
+  assert(cloudSource.includes("event.action === 'getStudyTopics'"))
+  assert(cloudSource.includes('topicKeys.length > STUDY_TOPIC_BATCH_LIMIT'))
+
+  const appSource = fs.readFileSync(fromRoot('miniapp/app.js'), 'utf8')
+  assert(appSource.includes("action: 'getStudyIndex'"))
+  assert(appSource.includes("action: 'getStudyTopics'"))
+  assert(appSource.includes('const batchSize = 3'))
 }
 
 async function testClientUgcSync() {
@@ -338,9 +460,10 @@ async function main() {
   testContentDetailRequirePaths()
   testDeploymentGuideInventory()
   testSeasonalBoundaries()
+  await testCloudAssetResolver()
   await testClientUgcSync()
   await testCloudUgcIdempotencyAndPrivacy()
-  console.log('P0 regression tests: 6 groups passed')
+  console.log('P0 regression tests: 7 groups passed')
 }
 
 main().catch(err => {

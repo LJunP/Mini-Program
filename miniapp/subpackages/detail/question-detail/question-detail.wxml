@@ -56,8 +56,8 @@
 
     <view class="section-title">结构化要点</view>
     <view class="card">
-      <view class="answer-step" wx:for="{{detail.answer.structured}}" wx:key="*this">
-        <view class="answer-step__index">{{index + 1}}</view>
+      <view class="answer-step" wx:for="{{detail.answer.structured}}" wx:for-index="stepIndex" wx:key="stepIndex">
+        <view class="answer-step__index">{{stepIndex + 1}}</view>
         <text class="answer-step__text">{{item}}</text>
       </view>
     </view>
@@ -75,12 +75,12 @@
 
   <view class="section-title">得分关键点</view>
   <view class="card">
-    <text class="key-point" wx:for="{{detail.keyPoints}}" wx:key="*this">{{item}}</text>
+    <text class="key-point" wx:for="{{detail.keyPoints}}" wx:for-index="pointIndex" wx:key="pointIndex">{{item}}</text>
   </view>
 
   <view class="section-title" wx:if="{{detail.traps && detail.traps.length}}">易错点</view>
   <view class="card traps" wx:if="{{detail.traps && detail.traps.length}}">
-    <view class="trap" wx:for="{{detail.traps}}" wx:key="*this">
+    <view class="trap" wx:for="{{detail.traps}}" wx:for-index="trapIndex" wx:key="trapIndex">
       <view class="trap__dot"></view>
       <text class="trap__text">{{item}}</text>
     </view>

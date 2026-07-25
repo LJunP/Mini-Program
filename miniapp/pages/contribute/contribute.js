@@ -17,7 +17,7 @@ Page({
     tags: [],
     images: [],
     rating: 0,
-    isPublic: true,
+    isPublic: false,
     location: '',
         linkedContent: null, // { refId, refDomain, refTitle }
 
@@ -63,7 +63,7 @@ Page({
           tags: post.tags || [],
           images: post.images || [],
           rating: post.rating || 0,
-          isPublic: post.isPublic !== false,
+          isPublic: post.isPublic === true,
           location: post.location || '',
           linkedContent: post.linkedContent || null,
           contentCount: (post.content || '').length,
@@ -87,7 +87,7 @@ Page({
                 content: draft.content || '',
                 tags: draft.tags || [],
                 rating: draft.rating || 0,
-                isPublic: draft.isPublic !== false,
+                isPublic: draft.isPublic === true,
                 location: draft.location || '',
                 contentCount: (draft.content || '').length
               });
