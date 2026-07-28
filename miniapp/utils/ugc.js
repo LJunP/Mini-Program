@@ -298,14 +298,60 @@ const MOCK_PUBLIC_POSTS = [
   }
 ];
 
-// 获取社区 Feed：仅返回用户真实创建并主动设为公开的本地投稿。
-function getCommunityFeed(domain) {
+// 获取社区 Feed（本地）：仅返回当前用户本地存储中已公开的投稿。
+// 仅作为离线回显，不包含其他用户的投稿。
+function getCommunityFeedLocal(domain) {
   const localPublic = getAllPosts().filter(p => p.isPublic === true);
   const allPosts = localPublic;
   if (domain && domain !== 'all') {
     return allPosts.filter(p => p.domain === domain);
   }
   return allPosts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+}
+
+// 兼容旧调用名
+function getCommunityFeed(domain) {
+  return getCommunityFeedLocal(domain);
+}
+
+/**
+ * 从云端拉取社区 Feed（所有用户的公开投稿）
+ * @param {string} domain - 板块筛选，'all' 或具体板块 key
+ * @returns {Promise<Array>} 云端公开投稿列表
+ */
+function getCloudCommunityFeed(domain) {
+  if (!_isLoggedIn()) return Promise.resolve([])
+
+  return _callCloud({
+    action: 'getCommunityFeed',
+    domain: domain || 'all',
+    page: 1,
+    pageSize: 50
+  }).then(res => {
+    if (res.code !== 0 || !res.list) return []
+
+    return res.list.map(item => ({
+      id: item.id,
+      cloudId: item.id,
+      title: item.title || '',
+      domain: item.domain || 'tea',
+      content: item.content || '',
+      tags: item.tags || [],
+      images: item.images || [],
+      rating: item.rating || 0,
+      location: item.location || '',
+      linkedContent: item.linkedContent || null,
+      isPublic: true,
+      authorName: item.authorName || '匿名用户',
+      likeCount: item.likeCount || 0,
+      isMine: item.is_mine === true,
+      createdAt: item.created_at,
+      updatedAt: item.created_at
+    })).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+  }).catch(err => {
+    console.warn('[ugc] getCloudCommunityFeed failed:', err)
+    return []
+  })
 }
 
 // 搜索投稿
@@ -411,6 +457,8 @@ module.exports = {
   formatDate,
   formatDateShort,
   getCommunityFeed,
+  getCommunityFeedLocal,
+  getCloudCommunityFeed,
   searchPosts,
   // 云同步 API
   syncFromCloud,

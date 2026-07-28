@@ -13,6 +13,7 @@ Page({
     domainOptions: [{ key: 'all', name: '全部', label: '全部' }, ...ugc.DOMAIN_OPTIONS],
     stats: { total: 0, byDomain: {} },
     isEmpty: true,
+    communityLoading: false,
     // 搜索
     searchKeyword: '',
     showSearch: false
@@ -36,16 +37,37 @@ Page({
         stats,
         isEmpty: formattedPosts.length === 0
       });
+      this._applyFilter();
     } else {
-      // 社区 Feed
-      const posts = ugc.getCommunityFeed();
-      const formattedPosts = posts.map(p => this._formatPost(p));
+      // 社区 Feed：从云端拉取所有用户的公开投稿
+      this._loadCloudCommunityFeed();
+    }
+  },
+
+  _loadCloudCommunityFeed() {
+    this.setData({ communityLoading: true });
+
+    // 先用本地公开投稿做即时回显
+    const localPosts = ugc.getCommunityFeedLocal();
+    const localFormatted = localPosts.map(p => this._formatPost(p));
+    this.setData({
+      posts: localFormatted,
+      isEmpty: localFormatted.length === 0
+    });
+    this._applyFilter();
+
+    // 再从云端拉取所有用户的公开投稿
+    ugc.getCloudCommunityFeed('all').then(cloudPosts => {
+      const formattedPosts = cloudPosts.map(p => this._formatPost(p));
       this.setData({
         posts: formattedPosts,
-        isEmpty: formattedPosts.length === 0
+        isEmpty: formattedPosts.length === 0,
+        communityLoading: false
       });
-    }
-    this._applyFilter();
+      this._applyFilter();
+    }).catch(() => {
+      this.setData({ communityLoading: false });
+    });
   },
 
   _formatPost(p) {
@@ -54,7 +76,8 @@ Page({
       dateText: ugc.formatDate(p.createdAt),
       contentPreview: (p.content || '').substring(0, 80) + ((p.content || '').length > 80 ? '…' : ''),
       starsText: '★'.repeat(p.rating || 0) + '☆'.repeat(5 - (p.rating || 0)),
-      isMock: p.authorId && p.authorId.indexOf('mock') >= 0
+      isMock: p.authorId && p.authorId.indexOf('mock') >= 0,
+      isCloud: !!p.cloudId
     };
   },
 
@@ -113,6 +136,16 @@ Page({
       wx.showModal({
         title: post.title,
         content: post.content,
+        showCancel: false,
+        confirmText: '关闭'
+      });
+      return;
+    }
+    // 云端他人的投稿只读不可编辑，仅自己本地投稿可编辑
+    if (post && post.isCloud && !post.isMine) {
+      wx.showModal({
+        title: post.title || '投稿详情',
+        content: post.content || '',
         showCancel: false,
         confirmText: '关闭'
       });

@@ -280,6 +280,14 @@
   padding: 4rpx 8rpx;
 }
 
+/* === 社区加载状态 === */
+.community-loading {
+  text-align: center;
+  padding: 48rpx 0;
+  font-size: 26rpx;
+  color: #8B8578;
+}
+
 /* === 社区卡片作者和点赞 === */
 .post-card__author {
   font-size: 22rpx;
