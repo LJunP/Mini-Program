@@ -45,8 +45,24 @@ function _rememberCloudId(localId, cloudId) {
   wx.setStorageSync(STORAGE_KEY, posts)
 }
 
+function _getAuthorName() {
+  try {
+    const auth = require('./auth.js')
+    const userInfo = auth.getUserInfo()
+    if (userInfo && userInfo.nickname) return userInfo.nickname
+  } catch (e) {}
+  try {
+    const store = require('../store/index.js')
+    const state = store.getState()
+    if (state.userInfo && state.userInfo.nickname) return state.userInfo.nickname
+  } catch (e) {}
+  return '微信用户'
+}
+
 function _syncPostToCloud(post) {
-  return _callCloud({ action: 'save', post }).then(res => {
+  // 附带真实昵称，供社区 Feed 展示
+  const postWithAuthor = { ...post, authorName: _getAuthorName() }
+  return _callCloud({ action: 'save', post: postWithAuthor }).then(res => {
     if (res.code === 0 && res.id) {
       _rememberCloudId(post.id, res.id)
     }
@@ -147,11 +163,11 @@ function savePost(post) {
   return newPost;
 }
 
-// 删除投稿
+// 删除投稿（兼容本地 ID 和云端文档 ID）
 function deletePost(id) {
   const posts = getAllPosts();
-  const post = posts.find(p => p.id === id);
-  const filtered = posts.filter(p => p.id !== id);
+  const post = posts.find(p => p.id === id || p.cloudId === id);
+  const filtered = posts.filter(p => p.id !== id && p.cloudId !== id);
   wx.setStorageSync(STORAGE_KEY, filtered);
 
   // 已登录则同步云端
@@ -159,17 +175,17 @@ function deletePost(id) {
     _callCloud({
       action: 'delete',
       id: (post && post.cloudId) || id,
-      clientId: id
+      clientId: post ? post.id : id
     }).catch(() => {});
   }
 
   return filtered.length < posts.length;
 }
 
-// 获取单条投稿
+// 获取单条投稿（兼容本地 ID 和云端文档 ID）
 function getPostById(id) {
   const posts = getAllPosts();
-  return posts.find(p => p.id === id);
+  return posts.find(p => p.id === id || p.cloudId === id);
 }
 
 // 保存草稿（自动暂存）
@@ -320,7 +336,8 @@ function getCommunityFeed(domain) {
  * @returns {Promise<Array>} 云端公开投稿列表
  */
 function getCloudCommunityFeed(domain) {
-  if (!_isLoggedIn()) return Promise.resolve([])
+  // 云函数通过 cloud.getWXContext() 获取 OPENID，不依赖客户端登录 token。
+  // 因此不需要 _isLoggedIn() 守卫，避免 silentLogin 未完成时社区 Feed 为空。
 
   return _callCloud({
     action: 'getCommunityFeed',

@@ -85,6 +85,7 @@ exports.main = async (event) => {
         if (post.location !== undefined) updateData.location = post.location
         if (post.linkedContent !== undefined) updateData.linkedContent = post.linkedContent
         if (post.isPublic !== undefined) updateData.isPublic = post.isPublic === true
+        if (post.authorName !== undefined) updateData.authorName = post.authorName
         if (post.id !== undefined) updateData.client_id = post.id
         updateData.updated_at = now
 
@@ -114,6 +115,7 @@ exports.main = async (event) => {
         status: 'published',
         // 隐私优先：字段缺失或异常值一律按私密处理。
         isPublic: post.isPublic === true,
+        authorName: post.authorName || '微信用户',
         likeCount: 0,
         created_at: now,
         updated_at: now
