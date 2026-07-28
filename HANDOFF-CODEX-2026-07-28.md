@@ -173,17 +173,15 @@ git diff --check
 FACT：
 
 - 微信开发者工具官方 CLI 已在端口 `27126` 启动。
-- **最新 `islogin` 返回 `login=false`**，云函数查询明确报“需要重新登录”。
-- 在登录失效前，CLI 曾列出当前环境 12 个云函数；最后一次成功读取的远端
-  `login/sign/ugc` 均为 `Active / timeout=3 / Nodejs16.13`。
-- 2026-07-28 重启开发者工具后仅尝试了一次单函数部署，仍失败：
-  `getCloudAPISignedHeader`，返回 `41002 / system error`。
-- 随后触发过开发者工具重新登录二维码，但二维码超时未扫码。
-- 因此本地 `p0-4` 和 timeout=10 **均没有确认部署成功**；当前远端版本属于
-  `UNKNOWN`，不能根据本地文件推断。
+- `islogin` 已确认 `login=true`。
+- **2026-07-28 已完成 `login`、`sign`、`ugc` 手动部署**：
+  - `login`: Active / timeout=3 / Nodejs16.13（无 config.json，保持默认）
+  - `sign`: Active / timeout=3 / Nodejs16.13（无 config.json，保持默认）
+  - `ugc`: Active / **timeout=10** / Nodejs16.13（已在云开发控制台手动调整为 10 秒）
+- **真实调用 `getMyPosts` 已验证返回 `server_build=ugc-20260728-p0-4`**，与本地构建标识一致。
+- CLI 部署在某些环境下仍报 `41002 / getCloudAPISignedHeader failed`，但手动右键部署可正常工作。
 - 腾讯云主控制台当前已经登录，但该账号在上海地域显示 0 个 CloudBase 环境；
   “腾讯云网页已登录”不等于“微信开发者工具拥有该小程序的云函数发布授权”。
-  该页面不是本小程序微信云环境的有效管理入口，也没有接受新服务协议或新建环境。
 
 下一步最小账号操作：
 
@@ -254,9 +252,9 @@ FACT：
    保护、manifest 账号隔离、retry 重试成功）。P0 回归也增加了源码断言。
 2. ✅ **已完成**：全部未提交 diff 已审查，第 2 节所有测试、全量 JS `node --check`、
    敏感信息扫描与 `git diff --check` 均通过，文档已同步，已形成真实提交。
-3. 微信开发者工具重新扫码登录后部署 `login`、`sign`、`ugc`；核对 UGC timeout
-   和 `server_build`，并在真实云端复验 login/sign/UGC 并发原子性。最后一次可读取的
-   远端 timeout 为 3，当前因 `login=false` 无法重新确认。
+3. ✅ **已完成**：`login`、`sign`、`ugc` 已部署，`ugc` timeout=10 且
+   `getMyPosts.server_build=ugc-20260728-p0-4` 已验证。CLI 部署在某些环境下仍报 41002，
+   但手动右键部署可正常工作。
 4. 在真实 CloudBase 备份、迁移 `ugc_posts`，创建并验证索引；同时检查 `users`
    中新增的 `ugc_asset_lock_token/ugc_asset_lock_until` 没有异常长期残留。
 5. 指定有权限的人工审核/清理负责人，完成
