@@ -134,15 +134,17 @@ function getPreferenceValues() {
 
 // ========== 登录状态 & 云函数调用 ==========
 
-function _isLoggedIn() {
+function _captureScope() {
   try {
-    const store = require('../store/index.js')
-    const state = store.getState()
-    if (state && typeof state.isLoggedIn !== 'undefined') {
-      return state.isLoggedIn
-    }
-    const auth = require('../utils/auth.js')
-    return auth.isLoggedIn()
+    return require('../utils/account-scope.js').captureActiveScope()
+  } catch (e) {
+    return null
+  }
+}
+
+function _isScopeCurrent(scope) {
+  try {
+    return require('../utils/account-scope.js').isActiveScope(scope)
   } catch (e) {
     return false
   }
@@ -165,9 +167,13 @@ function _callCloud(data) {
  * 从云端拉取偏好设置，覆盖本地
  */
 function syncFromCloud() {
-  if (!_isLoggedIn()) return Promise.resolve({ synced: false })
+  const scope = _captureScope()
+  if (!scope) return Promise.resolve({ synced: false })
 
   return _callCloud({ action: 'get' }).then(res => {
+    if (!_isScopeCurrent(scope)) {
+      return { synced: false, reason: 'account_scope_changed' }
+    }
     if (res.code !== 0 || !res.has_data || !res.preferences) {
       return { synced: false, reason: 'no_cloud_data' }
     }
@@ -194,10 +200,14 @@ function syncFromCloud() {
  * 将本地偏好推送到云端
  */
 function syncToCloud() {
-  if (!_isLoggedIn()) return Promise.resolve({ synced: false })
+  const scope = _captureScope()
+  if (!scope) return Promise.resolve({ synced: false })
 
   const preferences = getPreferences()
   return _callCloud({ action: 'save', preferences }).then(res => {
+    if (!_isScopeCurrent(scope)) {
+      return { synced: false, reason: 'account_scope_changed' }
+    }
     return { synced: res.code === 0, updated_at: res.updated_at }
   }).catch(err => {
     console.warn('[preferences] syncToCloud failed:', err)

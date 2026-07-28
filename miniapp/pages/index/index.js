@@ -7,7 +7,6 @@ const seasonal = require('../../utils/seasonal.js');
 
 const CHECKIN_KEY = 'daily_elegance_checkin';
 const COLLECTION_KEY = 'fengya_collections';
-const auth = require('../../utils/auth.js');
 
 Page({
   data: {
@@ -57,9 +56,10 @@ Page({
   },
 
   onShow() {
-    // 刷新收藏角标
+    // 刷新当前已确认账号的收藏与签到；同设备换号后不能沿用旧页面 data。
     const realmsWithBadges = this._loadRealmBadges();
-    this.setData({ realms: realmsWithBadges });
+    const checkinData = this._loadCheckin();
+    this.setData({ realms: realmsWithBadges, ...checkinData });
   },
 
   onPullDownRefresh() {
@@ -124,11 +124,17 @@ Page({
     let checkedToday = records.indexOf(today) >= 0;
 
     // 如果用户已登录，从云端同步签到状态
-    if (auth.isLoggedIn() && !checkedToday) {
+    let accountScope = null;
+    try {
+      accountScope = require('../../utils/account-scope.js');
+    } catch (e) {}
+    const scope = accountScope && accountScope.captureActiveScope();
+    if (scope && !checkedToday) {
       wx.cloud.callFunction({
         name: 'sign',
         data: { action: 'status' }
       }).then(res => {
+        if (!accountScope.isActiveScope(scope)) return;
         if (res.result && res.result.code === 0 && res.result.signedToday) {
           // 云端已签到，同步到本地
           if (records.indexOf(today) < 0) {
@@ -185,50 +191,85 @@ Page({
   },
 
   onCheckinTap() {
+    if (this._checkinSubmitting) return;
     if (this.data.checkedToday) {
       wx.showToast({ title: '今日已打卡', icon: 'none' });
       return;
     }
 
-    const records = wx.getStorageSync(CHECKIN_KEY) || [];
     const today = this._getTodayStr();
-    if (records.indexOf(today) < 0) {
-      records.push(today);
-      wx.setStorageSync(CHECKIN_KEY, records);
+    let accountScope = null;
+    try {
+      accountScope = require('../../utils/account-scope.js');
+    } catch (e) {}
+    const scope = accountScope && accountScope.captureActiveScope();
+
+    const applyConfirmedCheckin = (result, awardPoints) => {
+      const records = wx.getStorageSync(CHECKIN_KEY) || [];
+      if (records.indexOf(today) < 0) {
+        records.push(today);
+        wx.setStorageSync(CHECKIN_KEY, records);
+      }
+      const checkinData = this._loadCheckin();
+      if (result && result.signDays) {
+        checkinData.checkinStreak = result.signDays;
+      }
+      this.setData(checkinData);
+
+      if (awardPoints) {
+        let earnedPoints = 0;
+        try {
+          const points = require('../../utils/points.js');
+          earnedPoints = points.onSignIn(checkinData.checkinStreak);
+        } catch (e) {}
+        tracker.track('daily_elegance_checkin', {
+          event_params: { streak: checkinData.checkinStreak }
+        });
+        wx.showToast({
+          title: earnedPoints > 0 ? `风雅打卡 +${earnedPoints}积分` : '风雅打卡成功',
+          icon: 'none'
+        });
+      } else {
+        wx.showToast({ title: '今日已打卡，状态已同步', icon: 'none' });
+      }
+    };
+
+    // 身份未验证时无法安全确定本地资产归属，禁止把打卡写进全局匿名键。
+    if (!scope) {
+      wx.showToast({ title: '登录确认中，请稍后再打卡', icon: 'none' });
+      return;
     }
 
     // 异步竞态保护：用请求版本号确保只接受最新响应
     const reqId = (this._checkinReqId || 0) + 1;
     this._checkinReqId = reqId;
-
-    const checkinData = this._loadCheckin();
-    this.setData(checkinData);
-
-    // 更新积分
-    try {
-      const points = require('../../utils/points.js');
-      points.onSignIn(this.data.checkinStreak);
-    } catch (e) {}
-
-    wx.showToast({ title: '风雅打卡 +' + this.data.checkinStreak + '天', icon: 'success' });
-    tracker.track('daily_elegance_checkin', { event_params: { streak: this.data.checkinStreak } });
-
-    // 如果用户已登录，同步到云端签到
-    if (auth.isLoggedIn()) {
-      wx.cloud.callFunction({
-        name: 'sign',
-        data: { action: 'sign' }
-      }).then(res => {
-        // 只接受最新请求的响应
-        if (reqId !== this._checkinReqId) return;
-        if (res.result && res.result.code === 0 && res.result.signedToday) {
-          // 云端签到成功，更新本地连续天数
-          if (res.result.signDays && res.result.signDays !== this.data.checkinStreak) {
-            this.setData({ checkinStreak: res.result.signDays });
-          }
-        }
-      }).catch(() => {});
-    }
+    this._checkinSubmitting = true;
+    wx.cloud.callFunction({
+      name: 'sign',
+      data: { action: 'sign' }
+    }).then(res => {
+      if (
+        reqId !== this._checkinReqId ||
+        !accountScope.isActiveScope(scope)
+      ) {
+        return;
+      }
+      const result = (res && res.result) || {};
+      if (result.code !== 0 || result.signedToday !== true) {
+        wx.showToast({ title: result.message || '打卡失败', icon: 'none' });
+        return;
+      }
+      // 旧版云函数没有 alreadySigned 字段时也不加分，避免重复奖励。
+      applyConfirmedCheckin(result, result.alreadySigned === false);
+    }).catch(() => {
+      if (accountScope.isActiveScope(scope)) {
+        wx.showToast({ title: '打卡失败，请稍后重试', icon: 'none' });
+      }
+    }).then(() => {
+      if (reqId === this._checkinReqId) {
+        this._checkinSubmitting = false;
+      }
+    });
   },
 
   // 点击每日风雅卡片

@@ -231,42 +231,52 @@ Page({
     wx.showLoading({ title: '保存中...' });
     
     // 保存到本地 + 同步到云端
-    user.saveUserInfo(userInfo).then(() => {
+    return user.saveUserInfo(userInfo).then((result) => {
       wx.hideLoading();
-      
-      // 更新store
-      store.setState({ userInfo });
-      
+
+      const savedUser = result && result.user
+        ? result.user
+        : user.getUserInfo();
+      const changedFields = this._getChangedFields(savedUser);
+
+      // 必须使用 service 返回的实际合并对象，不能再用缺少 users._id 的表单对象。
+      store.login(savedUser);
+
       this.setData({
         isChanged: false,
-        originalData: { ...userInfo }
+        originalData: { ...savedUser }
       });
-      
-      wx.showToast({ title: '保存成功', icon: 'success' });
-      
+
       tracker.track('profile_save', { 
         event_params: { 
-          fields_changed: this._getChangedFields(userInfo)
+          fields_changed: changedFields,
+          cloud_synced: result && result.cloudSynced === true
         } 
       });
-      
-      // 延迟返回
-      setTimeout(() => {
-        wx.navigateBack();
-      }, 1500);
-    }).catch(() => {
-      wx.hideLoading();
-      // 即使云端失败，本地也已保存
-      store.setState({ userInfo });
-      this.setData({
-        isChanged: false,
-        originalData: { ...userInfo }
+
+      if (result && result.cloudSynced === true) {
+        wx.showToast({ title: '保存并同步成功', icon: 'success' });
+        setTimeout(() => {
+          wx.navigateBack();
+        }, 1500);
+        return result;
+      }
+
+      wx.showModal({
+        title: '云端待同步',
+        content: '资料已保存在本机，但云端尚未确认同步。请保持当前账号登录并稍后重试。',
+        showCancel: false,
+        confirmText: '知道了',
+        success: () => wx.navigateBack()
       });
-      wx.showToast({ title: '已保存（本地）', icon: 'success' });
-      
-      setTimeout(() => {
-        wx.navigateBack();
-      }, 1500);
+      return result;
+    }).catch((err) => {
+      wx.hideLoading();
+      console.warn('[profile edit] save failed:', {
+        code: err && (err.code || err.errCode || '')
+      });
+      wx.showToast({ title: '保存失败，请重试', icon: 'none' });
+      return null;
     });
   },
 

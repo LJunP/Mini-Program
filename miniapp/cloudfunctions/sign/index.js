@@ -1,5 +1,6 @@
 // 云函数 sign：签到与签到记录查询
 const cloud = require('wx-server-sdk')
+const crypto = require('crypto')
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 
 const db = cloud.database()
@@ -15,16 +16,51 @@ function getTodayStr() {
   return `${y}-${m}-${day}`
 }
 
+function signDocumentId(openid, date) {
+  const digest = crypto.createHash('sha256').update(`${openid}:${date}`).digest('hex')
+  return digest.slice(0, 32)
+}
+
+function uniqueDates(records) {
+  return Array.from(new Set(
+    (records || [])
+      .map(record => record && record.date)
+      .filter(date => typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date))
+  ))
+}
+
+function safeErrorCode(err) {
+  return String((err && (err.errCode || err.code)) || '').slice(0, 100)
+}
+
+async function getAllDates(openid) {
+  const pageSize = 100
+  const records = []
+  for (let page = 0; page < 50; page++) {
+    const { data } = await db.collection('sign_records')
+      .where({ _openid: openid })
+      .orderBy('date', 'desc')
+      .skip(page * pageSize)
+      .limit(pageSize)
+      .get()
+    records.push(...(Array.isArray(data) ? data : []))
+    if (!Array.isArray(data) || data.length < pageSize) {
+      return uniqueDates(records)
+    }
+  }
+  throw Object.assign(new Error('签到记录超过安全分页上限'), {
+    code: 'sign_records_page_limit'
+  })
+}
+
 exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext()
-
-  console.log('[sign] event:', JSON.stringify(event), 'OPENID:', OPENID)
 
   if (!OPENID) {
     return { code: -1, message: '无法获取 openid' }
   }
 
-  const { action } = event
+  const action = event && event.action
 
   if (!action || typeof action !== 'string' || !['sign', 'getRecords', 'status'].includes(action)) {
     return { code: -1, message: '参数非法' }
@@ -33,55 +69,54 @@ exports.main = async (event) => {
   try {
     if (action === 'sign') {
       const today = getTodayStr()
-      console.log('[sign] today:', today)
 
       // 查今天是否已签到
       const { data: todayRecords } = await db.collection('sign_records')
         .where({ _openid: OPENID, date: today })
+        .limit(1)
         .get()
-      console.log('[sign] todayRecords count:', todayRecords.length)
-
       if (todayRecords.length > 0) {
-        // 已签到：也要返回 signDays 和 records，否则客户端拿不到连续天数
-        const { data: allRecords } = await db.collection('sign_records')
-          .where({ _openid: OPENID })
-          .orderBy('date', 'desc')
-          .get()
-        const dates = allRecords.map(r => r.date)
+        const dates = await getAllDates(OPENID)
         const signDays = calcContinuousDays(dates, today)
-        console.log('[sign] already signed, signDays:', signDays, 'records:', dates)
         return {
           code: 0,
           message: '今日已签到',
           signedToday: true,
+          alreadySigned: true,
           signDays,
           records: dates
         }
       }
 
-      // 签到
-      const addResult = await db.collection('sign_records').add({
-        data: {
-          date: today,
-          created_at: Date.now()
+      // 确定性 ID + 原子新增保证同一账号同一天最多一个文档。
+      const deterministicId = signDocumentId(OPENID, today)
+      const newRecord = {
+        _id: deterministicId,
+        _openid: OPENID,
+        date: today,
+        created_at: Date.now()
+      }
+      let alreadySigned = false
+      try {
+        await db.collection('sign_records').add({ data: newRecord })
+      } catch (createErr) {
+        // 并发请求中只有一个能创建成功；重复请求读取并确认同一个确定性文档。
+        const existingResult = await db.collection('sign_records').doc(deterministicId).get()
+        const existing = existingResult && existingResult.data
+        if (!existing || existing._openid !== OPENID || existing.date !== today) {
+          throw createErr
         }
-      })
-      console.log('[sign] add result:', JSON.stringify(addResult))
+        alreadySigned = true
+      }
 
-      // 查全部签到记录，计算连续天数
-      const { data: allRecords } = await db.collection('sign_records')
-        .where({ _openid: OPENID })
-        .orderBy('date', 'desc')
-        .get()
-
-      const dates = allRecords.map(r => r.date)
+      const dates = await getAllDates(OPENID)
       const signDays = calcContinuousDays(dates, today)
-      console.log('[sign] new sign, signDays:', signDays, 'records:', dates)
 
       return {
         code: 0,
-        message: '签到成功',
+        message: alreadySigned ? '今日已签到' : '签到成功',
         signedToday: true,
+        alreadySigned,
         signDays,
         records: dates
       }
@@ -89,26 +124,25 @@ exports.main = async (event) => {
 
     // status 和 getRecords 共享查询逻辑
     if (action === 'status' || action === 'getRecords') {
-      const { data: allRecords } = await db.collection('sign_records')
-        .where({ _openid: OPENID })
-        .orderBy('date', 'desc')
-        .get()
-
-      console.log('[sign] getRecords, OPENID:', OPENID, 'records count:', allRecords.length, 'data:', JSON.stringify(allRecords))
-
-      const dates = allRecords.map(r => r.date)
+      const dates = await getAllDates(OPENID)
       const today = getTodayStr()
       const signedToday = dates.indexOf(today) >= 0
       const signDays = calcContinuousDays(dates, today)
 
       // status 只返回轻量结果（不含完整 records 数组）
       if (action === 'status') {
-        return { code: 0, signedToday, signDays }
+        return {
+          code: 0,
+          signedToday,
+          alreadySigned: signedToday,
+          signDays
+        }
       }
 
       return {
         code: 0,
         signedToday,
+        alreadySigned: signedToday,
         signDays,
         records: dates
       }
@@ -116,7 +150,11 @@ exports.main = async (event) => {
 
     return { code: -1, message: '未知操作: ' + action }
   } catch (err) {
-    console.error('[sign] error:', err)
+    console.error('[sign] operation failed:', JSON.stringify({
+      action,
+      code: safeErrorCode(err),
+      name: String((err && err.name) || '').slice(0, 80)
+    }))
     return { code: -1, message: '操作失败' }
   }
 }

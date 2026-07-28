@@ -141,14 +141,29 @@ App({
     try {
       const ugc = require('./utils/ugc.js')
       ugc.syncFromCloud().then(res => {
-        if (res.synced) console.log('[cloud sync] UGC投稿同步完成，拉取', res.count, '条')
-        // 拉取合并后再回推，确保登录前产生的本地投稿不会永久滞留在单机。
+        if (res.synced) {
+          console.log(
+            '[cloud sync] UGC投稿同步完成，拉取',
+            res.count,
+            '条，服务版本',
+            res.serverBuild || 'unknown'
+          )
+        }
+        if (!res.synced) return { synced: false, reason: 'pull_failed' }
+        // 只有完整拉取成功后才回推 dirty 本地稿，避免用陈旧缓存覆盖云端。
         return ugc.syncToCloud()
       }).then(res => {
-        if (res.synced) console.log('[cloud sync] UGC本地投稿回推完成', res.successCount, '条')
+        if (res && res.synced && res.successCount > 0) {
+          console.log('[cloud sync] UGC本地投稿回推完成', res.successCount, '条')
+        }
+      }).catch(e => {
+        console.warn('[cloud sync] ugc failed:', {
+          code: e && (e.code || e.errCode || ''),
+          serverBuild: e && e.serverBuild || ''
+        })
       })
     } catch (e) {
-      console.warn('[cloud sync] ugc failed:', e)
+      console.warn('[cloud sync] ugc unavailable')
     }
   },
 
@@ -222,14 +237,28 @@ App({
 
     // 5. 静默登录（走云函数）
     auth.silentLogin().then((user) => {
+      const verifiedUser = user || auth.getUserInfo()
+      if (!verifiedUser || !verifiedUser.id) {
+        throw new Error('云端登录未返回用户 ID')
+      }
+      const scopeResult = auth.consumeScopeResult()
+      if (scopeResult && scopeResult.quarantinedLegacy > 0) {
+        console.warn(
+          '[ugc] 无法确认归属的旧缓存已隔离，共',
+          scopeResult.quarantinedLegacy,
+          '条'
+        )
+      }
       this.globalData.isLoggedIn = true
-      this.globalData.userInfo = user || auth.getUserInfo()
+      this.globalData.userInfo = verifiedUser
       store.init()
 
       // 6. 登录成功后，异步拉取云端用户资产（不阻塞 UI）
       this.syncCloudAssets()
     }).catch(err => {
-      console.warn('[app] silentLogin failed:', err)
+      console.warn('[app] silentLogin failed:', {
+        code: err && (err.code || err.errCode || '')
+      })
       this.globalData.isLoggedIn = false
       store.init()
     })

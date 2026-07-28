@@ -6,13 +6,23 @@ const MAX_HISTORY_COUNT = 100; // 最大历史记录数量
 
 function _isLoggedIn() {
   try {
-    const store = require('../store/index.js')
-    const state = store.getState()
-    if (state && typeof state.isLoggedIn !== 'undefined') {
-      return state.isLoggedIn
-    }
-    const auth = require('../utils/auth.js')
-    return auth.isLoggedIn()
+    return !!require('../utils/account-scope.js').captureActiveScope()
+  } catch (e) {
+    return false
+  }
+}
+
+function _captureScope() {
+  try {
+    return require('../utils/account-scope.js').captureActiveScope()
+  } catch (e) {
+    return null
+  }
+}
+
+function _isScopeCurrent(scope) {
+  try {
+    return require('../utils/account-scope.js').isActiveScope(scope)
   } catch (e) {
     return false
   }
@@ -57,8 +67,12 @@ function _callCloud(data) {
  * @returns {Promise<Array>} 浏览历史列表（按时间倒序）
  */
 function getHistoryList() {
-  if (_isLoggedIn()) {
+  const scope = _captureScope()
+  if (scope) {
     return _callCloud({ action: 'getList' }).then(res => {
+      if (!_isScopeCurrent(scope)) {
+        return _loadLocal()
+      }
       if (res.code === 0 && res.list) {
         // 同步本地缓存
         _saveLocal(res.list.map(item => ({

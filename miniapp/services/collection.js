@@ -30,16 +30,23 @@ function getDomainMeta(domain) {
 
 function _isLoggedIn() {
   try {
-    // 优先使用 store 中的状态，避免与页面状态不同步
-    const store = require('../store/index.js')
-    const state = store.getState()
-    if (state && typeof state.isLoggedIn !== 'undefined') {
-      return state.isLoggedIn
-    }
-    // 降级到 auth 检查
-    const auth = require('../utils/auth.js')
-    const authResult = auth.isLoggedIn()
-    return authResult
+    return !!require('../utils/account-scope.js').captureActiveScope()
+  } catch (e) {
+    return false
+  }
+}
+
+function _captureScope() {
+  try {
+    return require('../utils/account-scope.js').captureActiveScope()
+  } catch (e) {
+    return null
+  }
+}
+
+function _isScopeCurrent(scope) {
+  try {
+    return require('../utils/account-scope.js').isActiveScope(scope)
   } catch (e) {
     return false
   }
@@ -172,11 +179,15 @@ function isCollected(targetDomain, targetRefId) {
  * 已登录时从云端拉取，未登录时用本地
  */
 function getGroups(domain) {
-  const loggedIn = _isLoggedIn()
+  const scope = _captureScope()
+  const loggedIn = !!scope
   // 登录状态检查已清理
   
   const fetchPromise = loggedIn
     ? _callCloud({ action: 'getList', domain: domain || 'all' }).then(res => {
+        if (!_isScopeCurrent(scope)) {
+          return _loadLocal()
+        }
         // 云函数结果日志已清理
         if (res.code === 0 && res.list) {
           // 同步本地缓存
@@ -230,10 +241,12 @@ function getGroups(domain) {
  * 获取收藏数量（优先云端）
  */
 function getCount() {
-  if (!_isLoggedIn()) {
+  const scope = _captureScope()
+  if (!scope) {
     return Promise.resolve(_loadLocal().length)
   }
   return _callCloud({ action: 'getCount' }).then(res => {
+    if (!_isScopeCurrent(scope)) return _loadLocal().length
     if (res.code === 0) return res.count
     return _loadLocal().length
   }).catch(() => _loadLocal().length)

@@ -1,440 +1,331 @@
-# 妙不可园微信小程序｜交给 Codex 的完整开发接管提示词
+# 妙不可园微信小程序｜当前开发交接与继续执行提示词
 
-> 使用方式：把本文件从"提示词开始"到"提示词结束"完整复制给 Codex。
-> 事实基准日期：2026-07-28。外部云资源、账号权限和控制台状态可能变化，接管后必须重新验证。
-
----
+> 事实基准：2026-07-28 当前磁盘与本轮真实验证。
+>
+> 使用方式：把本文件完整交给下一位开发者或模型。当前 Git 代码和真实运行结果
+> 高于任何旧交接文档；不得用本文档代替云端、真机、公众平台或审核证据。
 
 ## 提示词开始
 
-你现在接管一个正在上线前收尾的原生微信小程序项目。请以高级项目负责人、微信小程序架构师和主程的标准继续开发，不要只给建议，也不要重新从零设计。
+你接管的是正在上线前收尾的原生微信小程序“妙不可园”。请以项目负责人、
+微信小程序架构师和主程标准继续，不要重新从零设计，也不要只输出建议或报告。
 
-### 一、你的目标
+### 1. 工作区与产品
 
-1. 先确认当前代码与运行基线没有漂移。
-2. 保留已完成成果，优先完成剩余 P0 上线事项。
-3. 每项工作必须形成"真实代码或真实控制台操作 + 验证证据 + 文档同步"，不能用计划、报告、静态扫描代替真实进展。
-4. 默认自主推进；只有涉及第二真实微信账号、公众平台提交、接受服务协议、付费、密钥录入或其他必须由账号所有者决定的外部操作时，才向用户请求最小必要协助。
-
-### 二、工作区与版本基线
-
-- 仓库绝对路径：`/Users/lijunpeng/Desktop/workbuddy_project`
-- 小程序目录：`/Users/lijunpeng/Desktop/workbuddy_project/miniapp`
-- 当前分支：`main`
-- 最新提交：`0a83fab` — `fix: 补充社区Feed修复 - 云函数存储authorName、移除登录守卫、getPostById/deletePost兼容云端ID`
-- 基线标签：`baseline/sanitized-2026-07-25`
-- 产品名：妙不可园
-- 项目类型：原生微信小程序，不是 uni-app/Taro
+- 仓库：`/Users/lijunpeng/Desktop/workbuddy_project`
+- 小程序：`/Users/lijunpeng/Desktop/workbuddy_project/miniapp`
+- 分支：`main`
+- 当前 HEAD：`576641b`
+- **当前工作区为未提交开发态**：本轮 P0 修改和新增文件均已落盘，但尚未形成新提交。
+  接管者必须保留这些改动，禁止 reset、checkout 覆盖或从旧 HEAD 重新开发。
 - 微信 AppID：`wx3ce1ffb49a3b24e4`
-- CloudBase 环境：`cloud1-d6gh3spr3b2bd51d8`
-- `project.config.json` 内部旧项目名仍为 `halfday-miniapp`，这是历史标识，不等于当前产品名。
+- 微信云开发环境：`cloud1-d6gh3spr3b2bd51d8`
+- 项目：原生微信小程序，不是 Taro/uni-app
+- 产品：休闲模式的香、音、茶、影、养、游六雅；学习模式的教程、知识、
+  面试题库和复习
 
-接管后第一步必须执行：
+普通内容链路仍默认 `enableMock=true`，页面应保持
+`Pages → services → utils/request.js` 边界。不要在没有真实 REST 服务时切成
+`enableMock=false`。登录、用户资产、UGC、埋点、TTS、私有题库与私有素材已经有
+CloudBase 云函数，不能再把项目说成“完全没有后端”。
+
+### 2. 接管后立即执行
 
 ```bash
 cd /Users/lijunpeng/Desktop/workbuddy_project
 git status --short --branch
 git log -10 --oneline --decorate
 git rev-parse HEAD
+node --check miniapp/cloudfunctions/login/index.js
+node --check miniapp/cloudfunctions/sign/index.js
+node --check miniapp/cloudfunctions/ugc/index.js
+node --check miniapp/cloudfunctions/ugc/validation.js
+node --check miniapp/utils/account-scope.js
+node --check miniapp/utils/ugc.js
+node --check miniapp/services/user.js
+node --check miniapp/pages/profile/profile.js
+node --check miniapp/pages/index/index.js
+node --check scripts/testing/test-p0-regressions.js
+node --check scripts/testing/test-cloud-identity-atomicity.js
+node --check scripts/testing/test-account-scope-async.js
+node --check scripts/testing/test-index-sign-scope.js
+node --check scripts/testing/test-profile-session-integrity.js
 node scripts/testing/test-p0-regressions.js
+node scripts/testing/test-cloud-identity-atomicity.js
+node scripts/testing/test-account-scope-async.js
+node scripts/testing/test-index-sign-scope.js
+node scripts/testing/test-profile-session-integrity.js
 node scripts/testing/test-leisure.js
 node scripts/testing/test-study-content.js
 node scripts/testing/test-database-content-all.js
+git diff --check
 ```
 
-如果 HEAD 是 `0a83fab` 或其后的提交，且工作区干净，这是正常的。不要重置、覆盖或删除用户已有改动。
+预期基线：
 
-### 三、事实权威顺序
+- P0 回归：`9 groups passed`
+- 身份并发原子性：`2 groups passed`
+- 跨账号异步回包隔离：`5 flows passed`
+- 首页签到账号/积分隔离：`3 flows passed`
+- 资料与会话完整性：`6 groups passed`
+- 休闲内容：116 条主数据、19 条节气推荐通过
+- 教程/知识：6 篇通过
+- 本地面试题：18 专题、90 题通过
 
-发生冲突时按以下顺序判断：
+测试中的“媒体清理待重试”和“登录网络失败”日志是故障路径用例，最终退出码和
+通过汇总才是结果。
 
-1. 当前 Git 代码和实际运行结果；
-2. 本交接文档（`HANDOFF-CODEX-2026-07-28.md`）；
-3. `miniapp/PROJECT_PROGRESS.md`；
-4. `docs/technical/TECH_STATUS.md`；
-5. `docs/product/上线前操作指南.md`；
-6. `docs/product/内容事实与合规审计-2026-07-25.md`；
-7. `docs/product/音乐音频许可清单.md`；
-8. 旧交接文档 `HANDOFF-GLM-2026-07-25.md`（已被本文档取代，仅作历史参考）；
-9. 其他旧 README、产品方案和 `.agents/AGENTS.md`。
+### 3. 本轮已经完成的真实代码
 
-注意：部分旧文档仍写"没有真实后端"或旧文件数量。准确说法是：普通内容 REST API 尚未部署，开发/预发/生产的 `enableMock` 仍为 `true`；但是登录、用户资产、投稿、埋点、TTS、私有题库和私有素材已经有真实 CloudBase 云函数。不要因为旧文档而重复建设或把真实云函数删掉。
+以下均已落到当前工作区代码并通过本地回归：
 
-### 四、项目现在做什么
+1. 对仍使用历史全局 Storage 键的收藏、签到、浏览/搜索历史、积分徽章、偏好、
+   通知、学习进度/错题、笔记、评论、播放进度、计时器、订阅状态和旧 REST token
+   增加账号级快照 `account_snapshot:<users._id>`。
+2. 账号切换采用 fail-closed：快照读取、写入或清除任一步失败都中止切号；清除中途
+   失败会从完整快照恢复并保留当前登录态。特殊字符账号 ID 不再因重复编码写入错误
+   快照。
+3. `account-scope` 增加 `epoch` 上下文；偏好、通知、学习进度、历史和收藏的 A 账号
+   异步云回包在切到 B 后会被丢弃。对应真实内存回归为 `5 flows passed`。
+4. UGC 投稿、草稿、冲突和重试副本按本次云登录确认的 `users._id` 隔离；
+   `syncFromCloud/syncToCloud` 捕获账号作用域，旧回包不能写入 anonymous 或下一个账号。
+5. 匿名草稿在当前账号已有草稿时进入该账号的
+   `ugc_draft_conflicts:<user-id>`，不会遗留后再迁给 B；旧全局草稿冲突也会保留，
+   不再静默丢弃。
+6. 投稿云端确认失败时保留完整账号级 retry draft。公开/私密状态只回滚隐私字段，
+   正文、图片等刚编辑内容不再整条恢复旧快照；编辑页重新进入时可恢复待重试内容。
+7. `login` 对没有历史记录的账号以 OPENID 的 SHA-256 摘要生成确定性用户文档 ID，
+   用显式 ID 的原子新增处理冷启动并发。
+8. `sign` 以 `OPENID + 北京日期` 生成确定性签到 ID；同日并发只有一个新增成功。
+   首页和个人页均捕获账号作用域，并且只有 `alreadySigned === false` 才增加本地积分。
+9. 资料保存锁定既有 `users._id`：表单或云端异常不能覆盖身份锚；云端失败时返回
+   `localSaved=true / cloudSynced=false`，本地资料保留但不会伪装云同步成功。
+10. 登录、退出和切号时清理 persona 与 tracker 会话内存；旧账号画像、埋点队列及
+    延迟签到回包不能进入新账号。资料与会话测试为 `6 groups passed`。
+11. 私密、待审核、公开状态采用云端确认语义；公开投稿进入 `pending`，只有
+    `isPublic=true && status=approved` 才能进入社区 Feed 或被非作者读取。
+12. 作者名由云函数按服务端 OPENID 查询 `users.nickname`；服务端校验标题、正文、
+    标签、评分、位置、关联内容、分页、图片和动作参数。
+13. 图片只接受当前账号路径 `ugc/<users._id>/...` 的 CloudBase File ID，并须能在
+    当前环境签发临时 URL；非作者只收到临时 URL。
+14. 云端增加基于 `users` 文档的短期 UGC 资产锁，串行化同一账号的 save/delete；
+    清理 claim 存在时拒绝图片复用，同一 File ID 不允许用于多篇新投稿。
+15. 新投稿以 `OPENID + client_id` 映射确定性文档 ID，并改为显式 `_id` 的原子
+    `collection.add`。并发重复的完整载荷一致才返回幂等成功，不同载荷返回冲突，
+    不再以 `doc.set` 后写覆盖先写。
+16. 编辑和删除使用 `updated_at` 乐观锁与事务条件更新；历史记录缺少版本时只允许
+    严格幂等读取，修改/删除返回 `version_required + migration_required`。
+17. dirty 冲突进入账号级 `ugc_conflicts:<user-id>`；云端记录不存在或已有删除墓碑时，
+    离线脏副本不会自动复活。
+18. 编辑移图和删除前分页扫描引用；扫描不完整时 fail-closed。云端 `getStats` 也改为
+    稳定分页扫描，不再只统计默认首批记录。
+19. `deleteFile.fileList[].status` 逐项确认；部分成功后只保留失败项重试。删除先进入
+    `deleting` 并停止公开，完成后保留最小 `deleted` 墓碑。
+20. 无 `cloudId` 但已经包含云图片的本地稿，确认删除图片成功后才移除本地记录；
+    删除失败时保留稿件和清理状态，不再假删除。
+21. 公开 Feed 有请求竞态保护；社区只展示已批准内容。
+22. `ugc/config.json` 将本地目标超时设置为 10 秒；本地构建标识已经升级为
+    `ugc-20260728-p0-4`。
+23. 隐私页、上线指南、技术状态、项目进度和 UGC 人工审核/清理规程已更新，但在提交
+    前仍须按本交接再次核对 `p0-4`、新增测试和未完成项。
+24. `_uploadImages` 已从 `Promise.all` 改为 `Promise.allSettled`。部分上传失败时仅
+    回滚本次新上传的成功项（不删除原投稿已有图片），逐 File ID 确认 `deleteFile`
+    状态，回滚不完整则保存账号级 cleanup manifest（`ugc_cleanup_manifests:<userId>`）。
+    `ugc.js` 新增 `saveCleanupManifest`、`getCleanupManifests`、`clearCleanupManifest`、
+    `retryCleanupManifests` 和 `deleteCloudFilesConfirmed` 导出。`test-upload-cleanup.js`
+    覆盖 7 组故障路径场景；P0 回归也增加了源码断言。
 
-产品有两种模式：
+关键文件：
 
-- 休闲模式：香、音、茶、影、养、游六雅内容。
-- 学习模式：教程、知识、面试题库、复习。
+- `miniapp/cloudfunctions/ugc/index.js`
+- `miniapp/cloudfunctions/login/index.js`
+- `miniapp/cloudfunctions/sign/index.js`
+- `miniapp/cloudfunctions/ugc/validation.js`
+- `miniapp/cloudfunctions/ugc/policy.js`
+- `miniapp/utils/account-scope.js`
+- `miniapp/utils/ugc.js`
+- `miniapp/utils/auth.js`
+- `miniapp/services/user.js`
+- `miniapp/services/preferences.js`
+- `miniapp/services/notification-settings.js`
+- `miniapp/services/history.js`
+- `miniapp/services/collection.js`
+- `miniapp/utils/study-progress.js`
+- `miniapp/utils/persona.js`
+- `miniapp/utils/tracker.js`
+- `miniapp/pages/edit-profile/edit-profile.js`
+- `miniapp/pages/index/index.js`
+- `miniapp/pages/profile/profile.js`
+- `miniapp/pages/contribute/`
+- `scripts/testing/test-p0-regressions.js`
+- `scripts/testing/test-cloud-identity-atomicity.js`
+- `scripts/testing/test-account-scope-async.js`
+- `scripts/testing/test-index-sign-scope.js`
+- `scripts/testing/test-profile-session-integrity.js`
+- `scripts/testing/test-upload-cleanup.js`
+- `docs/product/上线前操作指南.md`
+- `docs/product/UGC内容审核与清理操作规程.md`
+- `docs/technical/TECH_STATUS.md`
+- `miniapp/PROJECT_PROGRESS.md`
 
-现有路由：
+### 4. 云端部署的真实状态
 
-- 主包 21 页，含首页、六雅列表、收藏、个人中心、学习四模块、资料、偏好、历史、通知、订阅、隐私协议。
-- 分包 7 页，含茶品详情、行旅详情、通用内容详情、学习详情、面试题详情、茶品对比、全局搜索。
+FACT：
 
-架构边界：
+- 微信开发者工具官方 CLI 已在端口 `27126` 启动。
+- **最新 `islogin` 返回 `login=false`**，云函数查询明确报“需要重新登录”。
+- 在登录失效前，CLI 曾列出当前环境 12 个云函数；最后一次成功读取的远端
+  `login/sign/ugc` 均为 `Active / timeout=3 / Nodejs16.13`。
+- 2026-07-28 重启开发者工具后仅尝试了一次单函数部署，仍失败：
+  `getCloudAPISignedHeader`，返回 `41002 / system error`。
+- 随后触发过开发者工具重新登录二维码，但二维码超时未扫码。
+- 因此本地 `p0-4` 和 timeout=10 **均没有确认部署成功**；当前远端版本属于
+  `UNKNOWN`，不能根据本地文件推断。
+- 腾讯云主控制台当前已经登录，但该账号在上海地域显示 0 个 CloudBase 环境；
+  “腾讯云网页已登录”不等于“微信开发者工具拥有该小程序的云函数发布授权”。
+  该页面不是本小程序微信云环境的有效管理入口，也没有接受新服务协议或新建环境。
 
-```text
-Pages / Components
-        ↓
-services/*
-        ↓
-utils/request.js
-        ├─ enableMock=true → utils/mock.js → utils/data-store.js
-        └─ enableMock=false → 未来 REST API
+下一步最小账号操作：
 
-用户资产/云内容的真实链路：
-页面或工具层 → wx.cloud.callFunction → 12 个 CloudBase 云函数 → 私有数据库/私有存储/Tencent TTS
+1. 账号所有者在“微信开发者工具”内刷新登录，必要时退出后重新扫码登录。
+2. 不要重复配置 TTS 密钥，不要把任何 Secret、票据或 Cookie 发到聊天。
+3. 登录刷新后部署本轮最低集合 `login sign ugc`：
+
+```bash
+'/Applications/wechatwebdevtools.app/Contents/MacOS/cli' cloud functions deploy \
+  --port 27126 \
+  --env 'cloud1-d6gh3spr3b2bd51d8' \
+  --names login sign ugc \
+  --remote-npm-install \
+  --project '/Users/lijunpeng/Desktop/workbuddy_project/miniapp' \
+  --lang zh
 ```
 
-新页面不要直接依赖 `utils/mock.js` 或 `utils/data-store.js`；优先经过 `services/`。不要在没有真实 REST 服务时把 `enableMock` 改成 `false`。
-
-### 五、当前数据与云能力
-
-本地六雅数据共 116 条：
-
-- 茶 60；行旅 6；养生 14；香道 12；音乐 12；电影 12。
-
-学习数据：
-
-- 本地精简教程 3、知识 3；
-- 本地 18 个面试专题，每专题 5 题，共 90 题；
-- `data/study_data.json` 为完整数据：教程 18、知识 18、面试题 901。
-
-云函数共 12 个：
-
-`login`、`updateProfile`、`collection`、`history`、`preferences`、`notificationSettings`、`sign`、`studyProgress`、`ugc`、`track`、`tts`、`getStudyData`。
-
-私有云资源约定：
-
-- 完整题库：`study/study_data.json`
-- 产品图片：`app-assets/images/`
-- 音乐音频：`app-assets/audio/`
-- 图片本地源文件仍保留在 `miniapp/assets/images/`，共 128 张有效图片；图片目录被 `project.config.json` 排除，不进入上传包。
-- 私有图片和音频由 `getStudyData` 签发临时 URL，存储桶不可改为公开。
-
-数据库集合按现有上线指南维护，包括：
-
-`users`、`sign_records`、`collections`、`events`、`history`、`user_preferences`、`notification_settings`、`study_progress`、`ugc_posts`。
-
-客户端不应直接获得集合读写权限；云函数使用服务端 `OPENID` 做身份边界。
-
-### 六、此前已经完成的全部主要工作
-
-以下均已落到代码或做过运行验收，不要重复开发：
-
-#### 1. 建立可追踪的安全基线
-
-- 建立 `baseline/sanitized-2026-07-25` 标签。
-- 当前代码库不应录入腾讯云 SecretId/SecretKey、微信密钥或其他明文凭证。
-- TTS 密钥此前已经配置在已部署云函数环境变量中；除非真实报错明确显示缺失、过期或泄漏，不要再要求用户重复录入或轮换。
-
-#### 2. 上线前安全与稳定性加固
-
-- 对云函数入参、ID、文本长度、动作类型等加入校验和边界限制。
-- 云函数身份以 `cloud.getWXContext()` 的服务端 `OPENID` 为准，不信任客户端传入的身份字段。
-- 收藏、历史、偏好、通知、签到、学习进度、资料、投稿等用户资产均已有对应云函数。
-- 投稿保存按 `cloudId`、`client_id` 和兼容旧 ID 做去重/更新，降低重复投稿风险。
-- 投稿默认私密：只有 `isPublic === true` 才视为公开；字段缺失或异常均按私密处理。
-- 私密投稿详情只允许所有者读取；社区 Feed 只查询 `isPublic: true`；响应中不向客户端泄露 `_openid`。
-- 投稿删除和编辑限制为当前所有者。
-- 埋点上报加入字段白名单和校验，避免客户端伪造云端身份字段。
-- TTS、私有题库和素材请求补充失败保护、超时与异常提示。
-- 新增 `scripts/testing/test-p0-regressions.js`，覆盖关键 P0 回归。
-
-#### 3. 私有题库与素材链路
-
-- `getStudyData` 优先从 CloudBase 私有存储读取 `study/study_data.json`。
-- 客户端按"索引 + 每批最多 3 个专题"同步，避免 3.56 MB 全量 JSON 触发响应体限制。
-- 产品图迁移到 CloudBase 私有存储；本地图片仍作为维护源保存，但不进入小程序包。
-- 私有资源路径设置白名单，不能任意为其他云文件签发临时地址。
-- 临时图片 URL 客户端缓存改为 5 分钟刷新，修复旧签名长期复用导致的 HTTP 403。
-
-#### 4. 面试题库性能治理
-
-- 原来 901 道题及完整答案全部进入页面 `data`，产生约 1.8 MB `setData` 警告。
-- 现在完整题目只保留在逻辑层，渲染层每页只接收 20 条轻量卡片字段。
-
-#### 5. 腾讯云 TTS 真实链路
-
-- 腾讯云基础/精品音色资源包已确认生效，当时基础模型显示 800 万字符可用额度。
-- 面试题详情页已经完成真实云函数合成、播放、暂停/失败保护和离开页面自动停止。
-- `tts` 云函数超时按 10 秒配置；`getStudyData` 按 15 秒配置。
-- 外部额度会变化，若以后失败先看真实错误码和控制台当前额度，不要猜测"没配置密钥"。
-
-#### 6. 首批真实授权音乐
-
-已经完成并上传 4/12 首，详情页支持用户点击播放，不会自动播放，并展示可复制的许可信息：
-
-- `music_001`《流水》：Charlie Huang，CC BY 2.5，8:13；
-- `music_003`《二泉映月》：张沛坚 / David290，CC BY-SA 4.0，4:28；
-- `music_008`《平沙落雁》：Charlie Huang，CC BY 2.5，7:14；
-- `music_009`《阳关三叠》：Charlie Huang，CC BY-SA 3.0，5:50。
-
-来源页、许可页、云端逻辑路径、文件大小和 SHA-256 全部记录在 `docs/product/音乐音频许可清单.md`。
-
-#### 7. 六雅内容事实与合规审计
-
-- 递归扫描 116 条六雅内容、19 条节气推荐及嵌套字段。
-- 全量重写 14 条养生、12 条香品、12 条音乐、12 条电影的高风险文案。
-- 清理 60 条茶品中的伪科学、医疗暗示、绝对化营销和模板化功效话术。
-- 清理行旅模板和地点错配，重写历史、路线、随笔及关联语境。
-- 修复音乐/电影串题错误。
-- 对养生和香品补充必要的健康/安全边界。
-- 泉州 `travel_006` 不再错误使用大理图片，目前 `coverImage` 留空。
-- 模拟茶评不再返回，模拟公共投稿不再进入社区 Feed，静态聚合评分只有 `ratingSource === 'verified'` 才显示。
-- 审计详情在 `docs/product/内容事实与合规审计-2026-07-25.md`。
-
-#### 8. 社区 Feed 跨账号可见性修复（2026-07-28 新完成）
-
-**这是最近完成的修复，必须了解上下文。**
-
-**原始 Bug**：客户端 `utils/ugc.js` 的 `getCommunityFeed()` 只读本地存储（`wx.getStorageSync`），从未调用云函数。账号 B 打开「风雅社区」时只能看到自己本地的公开投稿，永远看不到账号 A 同步到云端的公开投稿。
-
-**修复内容（2 个提交：`e947de6` + `0a83fab`）**：
-
-1. `utils/ugc.js` 新增 `getCloudCommunityFeed(domain)` 函数，调用云函数 `ugc` 的 `getCommunityFeed` action 拉取所有用户的 `isPublic: true` 投稿。
-2. `pages/contribute/list.js` 社区 Tab 改为异步加载：先用本地公开投稿即时回显，再从云端拉取全量公开投稿替换。
-3. `pages/contribute/list.wxml` 添加加载中提示；他人投稿不显示编辑/删除按钮，显示作者名。
-4. `pages/contribute/list.wxss` 添加加载状态样式。
-5. 云函数 `cloudfunctions/ugc/index.js` 的 `save` action 新增 `authorName` 字段存储（新建和更新均保存），供社区 Feed 展示真实昵称。
-6. `utils/ugc.js` 的 `_syncPostToCloud` 附带 `_getAuthorName()` 从 `auth.getUserInfo()` 或 `store.getState()` 获取用户昵称。
-7. `getCloudCommunityFeed` 移除 `_isLoggedIn()` 守卫——云函数通过 `cloud.getWXContext()` 获取 OPENID，不依赖客户端 token，避免 `silentLogin` 未完成时社区 Feed 为空。
-8. `getPostById(id)` 和 `deletePost(id)` 兼容云端文档 ID（同时搜索 `p.id` 和 `p.cloudId`）。
-
-**⚠️ 关键待办**：云函数 `ugc` 已被修改（添加了 `authorName` 存储），**用户必须在微信开发者工具中重新部署 `cloudfunctions/ugc` 云函数**（右键 → 上传并部署：云端安装依赖）。否则 `authorName` 不会写入数据库，社区 Feed 会显示"匿名用户"。
-
-**验证状态**：
-- FACT：代码修改已完成，四组自动化测试全部通过，lint 无错误。
-- UNKNOWN：真实跨账号真机验证尚未完成（需要用户用两个真实微信账号操作）。
-
-#### 9. 运行与包体积验收
-
-- 2026-07-25 最终临时预览代码包为 1176 KB。
-- 开发者工具自动过滤 34 个无依赖文件，主包小于 1.5 MiB。
-- 这只是临时预览，不是正式上传、提审或发布。
-
-#### 10. 最近提交顺序
-
-用于追溯变更：
-
-- `a99e19b`：完成六雅内容事实和合规清理；
-- `f6056ba`：记录 8 首缺失音乐的穷尽搜索结果；
-- `fa5d825`：根据代码审查更新隐私指南数据流细节；
-- `e947de6`：修复社区 Feed 跨账号不可见（客户端改调云函数）；
-- `0a83fab`：补充社区 Feed 修复（云函数存 authorName、移除登录守卫、兼容云端 ID）。
-
-### 七、尚未完成的内容
-
-#### P0：上线前必须完成
-
-**1. 重新部署 `ugc` 云函数 ⚠️ 紧急**
-- 云函数 `cloudfunctions/ugc/index.js` 已修改（新增 `authorName` 字段存储），但尚未重新部署到云端。
-- 用户需要在微信开发者工具中右键 `cloudfunctions/ugc` → 「上传并部署：云端安装依赖」。
-- 部署后，用户需要创建一条新的公开投稿来验证 `authorName` 是否正确写入数据库（旧投稿的 `authorName` 为空，更新后会补上）。
-
-**2. 跨账号社区 Feed 真机验证 ⚠️ 紧急**
-- 代码修复已完成，但真实跨账号验证尚未完成。
-- 验证步骤：
-  1. 账号 A 在微信开发者工具中预览小程序 → 创建投稿 → 编辑改为「🌐 公开」→ 更新。
-  2. 账号 A 重新生成预览二维码。
-  3. 账号 B（第二个真实微信账号）扫码进入小程序 → 底部 Tab「风雅社区」→ 应该能看到 A 的公开投稿。
-  4. 账号 B 点击 A 的投稿 → 应该能查看内容但不能编辑/删除。
-  5. 账号 A 将投稿改回私密 → 账号 B 刷新社区 → 不应再看到该投稿。
-
-**3. 第二真实账号隐私验收**
-- 代码策略和自动化回归已完成，但不能用单账号或静态测试代替跨账号真机验收。
-- 必须验证私密投稿在第二真实账号的社区 Feed 和详情页均不可见。
-- 还应顺带验证同一账号重新登录后的用户资产同步、投稿更新不重复、失败重试。
-- 验收矩阵详见 `HANDOFF-GLM-2026-07-25.md` 第七节或 `docs/product/上线前操作指南.md` 第 9 步第 14 项。
-
-**4. 微信公众平台用户隐私保护指引**
-- 路径与建议填法已写在 `docs/product/上线前操作指南.md` 第 5 步。
-- 需要按实际上线数据流填写昵称头像、选择照片、写入相册、设备信息、公开投稿与私密投稿说明、接收方/处理方和联系邮箱。
-- 你不能替用户同意法律协议、虚构接收方或提交不确定内容。
-
-**5. 真实音乐仍缺 8/12**
-- 缺少：
-  `music_002`《渔舟唱晚》、`music_004`《春江花月夜》、`music_005`《十面埋伏》、
-  `music_006`《梅花三弄》、`music_007`《百鸟朝凤》、`music_010`《高山》、
-  `music_011`《琵琶行》、`music_012`《渔樵问答》。
-- 已在 Wikimedia Commons 和 Internet Archive 做过穷尽搜索，未找到合格录音。搜索过程和结论记录在 `docs/product/音乐音频许可清单.md`。
-- 作品古老不等于具体录音可自由使用。必须同时验证曲目匹配、具体录音权利、许可允许小程序使用。
-- 未找到合格录音时保持 `audioSrc` 为空，不得用相似曲目、来源不明 MP3 或 AI 猜测的授权信息冒充。
-- 可以尝试新的来源：MusOpen、Free Music Archive、CC Mixter、各音乐学院开放资源等。
-
-**6. 正式上传、真机预览、提审和发布**
-- 当前只有开发者工具临时预览事实。
-- 在前述 P0 和全流程回归完成前不要宣称"已上线"。
-
-#### P1：中优先级
-
-- 补充页面级自动化和真实云函数集成测试。
-- 使用微信开发者工具 CLI 建立静态检查、上传和可控的提交流水线；自动提审要保留人工确认。
-- 用 `services/home.js` 和 `utils/persona.js` 做个性化推荐。
-- 补首页切换、雷达图、行旅路线等微交互动效。
-- 核验订阅消息是否真的配置模板 ID 并能实际投递；现有页面/设置不等于消息服务已上线，目前应视为 `UNKNOWN`。
-- 评估并处理 5 个未使用主包 JS 文件，但删除前必须确认没有动态引用。
-
-#### P2：长期建设
-
-- 内容管理后台 CMS。
-- 无障碍和色盲模式。
-- 如果未来决定建设普通 REST 后端，再接入内容、搜索等服务并关闭生产 Mock；这不是当前 P0，不能贸然切换。
-
-### 八、你现在应当怎么继续
-
-按以下顺序执行，不要把 P1/P2 抢到 P0 前：
-
-#### 第 1 阶段：恢复基线
-
-1. 执行前述 Git 和四组测试命令。
-2. 阅读以下关键代码文件：
-   - `miniapp/cloudfunctions/ugc/index.js`（注意 2026-07-28 新增的 `authorName` 存储）
-   - `miniapp/cloudfunctions/ugc/policy.js`
-   - `miniapp/utils/ugc.js`（注意 `getCloudCommunityFeed`、`getPostById`、`deletePost` 的最新改动）
-   - `miniapp/pages/contribute/contribute.js`
-   - `miniapp/pages/contribute/list.js`（注意 `_loadCloudCommunityFeed` 异步加载逻辑）
-   - `miniapp/pages/contribute/list.wxml`
-   - `miniapp/cloudfunctions/getStudyData/index.js`
-   - `miniapp/utils/asset-url.js`
-   - `miniapp/utils/config.js`
-   - `miniapp/app.js`
-3. 用 `FACT / INFERENCE / UNKNOWN` 汇报当前状态。
-
-#### 第 2 阶段：确认社区 Feed 修复已部署
-
-1. 确认 `cloudfunctions/ugc/index.js` 的 `save` action 中有 `authorName` 字段。
-2. 提醒用户在微信开发者工具中重新部署 `ugc` 云函数。
-3. 提醒用户进行跨账号真机验证（步骤见上文 P0 第 2 项）。
-4. 如果用户反馈验证失败，优先检查：
-   - 云函数是否已重新部署（检查 `authorName` 字段是否存在于云端数据库 `ugc_posts` 集合中）。
-   - `getCloudCommunityFeed` 是否被正确调用（Console 应有 `[ugc] getCloudCommunityFeed` 相关日志或无 `failed` 警告）。
-   - 投稿的 `isPublic` 字段是否为 `true`（在云开发控制台数据库中直接查看 `ugc_posts` 集合）。
-   - 社区 Tab 切换时是否触发了 `_loadCloudCommunityFeed()`（在 `list.js` 的 `onTabTap` 中确认）。
-
-#### 第 3 阶段：第二账号隐私验收
-
-推荐验收矩阵：
-
-1. 账号 A 新建投稿，不主动开启"公开"，确认保存结果为私密。
-2. 账号 A 能在"我的投稿"读取、编辑；重新登录后仍只有一条最新版记录。
-3. 账号 B 登录后，社区 Feed 不出现该投稿。
-4. 账号 B 通过该投稿真实云端 ID 请求详情，必须返回"投稿不存在或无权访问"，正文和图片均不能泄露。
-5. 账号 A 改为公开，账号 B 才能在 Feed 和详情中读取。
-6. 账号 A 再改为私密，账号 B 必须再次不可见，避免旧缓存泄露。
-7. 检查客户端响应和日志不包含 `_openid`、SecretId、SecretKey。
-8. 把账号标记、时间、步骤、预期、实测、错误码和结论写入新的验收记录；不要在文档中记录真实 openid 或密钥。
-
-如果你无法获得第二真实账号或无法操作已登录微信环境，明确告诉用户："代码和自动化已通过，现在只缺第二账号人工切换"，给出最短操作指令，然后转去推进不依赖该账号的工作。不要伪造跨账号通过。
-
-#### 第 4 阶段：完成公众平台隐私指引
-
-1. 以当前代码实际调用的权限、上传、公开/私密逻辑为准复核指南。
-2. 在微信公众平台打开提交页面，逐项比对。
-3. 对第三方接收方、联系邮箱或法律确认不确定时停在提交按钮前，请用户确认。
-4. 用户完成后保留无敏感信息的验收截图/记录，并同步进度文档。
-
-#### 第 5 阶段：继续补齐授权音乐
-
-每首音频必须走同一闭环：
-
-1. 找到具体录音的原始来源页，确认标题/曲牌确实匹配。
-2. 确认表演者、录制者、权利人和许可条款；优先原始馆藏、Wikimedia Commons 或明确开放许可的权威来源。
-3. 下载/转码时记录是否修改，不删减必要署名。
-4. 计算 SHA-256 和实际时长。
-5. 上传 CloudBase 私有目录 `app-assets/audio/`。
-6. 在 `miniapp/utils/data-store.js` 更新对应 `audioSrc`、`audioLicense`、时长等实际字段。
-7. 必要时更新 `getStudyData` 音频白名单并重新部署云函数。
-8. 更新 `docs/product/音乐音频许可清单.md`。
-9. 开发者工具和真机验证：进入详情不自动播、点击可播/暂停/恢复、离页停止、许可可复制、无 403/权限错误。
-10. 运行四组回归测试后提交。
-
-无法验证权利的录音宁可不上线。研究结果、下载文件或上传动作不是完成，只有应用内真实播放与许可展示验收通过才算完成。
-
-#### 第 6 阶段：全量上线回归
-
-按 `docs/product/上线前操作指南.md` 第 9 步至少完成：
-
-- 启动、六雅素材、详情排版、茶品雷达图；
-- 登录、收藏、签到、资料、历史、偏好、通知、学习进度；
-- 投稿同步、跨账号私密权限；
-- TTS 合成/播放/离页停止；
-- 埋点落库；
-- 完整题库显示 901 题；
-- 包体积、Console Errors、云资源 403；
-- 四组自动化测试。
-
-只有这些真实通过，且公众平台配置完成，才能进入正式上传与提审。
-
-### 九、社区 Feed 修复的技术细节（供 Codex 快速理解）
-
-**修改的文件列表**：
-
-| 文件 | 修改内容 |
-|---|---|
-| `miniapp/utils/ugc.js` | 新增 `getCloudCommunityFeed()`、`getCommunityFeedLocal()`、`_getAuthorName()`；修改 `_syncPostToCloud()` 附带 authorName；修改 `getPostById()` 和 `deletePost()` 兼容 cloudId；移除 `getCloudCommunityFeed` 的 `_isLoggedIn()` 守卫 |
-| `miniapp/pages/contribute/list.js` | 新增 `communityLoading` 状态和 `_loadCloudCommunityFeed()` 异步加载方法；修改 `onPostTap()` 处理云端他人投稿；修改 `_formatPost()` 添加 `isCloud` 字段 |
-| `miniapp/pages/contribute/list.wxml` | 社区加载中提示；他人投稿显示作者名不显示编辑/删除按钮；空状态添加 `!communityLoading` 条件 |
-| `miniapp/pages/contribute/list.wxss` | 新增 `.community-loading` 样式 |
-| `miniapp/cloudfunctions/ugc/index.js` | `save` action 新建和更新时存储 `authorName` 字段 |
-
-**数据流（修复后）**：
-
-```
-账号 A 创建/编辑投稿 (isPublic: true)
-  → savePost() 本地存储
-  → _syncPostToCloud() 附带 authorName = 用户昵称
-  → 云函数 save → ugc_posts 集合 (isPublic: true, authorName: "用户昵称")
-                                                      ↓
-账号 B 打开「风雅社区」Tab
-  → _loadCloudCommunityFeed()
-  → getCloudCommunityFeed('all')  ← 无需 _isLoggedIn() 守卫
-  → 云函数 getCommunityFeed → where({ isPublic: true }) → 返回列表
-  → 列表展示：authorName 正确显示，isMine=false 隐藏编辑/删除按钮
+4. 立即复查：
+
+```bash
+'/Applications/wechatwebdevtools.app/Contents/MacOS/cli' cloud functions info \
+  --port 27126 \
+  --env 'cloud1-d6gh3spr3b2bd51d8' \
+  --names login sign ugc \
+  --project '/Users/lijunpeng/Desktop/workbuddy_project/miniapp' \
+  --lang zh
 ```
 
-### 十、开发与安全红线
+只有同时满足以下条件才可写“部署完成”：
 
-- 不把 SecretId、SecretKey、微信密钥、openid 写进代码、文档、日志或聊天。
-- 不重复要求用户录入已经存在的 TTS 密钥；先看真实错误。
-- 不擅自接受腾讯云/微信服务协议，不擅自付费，不替用户做法律声明。
-- 不把私有 CloudBase 存储桶改为公开。
-- 不使用来源不明或曲目不匹配的音频。
-- 不用错误或生成不准确的地标图冒充泉州实景。
-- 不恢复模拟公共投稿、模拟茶评、伪造用户评价或未验证评分。
-- 不把 Mock 测试通过、文档完成、代码扫描通过称作真实上线验收。
-- 不破坏 Pages → services → request → 数据源的边界。
-- 不覆盖不属于你的未提交改动；禁止 destructive reset。
-- 每个独立任务小步提交，提交信息说明真实改动；提交前跑相关测试。
+- CLI 部署表中 `login/sign/ugc` 均为 `success=true`；
+- 远端 timeout 为 10；
+- 真实调用 `getMyPosts` 返回
+  `server_build=ugc-20260728-p0-4`。
 
-### 十一、每次汇报格式
+若仍为 41002，停止重复尝试，保留错误码并检查微信开发者工具账号/项目授权，不要转去
+腾讯云主控制台新建另一个环境。
 
-先给结论，再给证据：
+在真实云环境并发调用后分别确认：
+同一新微信账号只产生一个 `users` 文档、同一账号同一天只产生一个
+`sign_records` 文档、同一 `client_id` 的相同 UGC 请求幂等且不同载荷冲突、
+重复签到不重复加积分。还要验证 UGC 资产锁可以获取和释放，`users` 集合中没有长期
+残留的过期锁。正式发布前仍应核对全部 12 个云函数的部署时间、配置与真实调用结果。
+
+### 5. 云端开放写入前必须完成的数据治理
+
+1. 导出 `ugc_posts` 全量备份并记录总数。
+2. 保留已有 `deleted` 最小墓碑；`deleting` 进入异常清理清单。
+3. 活动历史记录补齐可信 `status`、服务端昵称和有效 `updated_at`。
+   缺失时间没有可信旧值时使用可审计的迁移基线时间，记录原值、新值、执行人和时间。
+4. 缺失 `client_id` 的记录制定可追踪回填值，可沿用文档 `_id`。
+5. 按 `_openid + client_id` 查空值和重复对，逐条处置，禁止脚本盲合并或删除。
+6. 无冲突后创建唯一复合索引 `idx_openid_client`，并实测重复写入被拒绝。
+7. 创建上线指南列出的社区、作者列表、审核与清理索引。
+8. 不符合 `ugc/<users._id>/...` 的历史图片进入人工核验，不能盲删。
+
+### 6. 仍未完成的 P0
+
+以下不能被本地测试、文档或单账号演示替代：
+
+1. ✅ **已完成**：`pages/contribute/contribute.js#_uploadImages` 已从 `Promise.all`
+   改为 `Promise.allSettled`。部分上传失败时仅回滚本次新上传的成功项（不删除原投稿
+   已有图片），逐 File ID 确认 `deleteFile` 状态，回滚不完整则保存账号级 cleanup
+   manifest（`ugc_cleanup_manifests:<userId>`）。`ugc.js` 新增 `saveCleanupManifest`、
+   `getCleanupManifests`、`clearCleanupManifest`、`retryCleanupManifests` 和
+   `deleteCloudFilesConfirmed` 导出。自动化故障路径测试 `test-upload-cleanup.js` 覆盖
+   7 组场景（全部成功、部分失败全回滚、部分失败部分回滚失败、全部失败、原投稿图片
+   保护、manifest 账号隔离、retry 重试成功）。P0 回归也增加了源码断言。
+2. ✅ **已完成**：全部未提交 diff 已审查，第 2 节所有测试、全量 JS `node --check`、
+   敏感信息扫描与 `git diff --check` 均通过，文档已同步，已形成真实提交。
+3. 微信开发者工具重新扫码登录后部署 `login`、`sign`、`ugc`；核对 UGC timeout
+   和 `server_build`，并在真实云端复验 login/sign/UGC 并发原子性。最后一次可读取的
+   远端 timeout 为 3，当前因 `login=false` 无法重新确认。
+4. 在真实 CloudBase 备份、迁移 `ugc_posts`，创建并验证索引；同时检查 `users`
+   中新增的 `ugc_asset_lock_token/ugc_asset_lock_until` 没有异常长期残留。
+5. 指定有权限的人工审核/清理负责人，完成
+   `pending → approved/rejected` 和 `deleting → deleted` 演练并留痕。
+6. 使用两个真实微信账号验证私密、待审核、批准、批准后编辑、改回私密、删除、
+   非作者无编辑权限和图片可见性。
+7. 同一设备执行 A → B → A 换号，确认投稿、草稿、retry draft、冲突隔离区以及
+   收藏、历史、签到、
+   积分、偏好、学习记录、笔记和订阅等账号快照均不串号且 A 可正确恢复。
+8. 真云存储验证资产锁、图片占用拒绝、逐 File ID 删除、部分失败只重试失败项、
+   历史共享图片保护、孤儿上传回滚、历史图片人工清理和删除不存在对象的重试行为。
+9. 在微信公众平台按真实数据流填写并提交用户隐私保护指引；先由运营主体提供并核验
+   可处理数据权利请求的真实联系渠道，不能用未验证邮箱或虚构客服替代。
+10. 12 首音乐目前只有 4 首有明确录音许可；剩余 8 首必须取得具体录音授权或明确不提供
+   播放，不能以古曲公版推断录音公版。
+11. 完成真机全流程、开发版本上传、提审和发布。在此之前不得称为“已上线”。
+
+### 7. 仍未完成的 P1
+
+- 管理员审核 API、最小审核后台、审核日志和拒绝原因。
+- UGC 冲突隔离区的用户可见恢复界面。
+- 孤儿上传登记、清理重试 Worker 和墓碑长期归档策略。
+- 社区 Feed 下一页加载；当前客户端只取首 50 条。
+- “我的投稿”超过 5000 条时的游标分页；当前会安全停止回推。
+- 文本/图片内容安全服务与人工复核闭环。
+- 登录、签到和 UGC 并发行为的持续集成/压力测试；当前只有本地伪 CloudBase 并发回归。
+- 页面级、云函数真实集成和微信开发者工具自动化测试。
+
+### 8. GLM 必须采用的继续执行顺序
+
+1. ✅ 已读取当前 dirty diff 和关键文件；未从 `576641b` 重做。
+2. ✅ 已修复 `_uploadImages` 部分成功时的孤儿文件问题，增加 7 组自动化测试。
+3. ✅ 已审查本轮所有账号隔离、资料、签到和 UGC 改动；未发现新 P0。
+4. ✅ 已重跑全部本地验证，已更新文档与状态文档，已确认无敏感信息，已提交当前工作树。
+5. 到部署动作时，只请求用户在微信开发者工具扫码登录；不要索要密钥。部署并核验
+   `login/sign/ugc`，不能用本地测试代替远端结果。
+6. 在执行数据库迁移、创建索引、人工审核、公众平台提交、正式上传或发布前，先做
+   只读检查；涉及法律确认、第二真实账号、不可逆删除或正式发布时向用户请求最小协助。
+7. 完成两个真实账号和真机矩阵后，才进入提审。
+
+每轮汇报必须使用：
 
 ```text
 当前阶段：
 
 FACT（已验证）：
-- ...
+- 代码/控制台真实动作：
+- 验证命令与结果：
+- 提交或远端版本：
 
 INFERENCE（合理推断）：
 - ...
 
-UNKNOWN / BLOCKED（仍需验证或外部协助）：
+UNKNOWN / BLOCKED：
 - ...
-
-本轮真实完成：
-- 代码/控制台操作：
-- 验证命令与结果：
-- 提交：
 
 下一步最高价值行动：
 - ...
 ```
 
-不要仅告诉用户"下一步建议"。只要不涉及新增授权、法律确认、付费或不可逆外部操作，就直接继续完成代码、验证和文档。
+静态扫描、计划、文档、构建号、测试桩和单账号演示都不能冒充真实云端部署或真机验收。
 
-现在从"恢复基线"开始接管；确认社区 Feed 修复的部署状态和真机验证结果，然后按优先级推进剩余 P0 事项。
+### 9. 真实性与安全边界
+
+- 不把测试、文档、构建号或控制台截图当成真机/云端部署。
+- 不索要或保留 SecretId、SecretKey、微信密钥、登录票据或 Cookie。
+- 不接受服务协议、不付款、不提交公众平台、不发布，除非账号所有者明确授权。
+- 不公开存储桶；私有产品图片、音频和题库继续用临时 URL。
+- 不物理删除历史数据或墓碑，除非已备份、验证、验收并获得新的明确授权。
+- 工作区存在用户改动时保留它们；禁止 `git reset --hard` 或覆盖式恢复。
 
 ## 提示词结束

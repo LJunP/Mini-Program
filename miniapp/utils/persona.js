@@ -114,6 +114,11 @@ function invalidateCache() {
   _cacheTime = 0;
 }
 
+// 账号切换或退出时必须显式清空，防止 30 秒缓存跨账号复用。
+function resetSessionCache() {
+  invalidateCache();
+}
+
 /**
  * 记录浏览行为
  * @param {string} domain 板块名
@@ -146,5 +151,6 @@ module.exports = {
   PERSONA_TYPES,
   calculatePersona,
   invalidateCache,
+  resetSessionCache,
   trackBrowse
 };

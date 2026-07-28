@@ -83,6 +83,7 @@
       <view class="post-card__body">
         <view class="post-card__header">
           <domain-tag domain="{{item.domain}}" size="small" />
+          <text class="post-card__status post-card__status--{{item.status}}" wx:if="{{activeTab === 'my' && item.statusText}}">{{item.statusText}}</text>
           <text class="post-card__author" wx:if="{{item.isMock || (activeTab === 'community' && !item.isMine)}}">@{{item.authorName}}</text>
           <text class="post-card__date">{{item.dateText}}</text>
         </view>
@@ -124,7 +125,7 @@
       </view>
 
         <!-- 操作区（仅自己的投稿） -->
-      <view class="post-card__actions" wx:if="{{!item.isMock && (activeTab === 'my' || item.isMine)}}">
+      <view class="post-card__actions" wx:if="{{!item.isMock && activeTab === 'my'}}">
         <view class="post-card__action" data-id="{{item.id}}" catchtap="onEditPost">
           <text>编辑</text>
         </view>
@@ -134,11 +135,6 @@
         </view>
       </view>
     </view>
-  </view>
-
-  <!-- 加载中 -->
-  <view class="community-loading" wx:if="{{activeTab === 'community' && communityLoading}}">
-    <text>正在加载社区内容…</text>
   </view>
 
   <!-- 空状态 -->

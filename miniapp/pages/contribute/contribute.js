@@ -43,6 +43,9 @@ Page({
   },
 
   onLoad(options) {
+    this._submissionSucceeded = false;
+    this._hasUnconfirmedChanges = false;
+    this._initialEditSnapshot = null;
     tracker.track('page_view', { page_path: 'pages/contribute/contribute' });
 
     // 如果有领域参数，预选
@@ -54,21 +57,26 @@ Page({
     if (options.id) {
       const post = ugc.getPostById(options.id);
       if (post) {
+        const retryDraft = ugc.getRetryDraft(post.id);
+        const editable = retryDraft
+          ? { ...post, ...retryDraft, id: post.id }
+          : post;
         this.setData({
-          editId: post.id,
+          editId: editable.id,
           isEdit: true,
-          title: post.title,
-          domain: post.domain,
-          content: post.content,
-          tags: post.tags || [],
-          images: post.images || [],
-          rating: post.rating || 0,
-          isPublic: post.isPublic === true,
-          location: post.location || '',
-          linkedContent: post.linkedContent || null,
-          contentCount: (post.content || '').length,
-          tempImages: (post.images || []).map(url => ({ url, path: url }))
+          title: editable.title,
+          domain: editable.domain,
+          content: editable.content,
+          tags: editable.tags || [],
+          images: editable.images || [],
+          rating: editable.rating || 0,
+          isPublic: editable.isPublic === true,
+          location: editable.location || '',
+          linkedContent: editable.linkedContent || null,
+          contentCount: (editable.content || '').length,
+          tempImages: (editable.images || []).map(url => ({ url, path: url }))
         });
+        this._initialEditSnapshot = JSON.stringify(this._draftPayload());
       }
     } else {
       // 尝试加载草稿
@@ -103,19 +111,35 @@ Page({
   },
 
   onUnload() {
-    // 自动保存草稿
-    if (!this.data.isEdit && (this.data.title || this.data.content)) {
-      ugc.saveDraft({
-        title: this.data.title,
-        domain: this.data.domain,
-        content: this.data.content,
-        tags: this.data.tags,
-        rating: this.data.rating,
-        isPublic: this.data.isPublic,
-        location: this.data.location,
-        linkedContent: this.data.linkedContent
-      });
+    if (
+      this._submissionSucceeded ||
+      (!this.data.title && !this.data.content)
+    ) return;
+
+    const draft = this._draftPayload();
+    if (this.data.isEdit) {
+      const changedSinceLoad = this._initialEditSnapshot !== JSON.stringify(draft);
+      if (this._hasUnconfirmedChanges || changedSinceLoad) {
+        ugc.saveRetryDraft(draft, 'edit_unconfirmed_on_unload');
+      }
+      return;
     }
+    ugc.saveDraft(draft);
+  },
+
+  _draftPayload() {
+    return {
+      editId: this.data.editId || '',
+      title: this.data.title,
+      domain: this.data.domain,
+      content: this.data.content,
+      tags: this.data.tags,
+      images: this.data.images,
+      rating: this.data.rating,
+      isPublic: this.data.isPublic,
+      location: this.data.location,
+      linkedContent: this.data.linkedContent
+    };
   },
 
   // 更新当前领域信息
@@ -243,6 +267,8 @@ this.setData({ isPublic });
 },
 
 onSubmit() {
+    if (this.data.submitting) return;
+
     // 验证
     if (!this.data.title.trim()) {
       wx.showToast({ title: '请输入标题', icon: 'none' });
@@ -252,11 +278,26 @@ onSubmit() {
       wx.showToast({ title: '请输入正文内容', icon: 'none' });
       return;
     }
+    if (!ugc.isCloudIdentityReady()) {
+      wx.showModal({
+        title: '正在确认账号',
+        content: '账号尚未完成云端确认，当前不会上传投稿或图片。请稍后重试。',
+        showCancel: false,
+        confirmText: '知道了'
+      });
+      return;
+    }
 
     this.setData({ submitting: true });
 
-    // 异步上传图片到云存储
-    this._uploadImages().then(uploadedImages => {
+    // 先上传图片，再等待投稿云函数明确确认；未确认不得提示“成功”。
+    this._uploadImages().catch(err => {
+      throw { stage: 'upload', cause: err };
+    }).then(uploadedImages => {
+      this.setData({
+        images: uploadedImages,
+        tempImages: uploadedImages.map(url => ({ url, path: url }))
+      });
       const postData = {
         id: this.data.editId,
         title: this.data.title.trim(),
@@ -267,14 +308,19 @@ onSubmit() {
         rating: this.data.rating,
         location: this.data.location.trim(),
         linkedContent: this.data.linkedContent,
-        isPublic: this.data.isPublic,
-        status: 'published'
+        isPublic: this.data.isPublic
       };
 
-      // 保存
-      ugc.savePost(postData);
+      return ugc.savePostConfirmed(postData).then(savedPost => ({
+        uploadedImages,
+        savedPost
+      }));
+    }).then(({ uploadedImages, savedPost }) => {
 
       // 清除草稿
+      this._submissionSucceeded = true;
+      this._hasUnconfirmedChanges = false;
+      ugc.clearRetryDraft(savedPost && savedPost.id || this.data.editId);
       if (!this.data.isEdit) {
         ugc.clearDraft();
       }
@@ -294,8 +340,15 @@ onSubmit() {
       this.setData({ submitting: false });
 
       wx.showToast({
-        title: this.data.isEdit ? '更新成功' : '投稿成功',
-        icon: 'success'
+        title: savedPost && savedPost.mediaCleanupPending
+          ? '内容已更新，旧图待清理'
+          : (savedPost && savedPost.status === 'pending'
+            ? '已提交审核'
+            : (this.data.isEdit ? '更新成功' : '投稿成功')),
+        icon: savedPost && (
+          savedPost.mediaCleanupPending ||
+          savedPost.status === 'pending'
+        ) ? 'none' : 'success'
       });
 
       setTimeout(() => {
@@ -303,12 +356,52 @@ onSubmit() {
       }, 1500);
     }).catch(err => {
       this.setData({ submitting: false });
-      console.error('[ugc] upload images failed', err);
-      wx.showToast({ title: '图片上传失败，请重试', icon: 'none' });
+      if (err && err.stage === 'upload') {
+        const cause = err.cause;
+        console.error('[ugc] upload images failed:', {
+          code: cause && (cause.errCode || cause.code || ''),
+          cleanupPending: cause && cause.cleanupPending,
+          cleanupFailedFileIds: cause && cause.cleanupFailedFileIds
+        });
+        const toastTitle = cause && cause.cleanupPending
+          ? '图片上传失败，部分文件待清理'
+          : '图片上传失败，请重试';
+        wx.showToast({ title: toastTitle, icon: 'none' });
+        return;
+      }
+
+      console.error('[ugc] cloud confirmation failed:', {
+        code: err && (err.code || err.errCode || ''),
+        serverBuild: err && err.serverBuild || ''
+      });
+      if (err && err.localPost && err.localPost.id) {
+        this.setData({
+          editId: err.localPost.id,
+          isEdit: true
+        });
+      }
+      this._hasUnconfirmedChanges = true;
+      ugc.saveRetryDraft(
+        this._draftPayload(),
+        err && err.staleScope ? 'scope_changed' : 'cloud_save_failed'
+      );
+      wx.showModal({
+        title: '云端尚未确认',
+        content: err && err.privacyStateUnchanged
+          ? '公开/私密状态没有完成变更，已保持原状态。请检查网络后重试。'
+          : '内容已保存在本机，但云端同步失败；当前不能视为投稿或更新成功，请稍后重试。',
+        showCancel: false,
+        confirmText: '知道了'
+      });
     });
   },
 
   // 上传图片到云存储
+  // 使用 Promise.allSettled 确保部分上传失败时不会产生孤儿云文件：
+  // - 仅回滚本次新上传成功的 File ID
+  // - 不删除原投稿已有图片
+  // - 逐 File ID 确认 deleteFile 状态
+  // - 清理不完整时保存可重试的 cleanup manifest
   _uploadImages() {
     const images = this.data.images || [];
     if (!images.length) return Promise.resolve([]);
@@ -319,8 +412,17 @@ onSubmit() {
 
     if (!needUpload.length) return Promise.resolve(alreadyUploaded);
 
+    const auth = require('../../utils/auth.js');
+    const userInfo = auth.getUserInfo();
+    const userScope = userInfo && typeof userInfo.id === 'string'
+      ? userInfo.id.trim().replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 100)
+      : '';
+    if (!userScope) {
+      return Promise.reject(new Error('账号尚未完成云端确认'));
+    }
+
     const uploadPromises = needUpload.map((filePath, index) => {
-      const cloudPath = `ugc/${Date.now()}_${index}_${Math.floor(Math.random() * 10000)}.jpg`;
+      const cloudPath = `ugc/${userScope}/${Date.now()}_${index}_${Math.floor(Math.random() * 1000000)}.jpg`;
       return new Promise((resolve, reject) => {
         wx.cloud.uploadFile({
           cloudPath,
@@ -331,8 +433,57 @@ onSubmit() {
       });
     });
 
-    return Promise.all(uploadPromises).then(cloudUrls => {
-      return [...alreadyUploaded, ...cloudUrls];
+    return Promise.allSettled(uploadPromises).then(results => {
+      const uploadedFileIds = [];
+      const failedIndexes = [];
+
+      results.forEach((result, index) => {
+        if (result.status === 'fulfilled') {
+          uploadedFileIds.push(result.value);
+        } else {
+          failedIndexes.push(index);
+        }
+      });
+
+      // 全部成功：返回合并结果
+      if (failedIndexes.length === 0) {
+        return [...alreadyUploaded, ...uploadedFileIds];
+      }
+
+      // 部分失败：必须回滚本次新上传的成功项，防止孤儿云文件
+      // alreadyUploaded（原投稿已有图片）绝不会被删除
+      if (uploadedFileIds.length === 0) {
+        const error = new Error('图片上传全部失败');
+        error.code = 'upload_all_failed';
+        error.failedCount = failedIndexes.length;
+        throw error;
+      }
+
+      // 逐 File ID 确认 deleteFile 状态
+      return ugc.deleteCloudFilesConfirmed(uploadedFileIds).then(cleanup => {
+        const cleanupFailed = cleanup.failed;
+
+        if (cleanupFailed.length > 0) {
+          // 清理不完整：保存可重试的 cleanup manifest
+          ugc.saveCleanupManifest({
+            fileIds: cleanupFailed,
+            reason: 'upload_partial_rollback_incomplete',
+            editId: this.data.editId || ''
+          });
+          console.warn('[ugc] 部分孤儿文件清理未完成，已保存 cleanup manifest', {
+            failedCount: cleanupFailed.length,
+            deletedCount: cleanup.deleted.length
+          });
+        }
+
+        const error = new Error('图片上传部分失败，已回滚已上传项');
+        error.code = 'upload_partial_failed';
+        error.uploadedThenDeleted = cleanup.deleted;
+        error.cleanupPending = cleanupFailed.length > 0;
+        error.cleanupFailedFileIds = cleanupFailed;
+        error.failedCount = failedIndexes.length;
+        throw error;
+      });
     });
   },
 

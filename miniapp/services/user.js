@@ -2,6 +2,14 @@
 // 改造：默认值去掉"林深"，保存时同步到云函数 updateProfile
 
 const STORAGE_KEY = 'user_info'
+const PROFILE_FIELDS = [
+  'nickname',
+  'avatarUrl',
+  'bio',
+  'gender',
+  'birthday',
+  'tags'
+]
 
 const DEFAULT_INFO = {
   nickname: '微信用户',
@@ -38,38 +46,115 @@ function _saveLocal(userInfo) {
   }
 }
 
-/**
- * 保存用户信息：先更新本地缓存，再异步同步到云端
- * @param {Object} userInfo - 用户信息
- * @returns {Promise<boolean>} 是否保存成功
- */
-function saveUserInfo(userInfo) {
-  // 本地立即保存
-  _saveLocal(userInfo)
+function _mergeProfile(base, patch) {
+  const merged = { ...DEFAULT_INFO, ...(base || {}) }
+  const source = patch && typeof patch === 'object' ? patch : {}
+  PROFILE_FIELDS.forEach(field => {
+    if (source[field] !== undefined) merged[field] = source[field]
+  })
+  if (typeof source.is_new === 'boolean') merged.is_new = source.is_new
+  return merged
+}
 
-  // 异步同步到云端
+function _cloudFailure(userInfo, message, code) {
+  const pendingUser = {
+    ...userInfo,
+    _profileSyncPending: true
+  }
+  _saveLocal(pendingUser)
+  return {
+    localSaved: true,
+    cloudSynced: false,
+    user: pendingUser,
+    code: code || 'cloud_sync_failed',
+    message: message || '资料已保存在本机，云端待同步'
+  }
+}
+
+/**
+ * 保存用户信息：以本地已验证 users._id 为身份锁，合并资料后再同步云端。
+ * 云端失败时保留带 id 的本地合并对象，并用 cloudSynced=false 明确返回。
+ * @param {Object} patch - 用户资料增量
+ * @returns {Promise<{localSaved:boolean, cloudSynced:boolean, user:Object}>}
+ */
+function saveUserInfo(patch) {
+  const current = getUserInfo()
+  const lockedUserId = typeof current.id === 'string' && current.id.trim()
+    ? current.id.trim()
+    : ''
+  if (!lockedUserId) {
+    const error = new Error('用户身份尚未完成云端确认')
+    error.code = 'identity_missing'
+    return Promise.reject(error)
+  }
+
+  const merged = {
+    ..._mergeProfile(current, patch),
+    // 调用方传入的 id 永远不能替换本地已验证 users._id。
+    id: lockedUserId,
+    _profileSyncPending: true
+  }
+  if (!_saveLocal(merged)) {
+    const error = new Error('资料无法保存到本机')
+    error.code = 'local_save_failed'
+    return Promise.reject(error)
+  }
+
   return new Promise((resolve) => {
     wx.cloud.callFunction({
       name: 'updateProfile',
       data: {
-        nickname: userInfo.nickname,
-        avatarUrl: userInfo.avatarUrl,
-        bio: userInfo.bio,
-        gender: userInfo.gender,
-        birthday: userInfo.birthday,
-        tags: userInfo.tags
+        nickname: merged.nickname,
+        avatarUrl: merged.avatarUrl,
+        bio: merged.bio,
+        gender: merged.gender,
+        birthday: merged.birthday,
+        tags: merged.tags
       },
       success: (res) => {
         const result = res.result || {}
         if (result.code === 0 && result.user) {
-          // 用云端返回的最新数据更新本地
-          _saveLocal(result.user)
+          if (
+            result.user.id !== undefined &&
+            result.user.id !== lockedUserId
+          ) {
+            resolve(_cloudFailure(
+              merged,
+              '云端返回的用户身份不一致，资料仅保存在本机',
+              'identity_mismatch'
+            ))
+            return
+          }
+          const confirmedUser = {
+            ..._mergeProfile(merged, result.user),
+            id: lockedUserId,
+            _profileSyncPending: false
+          }
+          _saveLocal(confirmedUser)
+          resolve({
+            localSaved: true,
+            cloudSynced: true,
+            user: confirmedUser,
+            code: 0,
+            message: '资料已同步'
+          })
+          return
         }
-        resolve(true)
+        resolve(_cloudFailure(
+          merged,
+          result.message || '云端更新失败',
+          result.code || 'cloud_rejected'
+        ))
       },
       fail: (err) => {
-        console.warn('[user] cloud sync failed, local saved:', err)
-        resolve(true) // 本地已保存，云端失败不影响
+        console.warn('[user] cloud sync pending:', {
+          code: err && (err.errCode || err.code || '')
+        })
+        resolve(_cloudFailure(
+          merged,
+          '网络或云函数不可用，资料仅保存在本机',
+          (err && (err.errCode || err.code)) || 'cloud_unavailable'
+        ))
       }
     })
   })
@@ -80,7 +165,8 @@ function saveUserInfo(userInfo) {
  */
 function updateUserInfo(patch) {
   const current = getUserInfo()
-  const updated = { ...current, ...patch }
+  const updated = _mergeProfile(current, patch)
+  if (current.id) updated.id = current.id
   _saveLocal(updated)
   return updated
 }

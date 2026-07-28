@@ -11,13 +11,23 @@ const CLOUD_SYNC_FLAG = 'study_progress_cloud_synced'; // 云同步标记
 
 function _isLoggedIn() {
   try {
-    const store = require('../store/index.js')
-    const state = store.getState()
-    if (state && typeof state.isLoggedIn !== 'undefined') {
-      return state.isLoggedIn
-    }
-    const auth = require('../utils/auth.js')
-    return auth.isLoggedIn()
+    return !!require('./account-scope.js').captureActiveScope()
+  } catch (e) {
+    return false
+  }
+}
+
+function _captureScope() {
+  try {
+    return require('./account-scope.js').captureActiveScope()
+  } catch (e) {
+    return null
+  }
+}
+
+function _isScopeCurrent(scope) {
+  try {
+    return require('./account-scope.js').isActiveScope(scope)
   } catch (e) {
     return false
   }
@@ -363,9 +373,13 @@ function getWrongStats() {
  * 合并策略：云端记录与本地记录取较新的一方
  */
 function syncFromCloud() {
-  if (!_isLoggedIn()) return Promise.resolve({ synced: false })
+  const scope = _captureScope()
+  if (!scope) return Promise.resolve({ synced: false })
 
   return _callCloud({ action: 'get' }).then(res => {
+    if (!_isScopeCurrent(scope)) {
+      return { synced: false, reason: 'account_scope_changed' }
+    }
     if (res.code !== 0 || !res.has_data) {
       return { synced: false, reason: 'no_cloud_data' }
     }
@@ -415,13 +429,17 @@ function syncFromCloud() {
  * 将本地全部进度推送到云端（全量覆盖）
  */
 function syncToCloud() {
-  if (!_isLoggedIn()) return Promise.resolve({ synced: false })
+  const scope = _captureScope()
+  if (!scope) return Promise.resolve({ synced: false })
 
   return _callCloud({
     action: 'sync',
     progress: readMap(),
     wrongBook: readWrongBook()
   }).then(res => {
+    if (!_isScopeCurrent(scope)) {
+      return { synced: false, reason: 'account_scope_changed' }
+    }
     if (res.code === 0) {
       try { wx.setStorageSync(CLOUD_SYNC_FLAG, true) } catch (e) {}
     }

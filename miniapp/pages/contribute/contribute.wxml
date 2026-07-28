@@ -154,7 +154,7 @@
     <view class="visibility-toggle">
       <view class="visibility-option {{isPublic ? 'visibility-option--active' : ''}}" data-public="true" bindtap="onVisibilityChange">
         <text>🌐 公开</text>
-        <text class="visibility-option__desc">显示在风雅社区</text>
+        <text class="visibility-option__desc">提交审核，通过后显示在风雅社区</text>
       </view>
       <view class="visibility-option {{!isPublic ? 'visibility-option--active' : ''}}" data-public="false" bindtap="onVisibilityChange">
         <text>🔒 私密</text>
@@ -166,7 +166,7 @@
   <!-- 底部操作 -->
   <view class="contribute-footer">
     <button class="footer-btn footer-btn--draft" bindtap="onSaveDraft">保存草稿</button>
-    <button class="footer-btn footer-btn--submit" bindtap="onSubmit" loading="{{submitting}}">
+    <button class="footer-btn footer-btn--submit" bindtap="onSubmit" loading="{{submitting}}" disabled="{{submitting}}">
       {{isEdit ? '更新投稿' : '发布投稿'}}
     </button>
   </view>

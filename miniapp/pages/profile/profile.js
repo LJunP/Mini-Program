@@ -7,6 +7,7 @@ const subscribe = require('../../utils/subscribe.js');
 const subscribeConfig = require('../../utils/subscribe-config.js');
 const tracker = require('../../utils/tracker.js');
 const pointsUtil = require('../../utils/points.js');
+const accountScope = require('../../utils/account-scope.js');
 
 const DOMAIN_COLORS = {
   incense: '#8B6F47',
@@ -29,6 +30,7 @@ Page({
     collectionCount: 0,
     // 签到相关
     signedToday: false,
+    signSubmitting: false,
     signDays: 0,
     signDates: [],
     // 最近浏览
@@ -115,16 +117,16 @@ Page({
   _loadSignDataWithState(isLoggedIn) {
     if (!isLoggedIn) {
       // 未登录时不重置签到数据（避免覆盖已签到状态），仅跳过云端查询
-      console.log('[profile] _loadSignDataWithState skipped: not logged in')
       return;
     }
-    console.log('[profile] _loadSignDataWithState: calling getRecords')
-    wx.cloud.callFunction({
+    const accountContext = accountScope.getActiveUserId();
+    if (!accountContext) return;
+    return wx.cloud.callFunction({
       name: 'sign',
       data: { action: 'getRecords' }
     }).then(res => {
+      if (accountScope.getActiveUserId() !== accountContext) return;
       const result = res.result || {};
-      console.log('[profile] getRecords response:', JSON.stringify(result))
       if (result.code === 0) {
         const signDates = this._buildSignDates(result.records || []);
         this.setData({
@@ -134,7 +136,10 @@ Page({
         });
       }
     }).catch(err => {
-      console.warn('[profile] load sign data failed:', err);
+      if (accountScope.getActiveUserId() !== accountContext) return;
+      console.warn('[profile] load sign data failed:', {
+        code: err && (err.code || err.errCode || '')
+      });
     });
   },
 
@@ -291,6 +296,7 @@ Page({
           wx.hideLoading();
           wx.showToast({ title: '登录成功', icon: 'success' });
           this._refreshPageData();
+          this._syncCloudAssetsAfterLogin();
 
           // 延迟后引导去设置昵称
           setTimeout(() => {
@@ -311,7 +317,9 @@ Page({
     }).catch(err => {
       wx.hideLoading();
       wx.showToast({ title: '登录失败', icon: 'none' });
-      console.warn('[profile] login failed', err);
+      console.warn('[profile] login failed:', {
+        code: err && (err.code || err.errCode || '')
+      });
     });
   },
 
@@ -344,7 +352,9 @@ Page({
     }).catch(err => {
       wx.hideLoading();
       wx.showToast({ title: '登录失败', icon: 'none' });
-      console.warn('[profile] login failed', err);
+      console.warn('[profile] login failed:', {
+        code: err && (err.code || err.errCode || '')
+      });
     });
   },
 
@@ -356,6 +366,8 @@ Page({
     wx.hideLoading();
     wx.showToast({ title: '登录成功', icon: 'success' });
     this._refreshPageData();
+
+    this._syncCloudAssetsAfterLogin();
 
     // 如果是新用户，引导前往资料编辑页
     if (user.is_new) {
@@ -369,6 +381,19 @@ Page({
           }
         }
       });
+    }
+  },
+
+  _syncCloudAssetsAfterLogin() {
+    // 启动登录失败后在个人页补登录，也必须同步偏好、通知、学习进度和 UGC。
+    try {
+      const app = getApp();
+      if (app && typeof app.syncCloudAssets === 'function') {
+        app.syncCloudAssets();
+        setTimeout(() => this._refreshPageData(), 1000);
+      }
+    } catch (err) {
+      console.warn('[profile] cloud asset sync unavailable');
     }
   },
 
@@ -416,9 +441,38 @@ Page({
             success: (modalRes) => {
               if (modalRes.confirm) {
                 const auth = require('../../utils/auth.js');
-                auth.logout();
-                store.logout();
-                wx.showToast({ title: '已注销', icon: 'success' });
+                try {
+                  auth.logout();
+                  store.logout();
+                  this.setData({
+                    signedToday: false,
+                    signSubmitting: false,
+                    signDays: 0,
+                    signDates: this._buildSignDates([]),
+                    recentBrowse: [],
+                    studyStats: {
+                      pendingCount: 0,
+                      learningCount: 0,
+                      masteredCount: 0,
+                      weakCount: 0,
+                      reviewCount: 0
+                    },
+                    ugcCount: 0,
+                    subscribeStatus: {
+                      DAILY_RECOMMEND: false,
+                      SIGN_REMIND: false,
+                      CONTENT_UPDATE: false,
+                      ACTIVITY_REMIND: false
+                    },
+                    subscribeEnabledCount: 0
+                  });
+                  wx.showToast({ title: '已注销', icon: 'success' });
+                } catch (err) {
+                  wx.showToast({
+                    title: '本地数据保存失败，请重试',
+                    icon: 'none'
+                  });
+                }
               }
             }
           });
@@ -429,6 +483,7 @@ Page({
 
   // 安全清除缓存：保留收藏、签到、浏览历史等核心数据
   _safeClearCache() {
+    const accountScope = require('../../utils/account-scope.js');
     // 需要保留的 key 前缀列表
     const preservePrefixes = [
       'fengya_collections',
@@ -445,6 +500,10 @@ Page({
       'notes_',
       'ugc_posts',
       'ugc_draft',
+      'ugc_conflicts',
+      'account_snapshot:',
+      'user_info',
+      'cloud_login_token',
       'user_id'
     ];
 
@@ -452,7 +511,9 @@ Page({
     const preservedData = {};
     const info = wx.getStorageInfoSync();
     (info.keys || []).forEach(key => {
-      const shouldPreserve = preservePrefixes.some(prefix => key === prefix || key.startsWith(prefix));
+      const shouldPreserve =
+        accountScope.isPersonalKey(key) ||
+        preservePrefixes.some(prefix => key === prefix || key.startsWith(prefix));
       if (shouldPreserve) {
         try {
           preservedData[key] = wx.getStorageSync(key);
@@ -574,7 +635,7 @@ Page({
   showFeedback() {
     wx.showModal({
       title: '意见反馈',
-      content: '感谢您的使用！如有任何建议或问题，请通过以下方式联系我们：\n\n邮箱：feedback@miaobukeyuan.com\n微信公众号：妙不可园',
+      content: '请点击小程序右上角“…”并选择“反馈与投诉”提交问题。正式发布前，运营主体还需在隐私保护指引中补充并核验可处理数据权利请求的联系渠道。',
       showCancel: false,
       confirmText: '我知道了'
     });
@@ -725,25 +786,7 @@ Page({
   // ====== 每日签到 ======
   // 计算签到数据（从云函数获取，异步）
   _loadSignData() {
-    if (!store.getState().isLoggedIn) {
-      return;
-    }
-    wx.cloud.callFunction({
-      name: 'sign',
-      data: { action: 'getRecords' }
-    }).then(res => {
-      const result = res.result || {};
-      if (result.code === 0) {
-        const signDates = this._buildSignDates(result.records || []);
-        this.setData({
-          signedToday: result.signedToday,
-          signDays: result.signDays || 0,
-          signDates
-        });
-      }
-    }).catch(err => {
-      console.warn('[profile] load sign data failed:', err);
-    });
+    return this._loadSignDataWithState(store.getState().isLoggedIn);
   },
 
   // 根据签到记录构建最近7天日历
@@ -769,6 +812,9 @@ Page({
   },
 
   onSignTap() {
+    if (this.data.signSubmitting) {
+      return;
+    }
     if (this.data.signedToday) {
       wx.showToast({ title: '今日已签到', icon: 'none' });
       return;
@@ -777,19 +823,32 @@ Page({
       this.onLoginTap();
       return;
     }
-    console.log('[profile] onSignTap: starting sign flow')
+    const accountContext = accountScope.getActiveUserId();
+    if (!accountContext) {
+      wx.showToast({ title: '账号正在切换，请稍后重试', icon: 'none' });
+      return;
+    }
+    let loadingShown = false;
+    this.setData({ signSubmitting: true });
     // 关键：wx.requestSubscribeMessage 必须在 TAP 同步调用栈中执行
-    subscribe.subscribeByScene('sign').then((subResult) => {
-      console.log('[profile] subscribe resolved:', JSON.stringify(subResult))
+    return subscribe.subscribeByScene('sign').then(() => {
+      if (accountScope.getActiveUserId() !== accountContext) {
+        const staleError = new Error('账号已切换');
+        staleError.code = 'stale_account_context';
+        throw staleError;
+      }
       wx.showLoading({ title: '签到中...' });
+      loadingShown = true;
       return wx.cloud.callFunction({
         name: 'sign',
         data: { action: 'sign' }
       });
     }).then(res => {
+      if (accountScope.getActiveUserId() !== accountContext) return;
       wx.hideLoading();
+      loadingShown = false;
       const result = (res && res.result) || {};
-      console.log('[profile] sign cloud function response:', JSON.stringify(result))
+      this.setData({ signSubmitting: false });
       if (result.code === 0) {
         const signDates = this._buildSignDates(result.records || []);
         this.setData({
@@ -797,19 +856,35 @@ Page({
           signDays: result.signDays || 1,
           signDates
         });
-        tracker.track('sign', { event_params: { sign_days: result.signDays || 1 } });
-        // 积分签到
-        const earnedPoints = pointsUtil.onSignIn(result.signDays || 1);
-        wx.showToast({ title: `签到成功 +${earnedPoints}积分`, icon: 'none' });
-        // 刷新积分与徽章
-        this._renderStore();
+        if (result.alreadySigned === false) {
+          tracker.track('sign', { event_params: { sign_days: result.signDays || 1 } });
+          const earnedPoints = pointsUtil.onSignIn(result.signDays || 1);
+          wx.showToast({ title: `签到成功 +${earnedPoints}积分`, icon: 'none' });
+          this._renderStore();
+        } else {
+          wx.showToast({
+            title: result.alreadySigned === true ? '今日已签到' : '签到状态已同步',
+            icon: 'none'
+          });
+        }
       } else {
-        console.warn('[profile] sign cloud function returned error:', result)
+        console.warn('[profile] sign rejected:', {
+          code: result.code || ''
+        });
         wx.showToast({ title: result.message || '签到失败', icon: 'none' });
       }
     }).catch(err => {
-      wx.hideLoading();
-      console.warn('[profile] sign flow failed:', err);
+      if (
+        (err && err.code === 'stale_account_context') ||
+        accountScope.getActiveUserId() !== accountContext
+      ) {
+        return;
+      }
+      if (loadingShown) wx.hideLoading();
+      this.setData({ signSubmitting: false });
+      console.warn('[profile] sign flow failed:', {
+        code: err && (err.code || err.errCode || '')
+      });
       wx.showToast({ title: '签到失败，请重试', icon: 'none' });
     });
   },
