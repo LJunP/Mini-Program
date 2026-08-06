@@ -2,7 +2,7 @@
 <view class="page-bg">
   <view class="container">
     <view class="title">用户协议</view>
-    <view class="update-date">更新日期：2026年7月1日</view>
+    <view class="update-date">更新日期：2026年8月6日</view>
 
     <view class="section">
       <view class="section-title">一、服务条款</view>
@@ -72,8 +72,7 @@
       <view class="section-title">九、联系我们</view>
       <view class="section-content">
         如果您对本用户协议有任何疑问，请通过以下方式联系我们：
-        <view class="contact">邮箱：support@miaobukeyuan.com</view>
-        <view class="contact">微信公众号：妙不可园</view>
+        <view class="contact">邮箱：480047915@qq.com</view>
       </view>
     </view>
   </view>
