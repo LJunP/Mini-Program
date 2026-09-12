@@ -1,8 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const tutorialsPath = '/Users/lijunpeng/Desktop/workbuddy_project/miniapp/data/study/tutorials.js';
-const knowledgePath = '/Users/lijunpeng/Desktop/workbuddy_project/miniapp/data/study/knowledge.js';
+const tutorialsPath = require('path').resolve(__dirname, '../../miniapp/data/study/tutorials.js');
+const knowledgePath = require('path').resolve(__dirname, '../../miniapp/data/study/knowledge.js');
 
 console.log('=== 开始执行教程与科普 36 篇精品深邃长文生成器 (对齐 18x18 黄金矩阵) ===');
 

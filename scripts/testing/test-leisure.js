@@ -18,7 +18,7 @@ global.wx = {
   getStorageInfoSync: () => ({ keys: [] })
 }
 
-const mock = require('/Users/lijunpeng/Desktop/workbuddy_project/miniapp/utils/mock.js')
+const mock = require(require('path').resolve(__dirname, '../../miniapp/utils/mock.js'))
 
 console.log('=== 休闲模式数据集成验证 ===\n');
 
@@ -116,7 +116,7 @@ try {
     assert(!forbiddenHeadings.test(text), `${item.id} 仍包含未经核验的模板扩写`)
   })
 
-  const seasonal = require('/Users/lijunpeng/Desktop/workbuddy_project/miniapp/utils/seasonal.js')
+  const seasonal = require(require('path').resolve(__dirname, '../../miniapp/utils/seasonal.js'))
   const seasonalText = collectStrings([
     seasonal.SEASONS,
     seasonal.SEASONAL_CONTENT
@@ -140,25 +140,25 @@ try {
   )
 
   const detailTemplate = require('fs').readFileSync(
-    '/Users/lijunpeng/Desktop/workbuddy_project/miniapp/subpackages/detail/content-detail/content-detail.wxml',
+    require('path').resolve(__dirname, '../../miniapp/subpackages/detail/content-detail/content-detail.wxml'),
     'utf8'
   )
   assert(detailTemplate.includes('本页为一般生活方式信息'))
   assert(detailTemplate.includes('本页介绍香材文化与嗅觉体验'))
 
   const teaCardTemplate = require('fs').readFileSync(
-    '/Users/lijunpeng/Desktop/workbuddy_project/miniapp/components/tea-card/tea-card.wxml',
+    require('path').resolve(__dirname, '../../miniapp/components/tea-card/tea-card.wxml'),
     'utf8'
   )
   assert(teaCardTemplate.includes("tea.ratingSource === 'verified'"))
 
   const teaServiceSource = require('fs').readFileSync(
-    '/Users/lijunpeng/Desktop/workbuddy_project/miniapp/services/tea.js',
+    require('path').resolve(__dirname, '../../miniapp/services/tea.js'),
     'utf8'
   )
   assert(teaServiceSource.includes('mockHandler: () => []'))
 
-  const ugc = require('/Users/lijunpeng/Desktop/workbuddy_project/miniapp/utils/ugc.js')
+  const ugc = require(require('path').resolve(__dirname, '../../miniapp/utils/ugc.js'))
   assert(
     ugc.getCommunityFeed().every(post => !String(post.id).startsWith('mock_')),
     '模拟投稿不得进入用户可见社区 Feed'

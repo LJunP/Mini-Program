@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const dataStorePath = '/Users/lijunpeng/Desktop/workbuddy_project/miniapp/utils/data-store.js';
+const dataStorePath = require('path').resolve(__dirname, '../../miniapp/utils/data-store.js');
 
 console.log('=== 开始执行休闲模式 116 条数据全量「美学金牌打磨」引擎 (第 2 版，精确字段注入) ===');
 

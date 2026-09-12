@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const rootDir = '/Users/lijunpeng/Desktop/workbuddy_project';
+const rootDir = require('path').resolve(__dirname, '../..');
 const srcBaseDir = path.join(rootDir, '小程序图片');
 const destBaseDir = path.join(rootDir, 'miniapp/assets/images');
 const dataStorePath = path.join(rootDir, 'miniapp/utils/data-store.js');

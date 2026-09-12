@@ -1280,7 +1280,7 @@ const questions = ${JSON.stringify(segment1.concat(segment2), null, 2)};
 module.exports = questions;
 `;
 
-const outputPath = '/Users/lijunpeng/Desktop/workbuddy_project/miniapp/data/study/topics/interview-docker_k8s.js';
+const outputPath = require('path').resolve(__dirname, '../../miniapp/data/study/topics/interview-docker_k8s.js');
 fs.writeFileSync(outputPath, fileContent, 'utf8');
 console.log('Successfully generated interview-docker_k8s.js with all 50 questions!');
 

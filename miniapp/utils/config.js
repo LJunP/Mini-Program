@@ -14,21 +14,21 @@ try {
 const ENV_CONFIGS = {
   [ENV_DEV]: {
     apiBaseUrl: '', // 预留：后端就绪后填写
-    cdnBaseUrl: (localEnv && localEnv.cdnBaseUrl) ? localEnv.cdnBaseUrl : 'https://gitee.com/LJunP/workbuddy-assets/raw/main/',
+    cdnBaseUrl: (localEnv && localEnv.cdnBaseUrl) ? localEnv.cdnBaseUrl : 'https://gitee.com/LJunP/Mini-Program-data/raw/main/',
     uploadUrl: '', // 预留
     enableLog: true,
     enableMock: true
   },
   [ENV_STAGING]: {
     apiBaseUrl: '', // 预留
-    cdnBaseUrl: 'https://gitee.com/LJunP/workbuddy-assets/raw/main/',
+    cdnBaseUrl: 'https://gitee.com/LJunP/Mini-Program-data/raw/main/',
     uploadUrl: '', // 预留
     enableLog: true,
     enableMock: true
   },
   [ENV_PROD]: {
     apiBaseUrl: '', // 预留
-    cdnBaseUrl: 'https://gitee.com/LJunP/workbuddy-assets/raw/main/',
+    cdnBaseUrl: 'https://gitee.com/LJunP/Mini-Program-data/raw/main/',
     uploadUrl: '', // 预留
     enableLog: false,
     enableMock: true

@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const targetFile = '/Users/lijunpeng/Desktop/workbuddy_project/miniapp/data/study/topics/interview-database.js';
+const targetFile = require('path').resolve(__dirname, '../../miniapp/data/study/topics/interview-database.js');
 const questions = require(targetFile);
 
 console.log('=== 开始修复数据库面试题中的 structured 字段 ===');

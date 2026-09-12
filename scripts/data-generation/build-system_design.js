@@ -29,6 +29,6 @@ for (let i = 1; i <= 50; i++) {
 
 const fileContent = `// interview-system_design.js\n// 自动生成主题题库：系统设计 (归属于 backend)\n\nconst questions = ${JSON.stringify(segment, null, 2)};\n\nmodule.exports = questions;`;
 
-const outputPath = '/Users/lijunpeng/Desktop/workbuddy_project/miniapp/data/study/topics/interview-system_design.js';
+const outputPath = require('path').resolve(__dirname, '../../miniapp/data/study/topics/interview-system_design.js');
 fs.writeFileSync(outputPath, fileContent, 'utf8');
 console.log('Successfully generated interview-system_design.js with 50 questions!');

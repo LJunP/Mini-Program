@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const workspaceDir = '/Users/lijunpeng/Desktop/workbuddy_project';
+const workspaceDir = require('path').resolve(__dirname, '../..');
 
 const topicsBackupDir = path.join(workspaceDir, 'data/cdn_backup/study/topics');
 const studyBackupDir = path.join(workspaceDir, 'data/cdn_backup/study');

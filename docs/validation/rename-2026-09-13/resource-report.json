@@ -1,0 +1,55 @@
+{
+  "batches": [
+    {
+      "code": 0,
+      "count": 50,
+      "failed": []
+    },
+    {
+      "code": 0,
+      "count": 50,
+      "failed": []
+    },
+    {
+      "code": 0,
+      "count": 19,
+      "failed": []
+    }
+  ],
+  "downloads": [
+    {
+      "kind": "image",
+      "width": 750,
+      "height": 560
+    },
+    {
+      "kind": "audio",
+      "status": 200
+    }
+  ],
+  "recheckedPages": [
+    {
+      "route": "pages/tea/tea",
+      "loading": false,
+      "listCount": 20,
+      "detail": false,
+      "hasAudio": false
+    },
+    {
+      "route": "pages/travel/travel",
+      "loading": false,
+      "listCount": 6,
+      "detail": false,
+      "hasAudio": false
+    },
+    {
+      "route": "subpackages/detail/content-detail/content-detail",
+      "detail": true,
+      "hasAudio": true
+    }
+  ],
+  "gitee": {
+    "status": 200,
+    "isReadme": true
+  }
+}

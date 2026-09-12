@@ -18,9 +18,15 @@ Page({
     this._loadHistory();
   },
 
+  onUnload() {
+    this._historyLoadId = (this._historyLoadId || 0) + 1;
+  },
+
   // 加载历史记录
-  _loadHistory() {
-    const historyList = historyService.getHistoryList();
+  async _loadHistory() {
+    const loadId = this._historyLoadId = (this._historyLoadId || 0) + 1;
+    const historyList = await historyService.getHistoryList();
+    if (loadId !== this._historyLoadId) return;
     const totalCount = historyList.length;
     
     // 为每条记录生成唯一键

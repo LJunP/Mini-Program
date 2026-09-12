@@ -1312,6 +1312,6 @@ const questions = ${JSON.stringify(questions, null, 2)};
 module.exports = questions;
 `;
 
-const outputPath = '/Users/lijunpeng/Desktop/workbuddy_project/miniapp/data/study/topics/interview-vue.js';
+const outputPath = require('path').resolve(__dirname, '../../miniapp/data/study/topics/interview-vue.js');
 fs.writeFileSync(outputPath, fileContent, 'utf8');
 console.log('Successfully generated interview-vue.js with all 50 questions!');

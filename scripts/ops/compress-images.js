@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-const rootDir = '/Users/lijunpeng/Desktop/workbuddy_project';
+const rootDir = require('path').resolve(__dirname, '../..');
 const miniappImagesDir = path.join(rootDir, 'miniapp/assets/images');
 const dataStorePath = path.join(rootDir, 'miniapp/utils/data-store.js');
 

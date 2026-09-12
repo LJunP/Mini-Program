@@ -1,8 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const topicsDir = '/Users/lijunpeng/Desktop/workbuddy_project/miniapp/data/study/topics';
-const backupDir = '/Users/lijunpeng/Desktop/workbuddy_project/data/cdn_backup/study/topics_original';
+const topicsDir = require('path').resolve(__dirname, '../../miniapp/data/study/topics');
+const backupDir = require('path').resolve(__dirname, '../../data/cdn_backup/study/topics_original');
 
 console.log('=== 开始执行 901 道面试题全量「金牌干货化打磨」引擎 (第 2 版，精确字段注入) ===');
 

@@ -1,14 +1,14 @@
 const fs = require('fs');
 const path = require('path');
 
-const srcDir = '/Users/lijunpeng/Desktop/workbuddy_project/data/cdn_backup/assets/images';
-const destDir = '/Users/lijunpeng/Desktop/workbuddy_project/miniapp/assets/images';
+const srcDir = require('path').resolve(__dirname, '../../data/cdn_backup/assets/images');
+const destDir = require('path').resolve(__dirname, '../../miniapp/assets/images');
 
-const topicsBackupDir = '/Users/lijunpeng/Desktop/workbuddy_project/data/cdn_backup/study/topics';
-const topicsDir = '/Users/lijunpeng/Desktop/workbuddy_project/miniapp/data/study/topics';
+const topicsBackupDir = require('path').resolve(__dirname, '../../data/cdn_backup/study/topics');
+const topicsDir = require('path').resolve(__dirname, '../../miniapp/data/study/topics');
 
-const studyBackupDir = '/Users/lijunpeng/Desktop/workbuddy_project/data/cdn_backup/study';
-const studyDir = '/Users/lijunpeng/Desktop/workbuddy_project/miniapp/data/study';
+const studyBackupDir = require('path').resolve(__dirname, '../../data/cdn_backup/study');
+const studyDir = require('path').resolve(__dirname, '../../miniapp/data/study');
 
 console.log('=== 开始执行开发环境图片、题库与文章资源全量还原脚本 ===');
 
@@ -41,7 +41,7 @@ function restoreImages(currentSrc, currentDest) {
 
 // 恢复完整题库
 function restoreTopics() {
-  const masterDbPath = '/Users/lijunpeng/Desktop/workbuddy_project/data/study_data.json';
+  const masterDbPath = require('path').resolve(__dirname, '../../data/study_data.json');
   if (!fs.existsSync(masterDbPath)) {
     console.error('❌ 错误: 未能找到 master 数据文件 data/study_data.json！');
     return;
@@ -70,7 +70,7 @@ module.exports = questions;
 
 // 恢复完整文章
 function restoreArticles() {
-  const masterDbPath = '/Users/lijunpeng/Desktop/workbuddy_project/data/study_data.json';
+  const masterDbPath = require('path').resolve(__dirname, '../../data/study_data.json');
   if (!fs.existsSync(masterDbPath)) return;
 
   console.log('\n正在从 study_data.json 还原教程与知识科普完整版数据...');

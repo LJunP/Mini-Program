@@ -57,7 +57,7 @@ scripts/
 
 **运行方式**：
 ```bash
-cd /Users/lijunpeng/Desktop/workbuddy_project
+cd /Users/lijunpeng/Desktop/open_source_project/Mini-Program
 node scripts/data-generation/build-algorithms.js
 ```
 
@@ -77,6 +77,6 @@ node scripts/data-generation/build-algorithms.js
 
 ## 注意事项
 
-1. 所有脚本中的路径均为**绝对路径**（`/Users/lijunpeng/Desktop/workbuddy_project`），迁移到其他环境时需要修改路径。
+1. 脚本以自身位置定位项目根目录，重命名或移动整个项目后无需修改脚本路径。
 2. `prepare-release.js` 和 `restore-dev.js` 是一对互逆操作，分别用于提审瘦身和开发还原。
 3. 数据生成脚本是一次性使用的，生成的数据已持久化到 `miniapp/data/study/` 和 `data/study_data.json` 中。

@@ -665,7 +665,7 @@ const questions = ${JSON.stringify(all, null, 2)};
 module.exports = questions;
 `;
 
-const outputPath = '/Users/lijunpeng/Desktop/workbuddy_project/miniapp/data/study/topics/interview-git_cicd.js';
+const outputPath = require('path').resolve(__dirname, '../../miniapp/data/study/topics/interview-git_cicd.js');
 fs.writeFileSync(outputPath, fileContent, 'utf8');
 console.log('Successfully generated interview-git_cicd.js with ' + all.length + ' questions!');
 

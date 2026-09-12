@@ -1,14 +1,14 @@
 const fs = require('fs');
 const path = require('path');
 
-const srcDir = '/Users/lijunpeng/Desktop/workbuddy_project/miniapp/assets/images';
-const destDir = '/Users/lijunpeng/Desktop/workbuddy_project/data/cdn_backup/assets/images';
+const srcDir = require('path').resolve(__dirname, '../../miniapp/assets/images');
+const destDir = require('path').resolve(__dirname, '../../data/cdn_backup/assets/images');
 
-const topicsDir = '/Users/lijunpeng/Desktop/workbuddy_project/miniapp/data/study/topics';
-const topicsBackupDir = '/Users/lijunpeng/Desktop/workbuddy_project/data/cdn_backup/study/topics';
+const topicsDir = require('path').resolve(__dirname, '../../miniapp/data/study/topics');
+const topicsBackupDir = require('path').resolve(__dirname, '../../data/cdn_backup/study/topics');
 
-const studyDir = '/Users/lijunpeng/Desktop/workbuddy_project/miniapp/data/study';
-const studyBackupDir = '/Users/lijunpeng/Desktop/workbuddy_project/data/cdn_backup/study';
+const studyDir = require('path').resolve(__dirname, '../../miniapp/data/study');
+const studyBackupDir = require('path').resolve(__dirname, '../../data/cdn_backup/study');
 
 console.log('=== 开始执行上线前大图、题库与文章全量超限瘦身脚本 ===');
 

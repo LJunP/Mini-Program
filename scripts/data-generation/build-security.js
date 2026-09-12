@@ -30,6 +30,6 @@ for (let i = 1; i <= 50; i++) {
 const fileContent = `// interview-security.js
 // 自动生成主题题库：安全 (归属于 backend)\n\nconst questions = ${JSON.stringify(segment, null, 2)};\n\nmodule.exports = questions;`;
 
-const outputPath = '/Users/lijunpeng/Desktop/workbuddy_project/miniapp/data/study/topics/interview-security.js';
+const outputPath = require('path').resolve(__dirname, '../../miniapp/data/study/topics/interview-security.js');
 fs.writeFileSync(outputPath, fileContent, 'utf8');
 console.log('Successfully generated interview-security.js with 50 questions!');

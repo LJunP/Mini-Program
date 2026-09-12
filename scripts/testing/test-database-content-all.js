@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const topicsDir = '/Users/lijunpeng/Desktop/workbuddy_project/miniapp/data/study/topics';
+const topicsDir = require('path').resolve(__dirname, '../../miniapp/data/study/topics');
 const files = fs.readdirSync(topicsDir).filter(f => f.endsWith('.js'));
 
 console.log('=== 全量面试题自动化质检 ===\n');

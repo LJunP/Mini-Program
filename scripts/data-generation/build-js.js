@@ -1313,6 +1313,6 @@ const segment2 = [
 const finalList = questions.concat(segment1).concat(segment2);
 const fileContent = '// interview-javascript.js\n// 自动生成主题题库：JavaScript (归属于 frontend)\n\nconst questions = ' + JSON.stringify(finalList, null, 2) + ';\n\nmodule.exports = questions;\n';
 
-const outputPath = '/Users/lijunpeng/Desktop/workbuddy_project/miniapp/data/study/topics/interview-javascript.js';
+const outputPath = require('path').resolve(__dirname, '../../miniapp/data/study/topics/interview-javascript.js');
 fs.writeFileSync(outputPath, fileContent, 'utf8');
 console.log('Successfully generated interview-javascript.js with all 50 questions!');

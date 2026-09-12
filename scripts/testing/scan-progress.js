@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const rootDir = '/Users/lijunpeng/Desktop/workbuddy_project';
+const rootDir = require('path').resolve(__dirname, '../..');
 const miniappDir = path.join(rootDir, 'miniapp');
 const dataDir = path.join(rootDir, 'data');
 

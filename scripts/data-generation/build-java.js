@@ -1299,7 +1299,7 @@ const questions = ${JSON.stringify(originalQuestions.concat(segment1).concat(seg
 module.exports = questions;
 `;
 
-const outputPath = '/Users/lijunpeng/Desktop/workbuddy_project/miniapp/data/study/topics/interview-java.js';
+const outputPath = require('path').resolve(__dirname, '../../miniapp/data/study/topics/interview-java.js');
 fs.writeFileSync(outputPath, fileContent, 'utf8');
 console.log('Successfully generated interview-java.js with all 50 questions!');
 

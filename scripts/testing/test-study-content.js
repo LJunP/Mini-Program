@@ -1,5 +1,5 @@
-const tutorials = require('/Users/lijunpeng/Desktop/workbuddy_project/miniapp/data/study/tutorials.js');
-const knowledge = require('/Users/lijunpeng/Desktop/workbuddy_project/miniapp/data/study/knowledge.js');
+const tutorials = require(require('path').resolve(__dirname, '../../miniapp/data/study/tutorials.js'));
+const knowledge = require(require('path').resolve(__dirname, '../../miniapp/data/study/knowledge.js'));
 
 console.log('=== 教程与知识科普数据全量自动化质检 ===\n');
 

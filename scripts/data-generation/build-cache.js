@@ -1328,7 +1328,7 @@ const questions = ${JSON.stringify(questions.concat(segment1).concat(segment2), 
 module.exports = questions;
 `;
 
-const outputPath = '/Users/lijunpeng/Desktop/workbuddy_project/miniapp/data/study/topics/interview-cache.js';
+const outputPath = require('path').resolve(__dirname, '../../miniapp/data/study/topics/interview-cache.js');
 fs.writeFileSync(outputPath, fileContent, 'utf8');
 console.log('Successfully generated interview-cache.js with all 50 questions!');
 

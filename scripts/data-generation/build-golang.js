@@ -1295,6 +1295,6 @@ const questions = ${JSON.stringify(originalQuestions.concat(segment1).concat(seg
 module.exports = questions;
 `;
 
-const outputPath = '/Users/lijunpeng/Desktop/workbuddy_project/miniapp/data/study/topics/interview-golang.js';
+const outputPath = require('path').resolve(__dirname, '../../miniapp/data/study/topics/interview-golang.js');
 fs.writeFileSync(outputPath, fileContent, 'utf8');
 console.log('Successfully generated interview-golang.js with all 50 questions!');
