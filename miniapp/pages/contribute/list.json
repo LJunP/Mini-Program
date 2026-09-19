@@ -1,7 +1,0 @@
-{
-  "navigationBarTitleText": "我的投稿",
-  "usingComponents": {
-    "domain-tag": "/components/domain-tag/domain-tag",
-    "empty-state": "/components/empty-state/empty-state"
-  }
-}

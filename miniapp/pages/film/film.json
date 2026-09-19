@@ -1,8 +1,0 @@
-{
-  "navigationBarTitleText": "看戏",
-  "usingComponents": {
-    "content-card": "/components/content-card/content-card",
-    "empty-state": "/components/empty-state/empty-state"
-  },
-  "enablePullDownRefresh": true
-}

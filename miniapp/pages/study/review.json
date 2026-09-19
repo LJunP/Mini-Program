@@ -1,7 +1,0 @@
-{
-  "navigationBarTitleText": "今日复习",
-  "enablePullDownRefresh": false,
-  "usingComponents": {
-    "empty-state": "/components/empty-state/empty-state"
-  }
-}

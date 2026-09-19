@@ -1,9 +1,0 @@
-{
-  "navigationBarTitleText": "养生",
-  "enablePullDownRefresh": true,
-  "onReachBottomDistance": 100,
-  "usingComponents": {
-    "content-card": "/components/content-card/content-card",
-    "empty-state": "/components/empty-state/empty-state"
-  }
-}

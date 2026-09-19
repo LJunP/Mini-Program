@@ -1,25 +1,5 @@
-# macOS
 .DS_Store
-
-# Local environment and private IDE state
-.env
-.env.*
-!.env.example
-miniapp/project.private.config.json
-miniapp/utils/local-env.js
-
-# Dependencies, logs, and generated reports
 node_modules/
 *.log
-__pycache__/
-*.py[cod]
-coverage/
-dist/
-scripts/tmp_*.py
-
-# Local agent/runtime snapshots
-.workbuddy/
-
-# Generated release artifacts and reversible staging backups
-data/study_data.enc
-data/cdn_backup/
+miniapp/utils/local-env.js
+project.private.config.json

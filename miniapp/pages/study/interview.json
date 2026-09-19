@@ -1,7 +1,0 @@
-{
-  "navigationBarTitleText": "面试学习",
-  "enablePullDownRefresh": false,
-  "usingComponents": {
-    "empty-state": "/components/empty-state/empty-state"
-  }
-}
